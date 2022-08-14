@@ -1,8 +1,19 @@
-use bevy::{prelude::*, sprite::MaterialMesh2dBundle, input::{keyboard::KeyboardInput, ButtonState}};
+use bevy::{
+    input::{keyboard::KeyboardInput, ButtonState},
+    prelude::*,
+    sprite::MaterialMesh2dBundle,
+};
 use rand::seq::SliceRandom;
 
+
 mod consts;
-use consts::{Board, TetriminoType, TopRightCorner, TETRIMINO_TYPES};
+use consts::{KEYS, BOARD, TETRIMINO_TYPES};
+
+mod board;
+use board::{Board, SelectedTetrimino};
+
+mod piece;
+use piece::{Position};
 
 fn main() {
     App::new()
@@ -11,26 +22,12 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
         .add_system(selected_tetrimino_movement_system)
+        .add_system(tetrimino_gravity)
         .run();
 }
 
-#[derive(Component)]
-struct nothing {
-    iamnothing: bool,
-}
-
-#[derive(Component)]
-struct SelectedTetrimino {
-    tetrimino_type: TetriminoType,
-}
-
-// Bundles are like "templates", to make it easy to create entities with a common set of components.
-#[derive(Component)]
-struct BoardBundle;
-
 fn setup(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
@@ -38,70 +35,81 @@ fn setup(
 
     // https://stackoverflow.com/questions/48490049/how-do-i-choose-a-random-value-from-an-enum
     let starting_piece = TETRIMINO_TYPES.choose(&mut rand::thread_rng()).unwrap();
+    let board = Board {
+        active_piece: SelectedTetrimino {
+            tetrimino_type: starting_piece.clone(),
+            position: Position {
+                X: BOARD::TOP_RIGHT_CORNER.X - (BOARD::WIDTH / 2.0 * BOARD::TETRIOMINO_SIDE_LENGTH),
+                Y: BOARD::TOP_RIGHT_CORNER.Y,
+            },
+        },
+    };
 
+    // spawn the current piece available to move around
     commands
         .spawn()
-        .insert(SelectedTetrimino {
-            tetrimino_type: starting_piece.clone(),
-        })
+        .insert(board)
         .insert_bundle(MaterialMesh2dBundle {
             mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
-            // If you are overriding the camera transform / creating your own transform, you need to do this! The default transform (with Z=0.0) will place the camera so that your sprites (at positive +Z coordinates) would be behind the camera, and you wouldn't see them!
-            // https://bevy-cheatbook.github.io/pitfalls/2d-camera-z.html
             transform: Transform {
                 translation: Vec3 {
-                    x: TopRightCorner::X - (Board::WIDTH / 2.0 * Board::TETRIOMINO_SIDE_LENGTH),
-                    y: TopRightCorner::Y,
+                    x: board.active_piece.position.X,
+                    y: board.active_piece.position.Y,
                     z: 2.0,
                 },
                 rotation: Quat::default(),
-                scale: Vec3::splat(Board::TETRIOMINO_SIDE_LENGTH),
+                scale: Vec3::splat(BOARD::TETRIOMINO_SIDE_LENGTH),
             },
             material: materials.add(ColorMaterial::from(starting_piece.get_color())),
             ..default()
         });
 
-    // Spawn rectangles
-    for i in 1..=Board::WIDTH as u8 {
-        for j in 1..=Board::HEIGHT as u8 {
-            // let tetrimino_type = TETRIMINO_TYPES;
-            commands
-                .spawn_bundle(MaterialMesh2dBundle {
-                    mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
-                    // If you are overriding the camera transform / creating your own transform, you need to do this! The default transform (with Z=0.0) will place the camera so that your sprites (at positive +Z coordinates) would be behind the camera, and you wouldn't see them!
-                    // https://bevy-cheatbook.github.io/pitfalls/2d-camera-z.html
-                    transform: Transform {
-                        translation: Vec3 {
-                            x: (i as f32 * Board::TETRIOMINO_SIDE_LENGTH) - TopRightCorner::X,
-                            y: (j as f32 * Board::TETRIOMINO_SIDE_LENGTH) - TopRightCorner::Y,
-                            z: 1.0,
-                        },
-                        rotation: Quat::default(),
-                        scale: Vec3::splat(Board::TETRIOMINO_SIDE_LENGTH),
+    // Spawn rectangles that are "empty"
+    for i in 1..=BOARD::WIDTH as u8 {
+        for j in 1..=BOARD::HEIGHT as u8 {
+            commands.spawn_bundle(MaterialMesh2dBundle {
+                mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
+                transform: Transform {
+                    translation: Vec3 {
+                        x: (i as f32 * BOARD::TETRIOMINO_SIDE_LENGTH) - BOARD::TOP_RIGHT_CORNER.X,
+                        y: (j as f32 * BOARD::TETRIOMINO_SIDE_LENGTH) - BOARD::TOP_RIGHT_CORNER.Y,
+                        z: 1.0,
                     },
-                    material: materials.add(ColorMaterial::from(Color::GRAY)),
-                    ..default()
-                })
-                .insert(nothing { iamnothing: true });
+                    rotation: Quat::default(),
+                    scale: Vec3::splat(BOARD::TETRIOMINO_SIDE_LENGTH),
+                },
+                material: materials.add(ColorMaterial::from(Color::GRAY)),
+                ..default()
+            });
         }
     }
+}
+
+fn tetrimino_gravity(mut commands: Commands, query: Query<&Board>) {
+
 }
 
 // https://bevy-cheatbook.github.io/input/keyboard.html
 fn selected_tetrimino_movement_system(
     mut commands: Commands,
     mut key_evr: EventReader<KeyboardInput>,
-    mut query: Query<(&SelectedTetrimino)>,
+    mut query: Query<&mut Transform, With<Board>>,
 ) {
-    let mut selected_tetrimino_transform = query.single_mut();
-    for ev in key_evr.iter() {
-        match ev.state {
-            ButtonState::Pressed => {
-                println!("Key press: {:?} ({})", ev.key_code, ev.scan_code);
-            }
-            ButtonState::Released => {
-                println!("Key release: {:?} ({})", ev.key_code, ev.scan_code);
-            }
+    // https://bevy-cheatbook.github.io/features/transforms.html?highlight=transform#transform-components
+    let mut board = query.single_mut();
+    for ev in key_evr
+        .iter()
+        .filter(|key| key.state == ButtonState::Pressed)
+    {
+        match ev.key_code {
+            Some(KEYS::CLOCKWISE) => println!("clockwise key"),
+            Some(KEYS::COUNTER_CLOCKWISE) => println!("counter clockwise key"),
+            Some(KEYS::MOVE_LEFT) => board.translation.x -= 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH,
+            Some(KEYS::MOVE_RIGHT) => board.translation.x += 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH,
+            Some(KEYS::SOFTDROP) => board.translation.y -= 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH,
+            Some(KEYS::HARDDROP) => println!("harddrop key"),
+            Some(_) => println!("That key is not registered"),
+            None => println!("Somehow nothing was pressed in the keyboard pressed event ??"),
         }
     }
 }
