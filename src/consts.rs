@@ -2,10 +2,10 @@ use bevy::prelude::*;
 use crate::piece::Position;
 
 // change handling (measured in frames per movement)
-pub const ARR: f32 = 1.6;
-pub const DAS: f32 = 8.3;
-pub const DCD: f32 = 1.0;
-pub const SDF: f32 = std::f32::INFINITY;
+// pub const ARR: f32 = 1.6;
+// pub const DAS: f32 = 8.3;
+// pub const DCD: f32 = 1.0;
+// pub const SDF: f32 = std::f32::INFINITY;
 
 #[derive(PartialEq)]
 pub struct KEYS;
@@ -21,24 +21,31 @@ impl KEYS {
 
 pub struct BOARD;
 impl BOARD {
-    pub const HEIGHT: f32 = 20.0;
-    pub const WIDTH: f32 = 10.0;
+    pub const HEIGHT: f32 = 20.0; // 20 blocks high
+    pub const WIDTH: f32 = 10.0; // 10 blocks wide
     pub const TETRIOMINO_SIDE_LENGTH: f32 = 40.0; // 40 pixels per side (square)
-    pub const TOP_RIGHT_CORNER: Position = Position {
-        X: (BOARD::WIDTH / 2.0) * BOARD::TETRIOMINO_SIDE_LENGTH,
-        Y: (BOARD::HEIGHT / 2.0) * BOARD::TETRIOMINO_SIDE_LENGTH,
+    pub const TOP_RIGHT_CORNER: Position = Position { // top right corner of the board
+      x: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0,
+      y: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0,
+    };
+    pub const BOTTOM_LEFT_CORNER: Position = Position {
+      x: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0 * -1.0,
+      y: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0 * -1.0,
     };
 }
-
-struct Delta {
-    x: f32,
-    y: f32,
+#[derive(Copy, Clone)]
+pub struct Delta {
+    pub x: f32,
+    pub y: f32,
 }
+
+#[derive(Component, Copy, Clone)]
+pub struct ActivePiece;
 
 // https://stackoverflow.com/questions/31012923/what-is-the-difference-between-copy-and-clone
 // https://stackoverflow.com/a/31013047
 // By the way, every Copy type is also required to be Clone. However, they are not required to do the same thing! For your own types, .clone() can be an arbitrary method of your choice, whereas implicit copying will always trigger a memcpy, not the clone(&self) implementation.
-#[derive(Component, Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum TetriminoType {
     I,
     O,
@@ -80,27 +87,27 @@ impl TetriminoType {
         match *self {
             TetriminoType::I => [
                 Delta { x: -1.0, y: 1.0 },
-                Delta { x: -1.0, y: 0.0 },
-                Delta { x: 0.0, y: 0.0 },
-                Delta { x: 1.0, y: 0.0 },
-            ],
-            TetriminoType::O => [
-                Delta { x: 0.0, y: 1.0 },
-                Delta { x: 1.0, y: 1.0 },
-                Delta { x: -1.0, y: 0.0 },
-                Delta { x: 0.0, y: 0.0 },
-            ],
-            TetriminoType::T => [
-                Delta { x: 0.0, y: 1.0 },
-                Delta { x: -1.0, y: 0.0 },
-                Delta { x: 0.0, y: 0.0 },
-                Delta { x: 1.0, y: 0.0 },
-            ],
-            TetriminoType::S => [
-                Delta { x: -1.0, y: 1.0 },
                 Delta { x: 0.0, y: 1.0 },
                 Delta { x: 1.0, y: 1.0 },
                 Delta { x: 2.0, y: 1.0 },
+            ],
+            TetriminoType::O => [
+              Delta { x: 0.0, y: 1.0 },
+              Delta { x: 1.0, y: 1.0 },
+              Delta { x: 0.0, y: 0.0 },
+              Delta { x: 1.0, y: 0.0 },
+            ],
+            TetriminoType::T => [
+              Delta { x: 0.0, y: 1.0 },
+              Delta { x: -1.0, y: 0.0 },
+              Delta { x: 0.0, y: 0.0 },
+              Delta { x: 1.0, y: 0.0 },
+            ],
+            TetriminoType::S => [
+                Delta { x: 0.0, y: 1.0 },
+                Delta { x: 1.0, y: 1.0 },
+                Delta { x: -1.0, y: 0.0 },
+                Delta { x: 0.0, y: 0.0 },
             ],
             TetriminoType::Z => [
                 Delta { x: -1.0, y: 1.0 },
@@ -109,14 +116,14 @@ impl TetriminoType {
                 Delta { x: 1.0, y: 0.0 },
             ],
             TetriminoType::J => [
-                Delta { x: 1.0, y: 1.0 },
+                Delta { x: -1.0, y: 1.0 },
                 Delta { x: -1.0, y: 0.0 },
                 Delta { x: 0.0, y: 0.0 },
                 Delta { x: 1.0, y: 0.0 },
             ],
             TetriminoType::L => [
-                Delta { x: 0.0, y: 1.0 },
                 Delta { x: 1.0, y: 1.0 },
+                Delta { x: -1.0, y: 0.0 },
                 Delta { x: 0.0, y: 0.0 },
                 Delta { x: 1.0, y: 0.0 },
             ],
