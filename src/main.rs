@@ -9,7 +9,7 @@ mod consts;
 use consts::{ActivePiece, BOARD, KEYS, TETRIMINO_TYPES};
 
 mod board;
-use board::{Board, SelectedTetrimino};
+use board::Board;
 
 mod piece;
 
@@ -29,55 +29,43 @@ fn setup(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-  commands.spawn(Camera2dBundle::default());
+    commands.spawn(Camera2dBundle::default());
 
     // https://stackoverflow.com/questions/48490049/how-do-i-choose-a-random-value-from-an-enum
     let starting_piece = TETRIMINO_TYPES.choose(&mut rand::thread_rng()).unwrap();
     let board = Board {
-        active_piece: SelectedTetrimino {
-            tetrimino_type: starting_piece.clone(),
-        },
+        active_piece: starting_piece.clone(),
     };
 
-    
-    // let board_piece_x = BOARD::TOP_RIGHT_CORNER.x - (BOARD::WIDTH / 2.0 * BOARD::TETRIOMINO_SIDE_LENGTH);
-    // let board_piece_y = BOARD::TOP_RIGHT_CORNER.y - ( ( BOARD::HEIGHT - 2.0 ) * BOARD::TETRIOMINO_SIDE_LENGTH);
-    let board_piece_x  = 0.0 + BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0;
-    let board_piece_y  = 0.0 + BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0;
-    // let board_piece_x: f32 = 0.0;
-    // let board_piece_y: f32 = 0.0;
-
-    println!("x: {}, y: {}", board_piece_x, board_piece_y);
     // spawn the current piece available to move around
     commands
         .spawn((
             board.active_piece,
             ActivePiece,
+            // https://www.reddit.com/r/bevy/comments/xs792h/help_with_understanding_child_parent_relationships/
             SpatialBundle {
-                transform: Transform::from_xyz(board_piece_x, board_piece_y, 1.0),
+                transform: Transform::from_xyz(
+                    BOARD::TOP_RIGHT_CORNER.x,
+                    BOARD::TOP_RIGHT_CORNER.y,
+                    1.0,
+                ),
                 visibility: Visibility { is_visible: true },
                 ..default()
             },
         ))
         .with_children(|parent| {
             for delta in starting_piece.get_structure().iter() {
-                let x: f32 = board_piece_x - (BOARD::TETRIOMINO_SIDE_LENGTH * delta.x);
-                let y: f32 = board_piece_y - (BOARD::TETRIOMINO_SIDE_LENGTH * delta.y);
-                println!("{}, {}", x, y);
+                // position is relative to the parent
+                let x = BOARD::TETRIOMINO_SIDE_LENGTH * delta.x;
+                let y = BOARD::TETRIOMINO_SIDE_LENGTH * delta.y;
                 parent.spawn(MaterialMesh2dBundle {
                     mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
                     transform: Transform {
-                        translation: Vec3 {
-                            x: x,
-                            y: y,
-                            z: 1.0,
-                        },
+                        translation: Vec3 { x: x, y: y, z: 1.0 },
                         rotation: Quat::default(),
                         scale: Vec3::splat(BOARD::TETRIOMINO_SIDE_LENGTH),
                     },
-                    material: materials.add(ColorMaterial::from(
-                        board.active_piece.tetrimino_type.get_color(),
-                    )),
+                    material: materials.add(ColorMaterial::from(board.active_piece.get_color())),
                     visibility: Visibility { is_visible: true },
                     ..default()
                 });
@@ -85,8 +73,10 @@ fn setup(
         });
 
     // Spawn boxes that represent the board
-    for i in 1..=BOARD::WIDTH as u8 { // 1 to 10
-        for j in 1..=BOARD::HEIGHT as u8 { // 1 to 20
+    for i in 1..=BOARD::WIDTH as u8 {
+        // 1 to 10
+        for j in 1..=BOARD::HEIGHT as u8 {
+            // 1 to 20
             commands.spawn(MaterialMesh2dBundle {
                 mesh: meshes.add(Mesh::from(shape::Quad::default())).into(),
                 transform: Transform {
@@ -105,12 +95,12 @@ fn setup(
     }
 }
 
-// fn tetrimino_gravity(mut commands: Commands, query: Query<&SelectedTetrimino>) {}
+// fn tetrimino_gravity(mut commands: Commands, query: Query<&ActivePiece>) {}
 
 // https://bevy-cheatbook.github.io/input/keyboard.html
 fn selected_tetrimino_movement_system(
     mut key_evr: EventReader<KeyboardInput>,
-    mut query: Query<&mut Transform, With<SelectedTetrimino>>,
+    mut query: Query<&mut Transform, With<ActivePiece>>,
 ) {
     // https://bevy-cheatbook.github.io/features/transforms.html?highlight=transform#transform-components
     let mut selected_tetrimino = query.single_mut();
@@ -119,9 +109,12 @@ fn selected_tetrimino_movement_system(
         .filter(|key| key.state == ButtonState::Pressed)
     {
         match ev.key_code {
-            // Some(KEYS::CLOCKWISE) => selected_tetrimino.translation.y += 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH,
-            Some(KEYS::CLOCKWISE) => selected_tetrimino.rotation *= Quat::from_rotation_z(90.0_f32.to_radians()),
-            Some(KEYS::COUNTER_CLOCKWISE) => selected_tetrimino.rotation *= Quat::from_rotation_z(-90.0_f32.to_radians()),
+            Some(KEYS::CLOCKWISE) => {
+                selected_tetrimino.rotation *= Quat::from_rotation_z(-90.0_f32.to_radians())
+            }
+            Some(KEYS::COUNTER_CLOCKWISE) => {
+                selected_tetrimino.rotation *= Quat::from_rotation_z(90.0_f32.to_radians())
+            }
             Some(KEYS::MOVE_LEFT) => {
                 selected_tetrimino.translation.x -= 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH
             }

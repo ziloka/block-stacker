@@ -45,7 +45,7 @@ pub struct ActivePiece;
 // https://stackoverflow.com/questions/31012923/what-is-the-difference-between-copy-and-clone
 // https://stackoverflow.com/a/31013047
 // By the way, every Copy type is also required to be Clone. However, they are not required to do the same thing! For your own types, .clone() can be an arbitrary method of your choice, whereas implicit copying will always trigger a memcpy, not the clone(&self) implementation.
-#[derive(Copy, Clone, Debug)]
+#[derive(Component, Copy, Clone, Debug)]
 pub enum TetriminoType {
     I,
     O,
