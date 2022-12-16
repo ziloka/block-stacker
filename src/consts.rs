@@ -19,7 +19,11 @@ impl KEYS {
     pub const HARDDROP: KeyCode = KeyCode::Space;
 }
 
-pub struct BOARD;
+
+#[derive(Bundle, Copy, Clone)]
+pub struct BOARD {
+  pub active_piece: TetriminoType,
+}
 impl BOARD {
     pub const HEIGHT: f32 = 20.0; // 20 blocks high
     pub const WIDTH: f32 = 10.0; // 10 blocks wide
