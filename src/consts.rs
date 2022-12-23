@@ -64,11 +64,10 @@ pub enum TetriminoType {
     L,
 }
 
-pub const TETRIMINO_TYPES: [TetriminoType; 8] = [
+pub const TETRIMINO_TYPES: [TetriminoType; 7] = [
     TetriminoType::I,
     TetriminoType::O,
     TetriminoType::T,
-    TetriminoType::S,
     TetriminoType::Z,
     TetriminoType::S,
     TetriminoType::J,
