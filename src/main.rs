@@ -1,8 +1,9 @@
 use bevy::{
+    diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     input::{keyboard::KeyboardInput, ButtonState},
     prelude::*,
     sprite::MaterialMesh2dBundle,
-    window::PresentMode
+    window::PresentMode,
 };
 use rand::seq::SliceRandom;
 
@@ -16,15 +17,17 @@ fn main() {
         // change background color
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
-          window: WindowDescriptor {
-              title: "tetris".to_string(),
-              width: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
-              height: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
-              present_mode: PresentMode::AutoVsync,
-              ..default()
-          },
-          ..default()
-      }))
+            window: WindowDescriptor {
+                title: "tetris".to_string(),
+                width: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
+                height: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
+                present_mode: PresentMode::AutoVsync,
+                ..default()
+            },
+            ..default()
+        }))
+        .add_plugin(LogDiagnosticsPlugin::default())
+        .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_startup_system(setup)
         .add_system(selected_tetrimino_movement_system)
         // .add_system(tetrimino_gravity)
@@ -137,18 +140,25 @@ fn selected_tetrimino_movement_system(
                 selected_tetrimino.rotation *= Quat::from_rotation_z(90.0_f32.to_radians())
             }
             Some(KEYS::MOVE_LEFT) => {
-              if selected_tetrimino.translation.x - 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH >= BOARD::BOTTOM_LEFT_CORNER.x + BOARD::TETRIOMINO_SIDE_LENGTH {
-                selected_tetrimino.translation.x -= 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH;
-              }
+                if selected_tetrimino.translation.x - 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH
+                    >= BOARD::BOTTOM_LEFT_CORNER.x + BOARD::TETRIOMINO_SIDE_LENGTH
+                {
+                    selected_tetrimino.translation.x -= 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH;
+                }
             }
             Some(KEYS::MOVE_RIGHT) => {
-              if selected_tetrimino.translation.x + 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH <= BOARD::TOP_RIGHT_CORNER.x - BOARD::TETRIOMINO_SIDE_LENGTH {
-                selected_tetrimino.translation.x += 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH;
-              }
+                // println!("{}, top right corner: {:?}", selected_tetrimino.translation, BOARD::TOP_RIGHT_CORNER);
+                if selected_tetrimino.translation.x + 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH
+                    <= BOARD::TOP_RIGHT_CORNER.x + BOARD::TETRIOMINO_SIDE_LENGTH
+                {
+                    selected_tetrimino.translation.x += 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH;
+                }
             }
             Some(KEYS::SOFTDROP) => {
-                if selected_tetrimino.translation.y - 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH >= BOARD::BOTTOM_LEFT_CORNER.y + BOARD::TETRIOMINO_SIDE_LENGTH {
-                  selected_tetrimino.translation.y -= 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH;
+                if selected_tetrimino.translation.y - 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH
+                    >= BOARD::BOTTOM_LEFT_CORNER.y + BOARD::TETRIOMINO_SIDE_LENGTH
+                {
+                    selected_tetrimino.translation.y -= 1.0 * BOARD::TETRIOMINO_SIDE_LENGTH;
                 }
             }
             Some(KEYS::HARDDROP) => println!("harddrop key"),

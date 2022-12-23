@@ -7,6 +7,10 @@ use crate::piece::Position;
 // pub const DCD: f32 = 1.0;
 // pub const SDF: f32 = std::f32::INFINITY;
 
+//delay = 725 * .85 ^ level + level (ms)
+pub(crate) const TIMER_FALLING_SECS: f32 = 0.725;
+pub(crate) const TIMER_KEY_SECS: f32 = 0.100;
+
 #[derive(PartialEq)]
 pub struct KEYS;
 
