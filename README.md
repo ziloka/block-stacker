@@ -16,3 +16,9 @@ https://github.com/corbamico/bevy-tetris
 https://github.com/TanTanDev/flappy_bevy
 
 https://github.com/zigurous/unity-tetris-tutorial
+
+https://github.com/JohnnyTurbo/LD43
+
+# Wallkicks
+
+https://www.youtube.com/watch?v=yIpk5TJ_uaI

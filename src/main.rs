@@ -12,17 +12,33 @@ use board::Board;
 #[macroquad::main("Tetris")]
 async fn main() {
     let mut board = Board::new(
-        Position { x: 0.0, y: 0.0 },
+        Position { x: 200.0, y: 20.0 },
         Position {
-            x: 0.0 + WIDTH * BLOCK_SIZE,
-            y: 0.0 + HEIGHT * BLOCK_SIZE,
+            x: 200.0 + WIDTH * BLOCK_SIZE,
+            y: 20.0 + HEIGHT * BLOCK_SIZE,
         },
     );
+
     loop {
         // draw background & board
         clear_background(BLACK);
         // draw rectangle from top left corner
-        draw_rectangle(0.0, 0.0, WIDTH * BLOCK_SIZE, HEIGHT * BLOCK_SIZE, GRAY);
+        draw_rectangle(
+            board.left_top_corner.x,
+            board.left_top_corner.y,
+            WIDTH * BLOCK_SIZE,
+            HEIGHT * BLOCK_SIZE,
+            GRAY,
+        );
+
+        // draw fps
+        draw_text(
+            format!("fps: {}", get_fps()).as_str(),
+            10.0,
+            20.0,
+            20.0,
+            WHITE,
+        );
 
         // draw active piece
         board.draw_tetrimino();
@@ -42,28 +58,24 @@ fn handle_movement(board: &mut Board) {
                 || !is_key_pressed(KeyCode::Down))
                 && current_time.duration_since(board.time).unwrap().as_millis() > ARR as u128))
     {
-        if is_key_down(KeyCode::Left)
-            && !board.conflict(
-                board.active_piece.position.x - BLOCK_SIZE,
-                board.active_piece.position.y,
-            )
-        {
-            board.active_piece.position.x -= BLOCK_SIZE;
-        } else if is_key_down(KeyCode::Right)
-            && !board.conflict(
-                board.active_piece.position.x + BLOCK_SIZE,
-                board.active_piece.position.y,
-            )
-        {
-            board.active_piece.position.x += BLOCK_SIZE;
-        } else if is_key_down(KeyCode::Down)
-            && !board.conflict(
-                board.active_piece.position.x,
-                board.active_piece.position.y + BLOCK_SIZE,
-            )
-        {
-            board.active_piece.position.y += BLOCK_SIZE;
+        if is_key_down(KeyCode::Left) && !board.conflict(-BLOCK_SIZE, 0.0) {
+            for dot in board.active_piece.dots.iter_mut() {
+                dot.x -= BLOCK_SIZE;
+            }
+        } else if is_key_down(KeyCode::Right) && !board.conflict(BLOCK_SIZE, 0.0) {
+            for dot in board.active_piece.dots.iter_mut() {
+                dot.x += BLOCK_SIZE;
+            }
+        } else if is_key_down(KeyCode::Down) && !board.conflict(0.0, BLOCK_SIZE) {
+            for dot in board.active_piece.dots.iter_mut() {
+                dot.y += BLOCK_SIZE;
+            }
         }
         board.time = current_time;
+    }
+
+    if is_key_pressed(KeyCode::Up) {
+        board.rotate_tetrimino(true, true) // rotate clockwise
+    } else if is_key_pressed(KeyCode::Z) {
     }
 }
