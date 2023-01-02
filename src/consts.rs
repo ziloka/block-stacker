@@ -47,50 +47,50 @@ impl Tetrimino {
 
     // https://github.com/zigurous/unity-tetris-tutorial/blob/main/Assets/Scripts/Data.cs
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L48-L101
-    pub fn get_structure(&self) -> [Position; 4] {
+    pub fn get_structure(&self) -> [Vec2; 4] {
         match *self {
             Tetrimino::I => [
-                Position { x: 0.0, y: 0.0 },
-                Position { x: -1.0, y: 0.0 },
-                Position { x: 2.0, y: 0.0 },
-                Position { x: 1.0, y: 0.0 },
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(2.0, 0.0),
+                vec2(1.0, 0.0),
             ],
             // this isn't really suppose to be here, squares don't change during rotation..
             Tetrimino::O => [
-                Position { x: 0.0, y: 0.0 },
-                Position { x: 1.0, y: 1.0 },
-                Position { x: 0.0, y: 1.0 },
-                Position { x: 1.0, y: 0.0 },
+                vec2(0.0, 0.0),
+                vec2(1.0, 1.0),
+                vec2(0.0, 1.0),
+                vec2(1.0, 0.0),
             ],
             Tetrimino::T => [
-                Position { x: 0.0, y: 0.0 },
-                Position { x: -1.0, y: 0.0 },
-                Position { x: 0.0, y: 1.0 },
-                Position { x: 1.0, y: 0.0 },
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(0.0, 1.0),
+                vec2(1.0, 0.0),
             ],
             Tetrimino::S => [
-                Position { x: 0.0, y: 0.0 },
-                Position { x: -1.0, y: 0.0 },
-                Position { x: 1.0, y: 1.0 },
-                Position { x: 0.0, y: 1.0 },
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(1.0, 1.0),
+                vec2(0.0, 1.0),
             ],
             Tetrimino::Z => [
-                Position { x: 0.0, y: 0.0 },
-                Position { x: -1.0, y: 0.0 },
-                Position { x: -1.0, y: 1.0 },
-                Position { x: 1.0, y: 0.0 },
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(-1.0, 1.0),
+                vec2(1.0, 0.0),
             ],
             Tetrimino::J => [
-                Position { x: 0.0, y: 0.0 },
-                Position { x: -1.0, y: 0.0 },
-                Position { x: -1.0, y: 1.0 },
-                Position { x: 1.0, y: 0.0 },
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(-1.0, 1.0),
+                vec2(1.0, 0.0),
             ],
             Tetrimino::L => [
-                Position { x: 0.0, y: 0.0 },
-                Position { x: -1.0, y: 0.0 },
-                Position { x: 1.0, y: 1.0 },
-                Position { x: 1.0, y: 0.0 },
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(1.0, 1.0),
+                vec2(1.0, 0.0),
             ],
         }
     }
@@ -172,12 +172,6 @@ impl Offset {
         vec2(-1.0, -1.0),
         vec2(-1.0, 0.0),
     ]];
-}
-
-#[derive(Clone, Copy, Debug)]
-pub struct Position {
-    pub x: f32,
-    pub y: f32,
 }
 
 pub struct Piece {

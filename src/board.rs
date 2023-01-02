@@ -1,23 +1,22 @@
-use macroquad::prelude::{draw_rectangle, vec2};
-use rand::seq::SliceRandom;
-use std::time::SystemTime;
+use macroquad::{
+    prelude::{draw_rectangle, vec2, Vec2},
+    time::get_time,
+};
 
-use crate::consts::{Piece, Position, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
+use crate::consts::{Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
 
 pub struct Board {
-    pub left_top_corner: Position,
-    pub right_bottom_corner: Position,
-    pub time: SystemTime,
+    pub left_top_corner: Vec2,
+    pub right_bottom_corner: Vec2,
+    pub time: f64,
     pub active_piece: Piece,
     positions: [[u8; WIDTH as usize]; HEIGHT as usize],
 }
 
 impl Board {
-    pub fn new(left_top_corner: Position, right_bottom_corner: Position) -> Self {
-        let tetrimino_type = TETRIMINO_TYPES
-            .choose(&mut rand::thread_rng())
-            .unwrap()
-            .clone();
+    pub fn new(left_top_corner: Vec2, right_bottom_corner: Vec2) -> Self {
+        let tetrimino_type =
+            TETRIMINO_TYPES[macroquad::rand::gen_range::<usize>(0, TETRIMINO_TYPES.len())];
         Self {
             active_piece: Piece {
                 tetrimino: tetrimino_type,
@@ -37,28 +36,9 @@ impl Board {
             right_bottom_corner: right_bottom_corner,
             // https://stackoverflow.com/a/53930630
             positions: [[0; WIDTH as usize]; HEIGHT as usize],
-            time: SystemTime::now(),
+            time: get_time() * 1000.0,
         }
     }
-
-    // pub fn new_tetrimino(&mut self) {
-    //     let tetrimino_type = TETRIMINO_TYPES
-    //         .choose(&mut rand::thread_rng())
-    //         .unwrap()
-    //         .clone();
-    //     self.active_piece = Piece {
-    //         tetrimino: tetrimino_type,
-    //         dots: tetrimino_type
-    //             .get_structure()
-    //             .iter()
-    //             .map(|pos| Position {
-    //                 x: self.left_top_corner.x + pos.x * BLOCK_SIZE,
-    //                 y: self.left_top_corner.y + pos.y * BLOCK_SIZE,
-    //             })
-    //             .collect::<Vec<_>>(),
-    //         rotation: 0.0,
-    //     };
-    // }
 
     pub fn draw_tetrimino(&self) {
         // draw current block
@@ -68,11 +48,7 @@ impl Board {
                 position.y,
                 BLOCK_SIZE,
                 BLOCK_SIZE,
-                // DrawRectangleParams {
-                // offset: vec2(0.5, 0.5),
-                // rotation: self.active_piece.rotation_index,
                 self.active_piece.tetrimino.get_color(),
-                // },
             );
         });
     }
@@ -90,17 +66,14 @@ impl Board {
             } else {
                 [vec2(0.0, 1.0), vec2(-1.0, 0.0)]
             };
-            let new_x_pos = (rot_matrix[0].x * relative_pos.x) + (rot_matrix[1].x * relative_pos.y);
-            let new_y_pos = (rot_matrix[0].y * relative_pos.x) + (rot_matrix[1].y * relative_pos.y);
-            let new_pos = vec2(new_x_pos + origin.x, new_y_pos + origin.y);
-            *pos = new_pos;
+            *pos = vec2(
+                (rot_matrix[0].x * relative_pos.x) + (rot_matrix[1].x * relative_pos.y) + origin.x,
+                (rot_matrix[0].y * relative_pos.x) + (rot_matrix[1].y * relative_pos.y) + origin.y,
+            );
         }
-        if !should_offset {
-            return;
-        }
-        let can_offset =
-            self.offset_tetrimino(old_rotation_index, self.active_piece.rotation_index);
-        if !can_offset {
+        if should_offset
+            && !self.offset_tetrimino(old_rotation_index, self.active_piece.rotation_index)
+        {
             self.rotate_tetrimino(!clockwise, false)
         }
     }
@@ -109,7 +82,7 @@ impl Board {
         (x % m + m) % m
     }
 
-    // https://github.com/JohnnyTurbo/LD43/blob/master/Assets/Scripts/PieceController.cs#L297-L340
+    // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340
     fn offset_tetrimino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
         let offset_data = match self.active_piece.tetrimino {
             Tetrimino::O => crate::consts::Offset::O.to_vec(),
@@ -126,12 +99,7 @@ impl Board {
                 offset_value2.x - offset_value1.x,
                 offset_value2.y - offset_value1.y,
             );
-            if !self
-                .active_piece
-                .dots
-                .iter()
-                .any(|pos| self.conflict(pos.x + end_offset.x, pos.y + end_offset.y))
-            {
+            if !self.conflict(end_offset.x, end_offset.y) {
                 move_possible = true;
                 break;
             }
@@ -153,10 +121,7 @@ impl Board {
         self.active_piece
             .dots
             .iter()
-            .map(|pos| Position {
-                x: pos.x + x_offset,
-                y: pos.y + y_offset,
-            })
+            .map(|pos| vec2(pos.x + x_offset, pos.y + y_offset))
             .any(|e| {
                 e.x <= self.left_top_corner.x // for the left side
              || e.x >= self.right_bottom_corner.x // for the right side
