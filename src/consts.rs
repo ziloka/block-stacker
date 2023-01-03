@@ -21,7 +21,7 @@ pub const TETRIMINO_TYPES: [Tetrimino; 7] = [
     Tetrimino::Z,
 ];
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Debug)]
 pub enum Tetrimino {
     I,
     J,
@@ -174,6 +174,7 @@ impl Offset {
     ]];
 }
 
+#[derive(Debug)]
 pub struct Piece {
     pub tetrimino: Tetrimino,
     pub dots: Vec<Vec2>, // each number is the tile index

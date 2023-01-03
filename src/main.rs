@@ -14,7 +14,6 @@ use board::Board;
 
 #[macroquad::main("Tetris")]
 async fn main() {
-
     // make randomly generated numbers pseudo random (based off of the current time which always changes)
     // https://github.com/not-fl3/macroquad/issues/369
     // https://github.com/not-fl3/macroquad/issues/519
@@ -46,6 +45,8 @@ async fn main() {
             WHITE,
         );
 
+        board.draw_board_tetriminos();
+
         // draw active piece
         board.draw_tetrimino();
 
@@ -56,7 +57,7 @@ async fn main() {
 
 fn handle_movement(board: &mut Board) {
     let current_time = macroquad::time::get_time() * 1000.0; // time in miliseconds since the start of the program
-                                                             // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml/?utm_source=share&utm_medium=web2x&context=3
+    // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml/?utm_source=share&utm_medium=web2x&context=3
     if (is_key_down(KeyCode::Left) || is_key_down(KeyCode::Right) || is_key_down(KeyCode::Down))
         && (current_time - board.time > DAS as f64
             || ((!is_key_pressed(KeyCode::Left)
@@ -64,15 +65,15 @@ fn handle_movement(board: &mut Board) {
                 || !is_key_pressed(KeyCode::Down))
                 && current_time - board.time > ARR as f64))
     {
-        if is_key_down(KeyCode::Left) && !board.conflict(-BLOCK_SIZE, 0.0) {
+        if is_key_down(KeyCode::Left) && !board.conflict(vec2(-BLOCK_SIZE, 0.0)) {
             for dot in board.active_piece.dots.iter_mut() {
                 dot.x -= BLOCK_SIZE;
             }
-        } else if is_key_down(KeyCode::Right) && !board.conflict(BLOCK_SIZE, 0.0) {
+        } else if is_key_down(KeyCode::Right) && !board.conflict(vec2(BLOCK_SIZE, 0.0)) {
             for dot in board.active_piece.dots.iter_mut() {
                 dot.x += BLOCK_SIZE;
             }
-        } else if is_key_down(KeyCode::Down) && !board.conflict(0.0, BLOCK_SIZE) {
+        } else if is_key_down(KeyCode::Down) && !board.conflict(vec2(0.0, BLOCK_SIZE)) {
             for dot in board.active_piece.dots.iter_mut() {
                 dot.y += BLOCK_SIZE;
             }
@@ -85,5 +86,17 @@ fn handle_movement(board: &mut Board) {
         board.rotate_tetrimino(true, true) // rotate clockwise
     } else if is_key_pressed(KeyCode::Z) {
         board.rotate_tetrimino(false, true) // rotate clockwise
+    } else if is_key_pressed(KeyCode::Space) { // the hard drop
+        let mut y_offset = 0;
+        for y in (0..HEIGHT as i32).rev() {
+          if !board.conflict(vec2(0.0, (y * BLOCK_SIZE as i32) as f32)) {
+            y_offset = y * BLOCK_SIZE as i32;
+            break;
+          }
+        }
+        for dot in board.active_piece.dots.iter_mut() {
+            dot.y += y_offset as f32;
+        }
+        board.set_active_tetrimino_position();
     }
 }
