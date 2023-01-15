@@ -1,7 +1,7 @@
 use std::ops::{Add, Sub};
 
 use macroquad::{
-    prelude::{draw_rectangle, vec2, Vec2, Color, GRAY},
+    prelude::{draw_rectangle, vec2, Color, Vec2},
     time::get_time,
 };
 
@@ -12,13 +12,13 @@ pub struct Board {
     pub right_bottom_corner: Vec2,
     pub time: f64,
     pub active_piece: Piece,
-    positions: [[Color; WIDTH as usize]; HEIGHT as usize],
+    positions: [[Option<Color>; WIDTH as usize]; HEIGHT as usize],
 }
 
 impl Board {
     pub fn new(left_top_corner: Vec2, right_bottom_corner: Vec2) -> Self {
-      const CELL_INIT: Color = GRAY;
-      const ROW_INIT: [Color; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
+        const CELL_INIT: Option<Color> = None;
+        const ROW_INIT: [Option<Color>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
         let tetrimino_type =
             TETRIMINO_TYPES[macroquad::rand::gen_range::<usize>(0, TETRIMINO_TYPES.len())];
         Self {
@@ -32,7 +32,8 @@ impl Board {
                             left_top_corner.x + (WIDTH / 2.0 * BLOCK_SIZE) + pos.x * BLOCK_SIZE,
                             left_top_corner.y + pos.y * BLOCK_SIZE,
                         )
-                    }).collect(),
+                    })
+                    .collect(),
                 rotation_index: 0,
             },
             left_top_corner: left_top_corner,
@@ -63,45 +64,62 @@ impl Board {
     }
 
     pub fn draw_tetrimino(&self) {
-      // draw current block
-      self.active_piece.dots.iter().for_each(|position| {
-          draw_rectangle(
-              position.x,
-              position.y,
-              BLOCK_SIZE,
-              BLOCK_SIZE,
-              self.active_piece.tetrimino.get_color(),
-          );
-      });
-  }
+        // draw current block
+        self.active_piece.dots.iter().for_each(|position| {
+            draw_rectangle(
+                position.x,
+                position.y,
+                BLOCK_SIZE,
+                BLOCK_SIZE,
+                self.active_piece.tetrimino.get_color(),
+            );
+        });
+    }
 
-  pub fn draw_board_tetriminos(&self) {
-      // draw all the blocks that are already on the board
-      for (y, row) in self.positions.iter().enumerate() {
-          for (x, color) in row.iter().enumerate() {
-              if *color != GRAY {
-                  draw_rectangle(
-                      self.left_top_corner.x + x as f32 * BLOCK_SIZE,
-                      self.left_top_corner.y + y as f32 * BLOCK_SIZE,
-                      BLOCK_SIZE,
-                      BLOCK_SIZE,
-                      *color,
-                  );
-              }
-          }
-      }
-  }
+    pub fn draw_board_tetriminos(&self) {
+        // draw all the blocks that are already on the board
+        for (y, row) in self.positions.iter().enumerate() {
+            for (x, color) in row.iter().enumerate() {
+                if let Some(color) = color {
+                    draw_rectangle(
+                        self.left_top_corner.x + x as f32 * BLOCK_SIZE,
+                        self.left_top_corner.y + y as f32 * BLOCK_SIZE,
+                        BLOCK_SIZE,
+                        BLOCK_SIZE,
+                        *color,
+                    );
+                }
+            }
+        }
+    }
+
+    pub fn get_relative_position_on_board(&self, absolute_position: Vec2) -> (usize, usize) {
+        let relative_position = self
+            .left_top_corner
+            .abs()
+            .sub(absolute_position.abs())
+            .abs();
+        // use one off technique, because the last row is suppose to be a new column
+        (
+            ((relative_position.y - 1.0) / BLOCK_SIZE).floor() as usize,
+            ((relative_position.x - 1.0) / BLOCK_SIZE).floor() as usize,
+        )
+    }
 
     // and x and y position are based off of the top left corner of the piece
     pub fn conflict(&self, relative_offset: Vec2) -> bool {
         self.active_piece
             .dots
             .iter()
-            .map(|pos| pos.add(relative_offset))
-            .any(|e| {
-                e.x < self.left_top_corner.x // for the left side
-               || e.x >= self.right_bottom_corner.x // for the right side
-               || e.y >= self.right_bottom_corner.y // for the floor (bottom)
+            .map(|relative_position| relative_position.add(relative_offset))
+            .any(|absolute| {
+                let (row, column) = self.get_relative_position_on_board(absolute);
+                (
+                    absolute.x < self.left_top_corner.x // for the left side
+               || absolute.x >=self.right_bottom_corner.x // for the right side
+               || absolute.y >= self.right_bottom_corner.y
+                    // for the floor (bottom)
+                ) || self.positions[row][column].is_some()
             })
     }
 
@@ -165,10 +183,10 @@ impl Board {
     }
 
     pub fn set_active_tetrimino_position(&mut self) {
-        for pos in &self.active_piece.dots {
-            let x = (pos.x - self.left_top_corner.x) / BLOCK_SIZE;
-            let y = (pos.y - self.left_top_corner.y) / BLOCK_SIZE;
-            self.positions[y as usize][x as usize] =self.active_piece.tetrimino.get_color();
+        for absolute_position in &self.active_piece.dots {
+            let (row, column) = self.get_relative_position_on_board(*absolute_position);
+            self.positions[row as usize][column as usize] =
+                Some(self.active_piece.tetrimino.get_color());
         }
         self.new_tetrimino();
     }

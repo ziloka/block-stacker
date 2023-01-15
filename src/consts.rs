@@ -177,6 +177,6 @@ impl Offset {
 #[derive(Debug)]
 pub struct Piece {
     pub tetrimino: Tetrimino,
-    pub dots: Vec<Vec2>, // each number is the tile index
+    pub dots: Vec<Vec2>,
     pub rotation_index: i8,
 }
