@@ -1,17 +1,20 @@
 use std::ops::{Add, Sub};
 
 use macroquad::{
-    prelude::{draw_rectangle, is_key_down, is_key_pressed, vec2, Color, KeyCode, Vec2, GRAY},
+    prelude::{draw_rectangle, is_key_down, is_key_pressed, vec2, Color, Vec2, GRAY},
     time::get_time,
 };
 
-use crate::consts::{Piece, Tetrimino, ARR, BLOCK_SIZE, DAS, HEIGHT, TETRIMINO_TYPES, WIDTH};
+use crate::consts::{Piece, Tetrimino, GameState, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
+use crate::settings::Settings;
 
 pub struct Board {
     pub left_top_corner: Vec2,
     pub right_bottom_corner: Vec2,
     pub time: f64,
     pub active_piece: Piece,
+    pub game_state: GameState,
+    pub settings: Settings,
     positions: [[Option<Color>; WIDTH as usize]; HEIGHT as usize],
 }
 
@@ -22,6 +25,9 @@ impl Board {
         let tetrimino_type =
             TETRIMINO_TYPES[macroquad::rand::gen_range::<usize>(0, TETRIMINO_TYPES.len())];
         Self {
+            left_top_corner: left_top_corner,
+            right_bottom_corner: right_bottom_corner,
+            time: get_time() * 1000.0,
             active_piece: Piece {
                 tetrimino: tetrimino_type,
                 dots: tetrimino_type
@@ -36,33 +42,32 @@ impl Board {
                     .collect(),
                 rotation_index: 0,
             },
-            left_top_corner: left_top_corner,
-            right_bottom_corner: right_bottom_corner,
+            game_state: GameState::Playing,
+            settings: Settings::default(),
             // https://stackoverflow.com/a/53930630
             positions: [ROW_INIT; HEIGHT as usize],
-            time: get_time() * 1000.0,
         }
     }
 
     pub fn handle_movement(&mut self) {
         let current_time = macroquad::time::get_time() * 1000.0; // time in miliseconds since the start of the program
                                                                  // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml/?utm_source=share&utm_medium=web2x&context=3
-        if (is_key_down(KeyCode::Left) || is_key_down(KeyCode::Right) || is_key_down(KeyCode::Down))
-            && (current_time - self.time > DAS as f64
-                || ((!is_key_pressed(KeyCode::Left)
-                    || !is_key_pressed(KeyCode::Right)
-                    || !is_key_pressed(KeyCode::Down))
-                    && current_time - self.time > ARR as f64))
+        if (is_key_down(self.settings.controls.left) || is_key_down(self.settings.controls.right) || is_key_down(self.settings.controls.soft_drop))
+            && (current_time - self.time > self.settings.handles.das as f64
+                || ((!is_key_pressed(self.settings.controls.left)
+                    || !is_key_pressed(self.settings.controls.right)
+                    || !is_key_pressed(self.settings.controls.soft_drop))
+                    && current_time - self.time > self.settings.handles.arr as f64))
         {
-            if is_key_down(KeyCode::Left) && !self.conflict(vec2(-BLOCK_SIZE, 0.0)) {
+            if is_key_down(self.settings.controls.left) && !self.conflict(vec2(-BLOCK_SIZE, 0.0)) {
                 for dot in self.active_piece.dots.iter_mut() {
                     dot.x -= BLOCK_SIZE;
                 }
-            } else if is_key_down(KeyCode::Right) && !self.conflict(vec2(BLOCK_SIZE, 0.0)) {
+            } else if is_key_down(self.settings.controls.right) && !self.conflict(vec2(BLOCK_SIZE, 0.0)) {
                 for dot in self.active_piece.dots.iter_mut() {
                     dot.x += BLOCK_SIZE;
                 }
-            } else if is_key_down(KeyCode::Down) && !self.conflict(vec2(0.0, BLOCK_SIZE)) {
+            } else if is_key_down(self.settings.controls.soft_drop) && !self.conflict(vec2(0.0, BLOCK_SIZE)) {
                 for dot in self.active_piece.dots.iter_mut() {
                     dot.y += BLOCK_SIZE;
                 }
@@ -71,11 +76,11 @@ impl Board {
         }
 
         // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L140-L147
-        if is_key_pressed(KeyCode::Up) {
+        if is_key_pressed(self.settings.controls.rotate_clockwise) {
             self.rotate_tetrimino(true, true); // rotate clockwise
-        } else if is_key_pressed(KeyCode::Z) {
+        } else if is_key_pressed(self.settings.controls.rotate_counterclockwise) {
             self.rotate_tetrimino(false, true); // rotate clockwise
-        } else if is_key_pressed(KeyCode::Space) {
+        } else if is_key_pressed(self.settings.controls.hard_drop) {
             // the hard drop
             let mut y_offset = 0.0;
             for y in 0..HEIGHT as i32 {
@@ -125,7 +130,7 @@ impl Board {
         });
     }
 
-    pub fn draw_board_tetriminos(&self) {
+    pub fn draw_tetriminos(&self) {
         draw_rectangle(
             self.left_top_corner.x,
             self.left_top_corner.y,

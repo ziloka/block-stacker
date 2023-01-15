@@ -6,10 +6,6 @@ use macroquad::{
 pub const HEIGHT: f32 = 20.0;
 pub const WIDTH: f32 = 10.0;
 pub const BLOCK_SIZE: f32 = 30.0;
-// https://www.reddit.com/r/Tetris/comments/frbii6/jstris_das_arr_in_tetrio/
-// https://tetris.wiki/DAS
-pub const DAS: f32 = 133.0; // Delayed Auto Shift in miliseconds
-pub const ARR: f32 = 10.0; // Auto Repeat Rate in miliseconds
 
 pub const TETRIMINO_TYPES: [Tetrimino; 7] = [
     Tetrimino::I,
@@ -179,4 +175,11 @@ pub struct Piece {
     pub tetrimino: Tetrimino,
     pub dots: Vec<Vec2>,
     pub rotation_index: i8,
+}
+
+pub enum GameState {
+    Playing,
+    GameOver,
+    Paused,
+    OpenSettings
 }
