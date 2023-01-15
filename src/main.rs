@@ -98,4 +98,7 @@ fn handle_movement(board: &mut Board) {
         }
         board.set_active_tetrimino_position();
     }
+
+    // handle line clears
+    board.clear_lines();
 }

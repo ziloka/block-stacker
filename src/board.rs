@@ -113,7 +113,7 @@ impl Board {
             .any(|absolute| {
                 let (row, column) = self.get_relative_position_on_board(absolute);
                 (
-                    absolute.x < self.left_top_corner.x // for the left side
+                  absolute.x < self.left_top_corner.x // for the left side
                || absolute.x >=self.right_bottom_corner.x // for the right side
                || absolute.y >= self.right_bottom_corner.y
                     // for the floor (bottom)
@@ -187,4 +187,28 @@ impl Board {
         }
         self.new_tetrimino();
     }
+
+    pub fn clear_lines(& mut self) {
+      let mut index = HEIGHT - 1.0;
+      while index >= 0.0 {
+        let row = self.positions[index as usize];
+        if row.iter().all(|x| x.is_some()) {
+          self.clear_line(index as usize);
+        } else {
+          index -= 1.0;
+        }
+      }
+    } 
+
+    fn clear_line(&mut self, row_index: usize) {
+        for y in (1..row_index + 1).rev() {
+            for x in 0..self.positions[y].len() {
+                self.positions[y][x] = self.positions[y - 1][x];
+            }
+        }
+        for x in 0..self.positions[0].len() {
+            self.positions[0][x] = None;
+        }
+    }
+
 }
