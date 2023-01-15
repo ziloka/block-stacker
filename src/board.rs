@@ -1,11 +1,11 @@
 use std::ops::{Add, Sub};
 
 use macroquad::{
-    prelude::{draw_rectangle, vec2, Color, Vec2},
+    prelude::{draw_rectangle, is_key_down, is_key_pressed, vec2, Color, KeyCode, Vec2, GRAY},
     time::get_time,
 };
 
-use crate::consts::{Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
+use crate::consts::{Piece, Tetrimino, ARR, BLOCK_SIZE, DAS, HEIGHT, TETRIMINO_TYPES, WIDTH};
 
 pub struct Board {
     pub left_top_corner: Vec2,
@@ -44,6 +44,55 @@ impl Board {
         }
     }
 
+    pub fn handle_movement(&mut self) {
+        let current_time = macroquad::time::get_time() * 1000.0; // time in miliseconds since the start of the program
+                                                                 // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml/?utm_source=share&utm_medium=web2x&context=3
+        if (is_key_down(KeyCode::Left) || is_key_down(KeyCode::Right) || is_key_down(KeyCode::Down))
+            && (current_time - self.time > DAS as f64
+                || ((!is_key_pressed(KeyCode::Left)
+                    || !is_key_pressed(KeyCode::Right)
+                    || !is_key_pressed(KeyCode::Down))
+                    && current_time - self.time > ARR as f64))
+        {
+            if is_key_down(KeyCode::Left) && !self.conflict(vec2(-BLOCK_SIZE, 0.0)) {
+                for dot in self.active_piece.dots.iter_mut() {
+                    dot.x -= BLOCK_SIZE;
+                }
+            } else if is_key_down(KeyCode::Right) && !self.conflict(vec2(BLOCK_SIZE, 0.0)) {
+                for dot in self.active_piece.dots.iter_mut() {
+                    dot.x += BLOCK_SIZE;
+                }
+            } else if is_key_down(KeyCode::Down) && !self.conflict(vec2(0.0, BLOCK_SIZE)) {
+                for dot in self.active_piece.dots.iter_mut() {
+                    dot.y += BLOCK_SIZE;
+                }
+            }
+            self.time = current_time;
+        }
+
+        // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L140-L147
+        if is_key_pressed(KeyCode::Up) {
+            self.rotate_tetrimino(true, true); // rotate clockwise
+        } else if is_key_pressed(KeyCode::Z) {
+            self.rotate_tetrimino(false, true); // rotate clockwise
+        } else if is_key_pressed(KeyCode::Space) {
+            // the hard drop
+            let mut y_offset = 0.0;
+            for y in 0..HEIGHT as i32 {
+                if !self.conflict(vec2(0.0, (y as f32) * BLOCK_SIZE)) {
+                    y_offset = (y as f32) * BLOCK_SIZE as f32;
+                }
+            }
+            for dot in self.active_piece.dots.iter_mut() {
+                dot.y += y_offset;
+            }
+            self.set_active_tetrimino_position();
+        }
+
+        // handle line clears
+        self.clear_lines();
+    }
+
     fn new_tetrimino(&mut self) {
         let tetrimino_type =
             TETRIMINO_TYPES[macroquad::rand::gen_range::<usize>(0, TETRIMINO_TYPES.len())];
@@ -63,7 +112,7 @@ impl Board {
         };
     }
 
-    pub fn draw_tetrimino(&self) {
+    pub fn draw_current_tetrimino(&self) {
         // draw current block
         self.active_piece.dots.iter().for_each(|position| {
             draw_rectangle(
@@ -77,6 +126,14 @@ impl Board {
     }
 
     pub fn draw_board_tetriminos(&self) {
+        draw_rectangle(
+            self.left_top_corner.x,
+            self.left_top_corner.y,
+            WIDTH * BLOCK_SIZE,
+            HEIGHT * BLOCK_SIZE,
+            GRAY,
+        );
+
         // draw all the blocks that are already on the board
         for (y, row) in self.positions.iter().enumerate() {
             for (x, color) in row.iter().enumerate() {
@@ -113,7 +170,7 @@ impl Board {
             .any(|absolute| {
                 let (row, column) = self.get_relative_position_on_board(absolute);
                 (
-                  absolute.x < self.left_top_corner.x // for the left side
+                    absolute.x < self.left_top_corner.x // for the left side
                || absolute.x >=self.right_bottom_corner.x // for the right side
                || absolute.y >= self.right_bottom_corner.y
                     // for the floor (bottom)
@@ -188,17 +245,17 @@ impl Board {
         self.new_tetrimino();
     }
 
-    pub fn clear_lines(& mut self) {
-      let mut index = HEIGHT - 1.0;
-      while index >= 0.0 {
-        let row = self.positions[index as usize];
-        if row.iter().all(|x| x.is_some()) {
-          self.clear_line(index as usize);
-        } else {
-          index -= 1.0;
+    pub fn clear_lines(&mut self) {
+        let mut index = HEIGHT - 1.0;
+        while index >= 0.0 {
+            let row = self.positions[index as usize];
+            if row.iter().all(|x| x.is_some()) {
+                self.clear_line(index as usize);
+            } else {
+                index -= 1.0;
+            }
         }
-      }
-    } 
+    }
 
     fn clear_line(&mut self, row_index: usize) {
         for y in (1..row_index + 1).rev() {
@@ -210,5 +267,4 @@ impl Board {
             self.positions[0][x] = None;
         }
     }
-
 }
