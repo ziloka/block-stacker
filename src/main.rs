@@ -83,9 +83,9 @@ fn handle_movement(board: &mut Board) {
 
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L140-L147
     if is_key_pressed(KeyCode::Up) {
-        board.rotate_tetrimino(true, true) // rotate clockwise
+        board.rotate_tetrimino(true, true); // rotate clockwise
     } else if is_key_pressed(KeyCode::Z) {
-        board.rotate_tetrimino(false, true) // rotate clockwise
+        board.rotate_tetrimino(false, true); // rotate clockwise
     } else if is_key_pressed(KeyCode::Space) { // the hard drop
         let mut y_offset = 0;
         for y in (0..HEIGHT as i32).rev() {

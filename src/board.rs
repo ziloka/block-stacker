@@ -99,7 +99,7 @@ impl Board {
             .iter()
             .map(|pos| pos.add(relative_offset))
             .any(|e| {
-                e.x <= self.left_top_corner.x // for the left side
+                e.x < self.left_top_corner.x // for the left side
                || e.x >= self.right_bottom_corner.x // for the right side
                || e.y >= self.right_bottom_corner.y // for the floor (bottom)
             })
