@@ -87,15 +87,14 @@ fn handle_movement(board: &mut Board) {
     } else if is_key_pressed(KeyCode::Z) {
         board.rotate_tetrimino(false, true); // rotate clockwise
     } else if is_key_pressed(KeyCode::Space) { // the hard drop
-        let mut y_offset = 0;
-        for y in (0..HEIGHT as i32).rev() {
-          if !board.conflict(vec2(0.0, (y * BLOCK_SIZE as i32) as f32)) {
-            y_offset = y * BLOCK_SIZE as i32;
-            break;
+        let mut y_offset = 0.0;
+        for y in 0..HEIGHT as i32 {
+          if !board.conflict(vec2(0.0, (y as f32) * BLOCK_SIZE )) {
+            y_offset = (y as f32) * BLOCK_SIZE as f32;
           }
         }
         for dot in board.active_piece.dots.iter_mut() {
-            dot.y += y_offset as f32;
+            dot.y += y_offset;
         }
         board.set_active_tetrimino_position();
     }

@@ -99,11 +99,9 @@ impl Board {
             .abs()
             .sub(absolute_position.abs())
             .abs();
-        // use one off technique, because the last row is suppose to be a new column
-        (
-            ((relative_position.y - 1.0) / BLOCK_SIZE).floor() as usize,
-            ((relative_position.x - 1.0) / BLOCK_SIZE).floor() as usize,
-        )
+        let row = (relative_position.y / BLOCK_SIZE) as usize;
+        let column = (relative_position.x / BLOCK_SIZE) as usize;
+        (row, column)
     }
 
     // and x and y position are based off of the top left corner of the piece
@@ -173,7 +171,6 @@ impl Board {
         }
 
         if move_possible {
-            // move the piece
             for pos in self.active_piece.dots.iter_mut() {
                 *pos = pos.add(end_offset);
             }
