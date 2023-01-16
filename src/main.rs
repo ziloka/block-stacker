@@ -38,7 +38,7 @@ async fn main() {
                 );
                 board.draw_tetriminos();
                 board.draw_current_tetrimino();
-                  board.handle_movement();
+                board.handle_movement();
             }
             GameState::Paused => {
                 todo!();
@@ -57,11 +57,11 @@ fn handle_keyboard_input(board: &mut Board) {
     if macroquad::input::is_key_pressed(macroquad::input::KeyCode::Escape) {
         match board.game_state {
             GameState::Playing => {
-              board.game_state = GameState::OpenSettings;
-            },
+                board.game_state = GameState::OpenSettings;
+            }
             GameState::OpenSettings => {
-              board.game_state = GameState::Playing;
-            },
+                board.game_state = GameState::Playing;
+            }
             _ => panic!("Not implemented yet"),
         }
     }
