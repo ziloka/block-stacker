@@ -227,7 +227,7 @@ dependencies = [
 [[package]]
 name = "egui-macroquad"
 version = "0.12.0"
-source = "git+https://github.com/matthiascy/egui-macroquad#069cbffb86c88b8bcf886fbf8eedbb4198a9fdc8"
+source = "git+https://github.com/ziloka/egui-macroquad?rev=069cbffb86c88b8bcf886fbf8eedbb4198a9fdc8#069cbffb86c88b8bcf886fbf8eedbb4198a9fdc8"
 dependencies = [
  "egui",
  "egui-miniquad",

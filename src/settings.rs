@@ -4,16 +4,15 @@ use macroquad::prelude::KeyCode;
 
 type Binding = Option<(KeyOrPointer, Modifiers)>;
 
+pub struct KeyInfo {
+    pub key: KeyCode,
+    binding: Binding,
+}
+
 // https://tetris.wiki/DAS
 pub struct Settings {
     pub handles: Handles,
     pub controls: Controls,
-    left: Binding,
-    right: Binding,
-    soft_drop: Binding,
-    hard_drop: Binding,
-    rotate_clockwise: Binding,
-    rotate_counterclockwise: Binding,
 }
 
 pub struct Handles {
@@ -22,12 +21,12 @@ pub struct Handles {
 }
 
 pub struct Controls {
-    pub left: KeyCode,
-    pub right: KeyCode,
-    pub soft_drop: KeyCode,
-    pub hard_drop: KeyCode,
-    pub rotate_clockwise: KeyCode,
-    pub rotate_counterclockwise: KeyCode,
+    pub left: KeyInfo,
+    pub right: KeyInfo,
+    pub soft_drop: KeyInfo,
+    pub hard_drop: KeyInfo,
+    pub rotate_clockwise: KeyInfo,
+    pub rotate_counterclockwise: KeyInfo,
 }
 
 impl Default for Settings {
@@ -39,19 +38,31 @@ impl Default for Settings {
                 arr: 10.0,
             },
             controls: Controls {
-                left: KeyCode::Left,
-                right: KeyCode::Right,
-                soft_drop: KeyCode::Down,
-                hard_drop: KeyCode::Space,
-                rotate_clockwise: KeyCode::Up,
-                rotate_counterclockwise: KeyCode::Z,
+                left: KeyInfo {
+                    key: KeyCode::Left,
+                    binding: None,
+                },
+                right: KeyInfo {
+                    key: KeyCode::Right,
+                    binding: None,
+                },
+                soft_drop: KeyInfo {
+                    key: KeyCode::Down,
+                    binding: None,
+                },
+                hard_drop: KeyInfo {
+                    key: KeyCode::Space,
+                    binding: None,
+                },
+                rotate_clockwise: KeyInfo {
+                    key: KeyCode::Up,
+                    binding: None,
+                },
+                rotate_counterclockwise: KeyInfo {
+                    key: KeyCode::Z,
+                    binding: None,
+                },
             },
-            left: None,
-            right: None,
-            soft_drop: None,
-            hard_drop: None,
-            rotate_clockwise: None,
-            rotate_counterclockwise: None,
         }
     }
 }
@@ -69,79 +80,81 @@ impl Settings {
                 ui.separator();
 
                 ui.label("Left");
-                // let r = ui.checkbox(&mut self.left_text.check, "Left:");
-                if ui.add(Bind::new("_left", &mut self.left)).changed() {
-                    match self.left {
-                        Some((KeyOrPointer::Key(key), _)) => {
-                            self.controls.left = egui_key_to_macroquad_keycode(key);
-                        }
-                        _ => {}
-                    }
+
+                if ui
+                    .add(Bind::new("_left", &mut self.controls.left.binding))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.left;
+                    self.set_keybinding(&binding, &mut key);
                 }
                 ui.label("Right");
-                if ui.add(Bind::new("_right", &mut self.right)).changed() {
-                  match self.right {
-                    Some((KeyOrPointer::Key(key), _)) => {
-                        self.controls.right = egui_key_to_macroquad_keycode(key);
-                    }
-                    _ => {}
-                  }
+                if ui
+                    .add(Bind::new("_right", &mut self.controls.right.binding))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.right;
+                    self.set_keybinding(&binding, &mut key);
                 }
                 ui.label("Soft Drop");
                 if ui
-                    .add(Bind::new("_soft_drop", &mut self.soft_drop))
+                    .add(Bind::new(
+                        "_soft_drop",
+                        &mut self.controls.soft_drop.binding,
+                    ))
                     .changed()
                 {
-                  match self.soft_drop {
-                    Some((KeyOrPointer::Key(key), _)) => {
-                        self.controls.soft_drop = egui_key_to_macroquad_keycode(key);
-                    }
-                    _ => {}
-                  }
+                    let KeyInfo { binding, mut key } = self.controls.soft_drop;
+                    self.set_keybinding(&binding, &mut key);
                 }
                 ui.label("Hard Drop");
                 if ui
-                    .add(Bind::new("_hard_drop", &mut self.hard_drop))
+                    .add(Bind::new(
+                        "_hard_drop",
+                        &mut self.controls.hard_drop.binding,
+                    ))
                     .changed()
                 {
-                  match self.hard_drop {
-                    Some((KeyOrPointer::Key(key), _)) => {
-                        self.controls.hard_drop = egui_key_to_macroquad_keycode(key);
-                    }
-                    _ => {}
-                  }
+                    let KeyInfo { binding, mut key } = self.controls.hard_drop;
+                    self.set_keybinding(&binding, &mut key);
                 }
                 ui.label("Rotate Clockwise");
                 if ui
-                    .add(Bind::new("_rotate_clockwise", &mut self.rotate_clockwise))
+                    .add(Bind::new(
+                        "_rotate_clockwise",
+                        &mut self.controls.rotate_clockwise.binding,
+                    ))
                     .changed()
                 {
-                  match self.rotate_clockwise {
-                    Some((KeyOrPointer::Key(key), _)) => {
-                        self.controls.rotate_clockwise = egui_key_to_macroquad_keycode(key);
-                    }
-                    _ => {}
-                  }
+                    let KeyInfo { binding, mut key } = self.controls.rotate_clockwise;
+                    self.set_keybinding(&binding, &mut key);
                 }
                 ui.label("Rotate Counter Clockwise");
                 if ui
                     .add(Bind::new(
                         "_rotate_counterclockwise",
-                        &mut self.rotate_counterclockwise,
+                        &mut self.controls.rotate_counterclockwise.binding,
                     ))
                     .changed()
                 {
-                  match self.rotate_counterclockwise {
-                    Some((KeyOrPointer::Key(key), _)) => {
-                        self.controls.rotate_counterclockwise = egui_key_to_macroquad_keycode(key);
-                    }
-                    _ => {}
-                  }
+                    let KeyInfo { binding, mut key } = self.controls.rotate_counterclockwise;
+                    self.set_keybinding(&binding, &mut key);
                 }
             });
         });
 
         egui_macroquad::draw();
+    }
+
+    
+
+    fn set_keybinding(&self, binding: &Binding, key_code: &mut KeyCode) {
+        match binding {
+            Some((KeyOrPointer::Key(key), _)) => {
+                *key_code = egui_key_to_macroquad_keycode(*key);
+            }
+            _ => {}
+        }
     }
 }
 
