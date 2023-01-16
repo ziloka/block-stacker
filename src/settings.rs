@@ -1,18 +1,19 @@
-use macroquad::{
-    prelude::{vec2, KeyCode},
-    ui::{hash, root_ui, widgets::Window},
-};
+use egui::{Key, Modifiers};
+use egui_bind::{Bind, KeyOrPointer};
+use macroquad::prelude::KeyCode;
+
+type Binding = Option<(KeyOrPointer, Modifiers)>;
 
 // https://tetris.wiki/DAS
 pub struct Settings {
     pub handles: Handles,
     pub controls: Controls,
-    left_text: String,
-    right_text: String,
-    soft_drop_text: String,
-    hard_drop_text: String,
-    rotate_clockwise_text: String,
-    rotate_counterclockwise_text: String,
+    left: Binding,
+    right: Binding,
+    soft_drop: Binding,
+    hard_drop: Binding,
+    rotate_clockwise: Binding,
+    rotate_counterclockwise: Binding,
 }
 
 pub struct Handles {
@@ -45,43 +46,180 @@ impl Default for Settings {
                 rotate_clockwise: KeyCode::Up,
                 rotate_counterclockwise: KeyCode::Z,
             },
-            left_text: "".to_string(),
-            right_text: "".to_string(),
-            soft_drop_text: "".to_string(),
-            hard_drop_text: "".to_string(),
-            rotate_clockwise_text: "".to_string(),
-            rotate_counterclockwise_text: "".to_string(),
+            left: None,
+            right: None,
+            soft_drop: None,
+            hard_drop: None,
+            rotate_clockwise: None,
+            rotate_counterclockwise: None,
         }
     }
 }
 
 impl Settings {
     pub fn draw_menu(&mut self) {
-        Window::new(hash!(), vec2(0., 0.), vec2(300., 800.))
-            .label("Settings")
-            .titlebar(true)
-            .ui(&mut *root_ui(), |ui| {
-                ui.tree_node(hash!(), "handles", |ui| {
-                    ui.slider(hash!(), "DAS (frames)", 20.0..0., &mut self.handles.das);
-                    ui.slider(hash!(), "ARR (frames)", 0.0..5., &mut self.handles.arr);
-                });
+        egui_macroquad::ui(|egui_ctx| {
+            egui::Window::new("Settings").show(egui_ctx, |ui| {
+                ui.label("Handles");
+                ui.add(egui::Slider::new(&mut self.handles.das, 0.0..=20.0).text("DAS (ms)"));
+                ui.add(egui::Slider::new(&mut self.handles.arr, 0.0..=5.0).text("ARR (ms)"));
+
                 ui.separator();
-                ui.tree_node(hash!(), "controls", |ui| {
-                    ui.input_text(hash!(), "Left:", &mut self.left_text);
-                    ui.input_text(hash!(), "Right:", &mut self.right_text);
-                    ui.input_text(hash!(), "Soft Drop: {:?}", &mut self.soft_drop_text);
-                    ui.input_text(hash!(), "Hard Drop: {:?}", &mut self.hard_drop_text);
-                    ui.input_text(
-                        hash!(),
-                        "Rotate Clockwise: {:?}",
-                        &mut self.rotate_clockwise_text,
-                    );
-                    ui.input_text(
-                        hash!(),
-                        "Rotate Counterclockwise: {:?}",
-                        &mut self.rotate_counterclockwise_text,
-                    );
-                });
+                ui.label("Controls");
+                ui.separator();
+
+                ui.label("Left");
+                // let r = ui.checkbox(&mut self.left_text.check, "Left:");
+                if ui.add(Bind::new("_left", &mut self.left)).changed() {
+                    match self.left {
+                        Some((KeyOrPointer::Key(key), _)) => {
+                            self.controls.left = egui_key_to_macroquad_keycode(key);
+                        }
+                        _ => {}
+                    }
+                }
+                ui.label("Right");
+                if ui.add(Bind::new("_right", &mut self.right)).changed() {
+                  match self.right {
+                    Some((KeyOrPointer::Key(key), _)) => {
+                        self.controls.right = egui_key_to_macroquad_keycode(key);
+                    }
+                    _ => {}
+                  }
+                }
+                ui.label("Soft Drop");
+                if ui
+                    .add(Bind::new("_soft_drop", &mut self.soft_drop))
+                    .changed()
+                {
+                  match self.soft_drop {
+                    Some((KeyOrPointer::Key(key), _)) => {
+                        self.controls.soft_drop = egui_key_to_macroquad_keycode(key);
+                    }
+                    _ => {}
+                  }
+                }
+                ui.label("Hard Drop");
+                if ui
+                    .add(Bind::new("_hard_drop", &mut self.hard_drop))
+                    .changed()
+                {
+                  match self.hard_drop {
+                    Some((KeyOrPointer::Key(key), _)) => {
+                        self.controls.hard_drop = egui_key_to_macroquad_keycode(key);
+                    }
+                    _ => {}
+                  }
+                }
+                ui.label("Rotate Clockwise");
+                if ui
+                    .add(Bind::new("_rotate_clockwise", &mut self.rotate_clockwise))
+                    .changed()
+                {
+                  match self.rotate_clockwise {
+                    Some((KeyOrPointer::Key(key), _)) => {
+                        self.controls.rotate_clockwise = egui_key_to_macroquad_keycode(key);
+                    }
+                    _ => {}
+                  }
+                }
+                ui.label("Rotate Counter Clockwise");
+                if ui
+                    .add(Bind::new(
+                        "_rotate_counterclockwise",
+                        &mut self.rotate_counterclockwise,
+                    ))
+                    .changed()
+                {
+                  match self.rotate_counterclockwise {
+                    Some((KeyOrPointer::Key(key), _)) => {
+                        self.controls.rotate_counterclockwise = egui_key_to_macroquad_keycode(key);
+                    }
+                    _ => {}
+                  }
+                }
             });
+        });
+
+        egui_macroquad::draw();
+    }
+}
+
+fn egui_key_to_macroquad_keycode(key: Key) -> KeyCode {
+    match key {
+        Key::ArrowDown => KeyCode::Down,
+        Key::ArrowLeft => KeyCode::Left,
+        Key::ArrowRight => KeyCode::Right,
+        Key::ArrowUp => KeyCode::Up,
+        Key::Escape => KeyCode::Escape,
+        Key::Tab => KeyCode::Tab,
+        Key::Backspace => KeyCode::Backspace,
+        Key::Enter => KeyCode::Enter,
+        Key::Space => KeyCode::Space,
+        Key::Insert => KeyCode::Insert,
+        Key::Delete => KeyCode::Delete,
+        Key::Home => KeyCode::Home,
+        Key::End => KeyCode::End,
+        Key::PageUp => KeyCode::PageUp,
+        Key::PageDown => KeyCode::PageDown,
+        Key::Minus => KeyCode::Minus,
+        Key::PlusEquals => todo!(),
+        // Key::PlusEquals => KeyCode::PlusEquals,
+        Key::Num0 => KeyCode::Key0,
+        Key::Num1 => KeyCode::Key1,
+        Key::Num2 => KeyCode::Key2,
+        Key::Num3 => KeyCode::Key3,
+        Key::Num4 => KeyCode::Key4,
+        Key::Num5 => KeyCode::Key5,
+        Key::Num6 => KeyCode::Key6,
+        Key::Num7 => KeyCode::Key7,
+        Key::Num8 => KeyCode::Key8,
+        Key::Num9 => KeyCode::Key9,
+        Key::A => KeyCode::A,
+        Key::B => KeyCode::B,
+        Key::C => KeyCode::C,
+        Key::D => KeyCode::D,
+        Key::E => KeyCode::E,
+        Key::F => KeyCode::F,
+        Key::G => KeyCode::G,
+        Key::H => KeyCode::H,
+        Key::I => KeyCode::I,
+        Key::J => KeyCode::J,
+        Key::K => KeyCode::K,
+        Key::L => KeyCode::L,
+        Key::M => KeyCode::M,
+        Key::N => KeyCode::N,
+        Key::O => KeyCode::O,
+        Key::P => KeyCode::P,
+        Key::Q => KeyCode::Q,
+        Key::R => KeyCode::R,
+        Key::S => KeyCode::S,
+        Key::T => KeyCode::T,
+        Key::U => KeyCode::U,
+        Key::V => KeyCode::V,
+        Key::W => KeyCode::W,
+        Key::X => KeyCode::X,
+        Key::Y => KeyCode::Y,
+        Key::Z => KeyCode::Z,
+        Key::F1 => KeyCode::F1,
+        Key::F2 => KeyCode::F2,
+        Key::F3 => KeyCode::F3,
+        Key::F4 => KeyCode::F4,
+        Key::F5 => KeyCode::F5,
+        Key::F6 => KeyCode::F6,
+        Key::F7 => KeyCode::F7,
+        Key::F8 => KeyCode::F8,
+        Key::F9 => KeyCode::F9,
+        Key::F10 => KeyCode::F10,
+        Key::F11 => KeyCode::F11,
+        Key::F12 => KeyCode::F12,
+        Key::F13 => KeyCode::F13,
+        Key::F14 => KeyCode::F14,
+        Key::F15 => KeyCode::F15,
+        Key::F16 => KeyCode::F16,
+        Key::F17 => KeyCode::F17,
+        Key::F18 => KeyCode::F18,
+        Key::F19 => KeyCode::F19,
+        Key::F20 => KeyCode::F20,
     }
 }

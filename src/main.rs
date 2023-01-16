@@ -28,7 +28,6 @@ async fn main() {
                 board.settings.draw_menu();
             }
             GameState::Playing => {
-                // board.settings.update();
                 clear_background(BLACK);
                 draw_text(
                     format!("fps: {}", get_fps()).as_str(),
@@ -39,10 +38,7 @@ async fn main() {
                 );
                 board.draw_tetriminos();
                 board.draw_current_tetrimino();
-                // only handles keyboard input move the active tetrimino piece
-                board.handle_movement();
-                // board.draw();
-                // board.update();
+                  board.handle_movement();
             }
             GameState::Paused => {
                 todo!();
@@ -59,7 +55,14 @@ async fn main() {
 
 fn handle_keyboard_input(board: &mut Board) {
     if macroquad::input::is_key_pressed(macroquad::input::KeyCode::Escape) {
-        board.game_state = GameState::OpenSettings;
-        board.settings.draw_menu();
+        match board.game_state {
+            GameState::Playing => {
+              board.game_state = GameState::OpenSettings;
+            },
+            GameState::OpenSettings => {
+              board.game_state = GameState::Playing;
+            },
+            _ => panic!("Not implemented yet"),
+        }
     }
 }
