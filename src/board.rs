@@ -5,7 +5,7 @@ use macroquad::{
     time::get_time,
 };
 
-use crate::consts::{Piece, Tetrimino, GameState, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
+use crate::consts::{GameState, Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
 use crate::settings::Settings;
 
 pub struct Board {
@@ -51,8 +51,9 @@ impl Board {
 
     pub fn handle_movement(&mut self) {
         let current_time = macroquad::time::get_time() * 1000.0; // time in miliseconds since the start of the program
-                                                                 // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml/?utm_source=share&utm_medium=web2x&context=3
-        if (is_key_down(self.settings.controls.left) || is_key_down(self.settings.controls.right) || is_key_down(self.settings.controls.soft_drop))
+        if (is_key_down(self.settings.controls.left)
+            || is_key_down(self.settings.controls.right)
+            || is_key_down(self.settings.controls.soft_drop))
             && (current_time - self.time > self.settings.handles.das as f64
                 || ((!is_key_pressed(self.settings.controls.left)
                     || !is_key_pressed(self.settings.controls.right)
@@ -63,11 +64,15 @@ impl Board {
                 for dot in self.active_piece.dots.iter_mut() {
                     dot.x -= BLOCK_SIZE;
                 }
-            } else if is_key_down(self.settings.controls.right) && !self.conflict(vec2(BLOCK_SIZE, 0.0)) {
+            } else if is_key_down(self.settings.controls.right)
+                && !self.conflict(vec2(BLOCK_SIZE, 0.0))
+            {
                 for dot in self.active_piece.dots.iter_mut() {
                     dot.x += BLOCK_SIZE;
                 }
-            } else if is_key_down(self.settings.controls.soft_drop) && !self.conflict(vec2(0.0, BLOCK_SIZE)) {
+            } else if is_key_down(self.settings.controls.soft_drop)
+                && !self.conflict(vec2(0.0, BLOCK_SIZE))
+            {
                 for dot in self.active_piece.dots.iter_mut() {
                     dot.y += BLOCK_SIZE;
                 }

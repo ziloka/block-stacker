@@ -17,6 +17,7 @@ pub const TETRIMINO_TYPES: [Tetrimino; 7] = [
     Tetrimino::Z,
 ];
 
+// https://en.wikipedia.org/wiki/Tetromino
 #[derive(Clone, Copy, Debug)]
 pub enum Tetrimino {
     I,
@@ -32,12 +33,12 @@ impl Tetrimino {
     pub fn get_color(&self) -> Color {
         match *self {
             Tetrimino::I => SKYBLUE,
-            Tetrimino::O => YELLOW,
-            Tetrimino::T => PURPLE,
-            Tetrimino::S => GREEN,
-            Tetrimino::Z => RED,
             Tetrimino::J => BLUE,
             Tetrimino::L => ORANGE,
+            Tetrimino::O => YELLOW,
+            Tetrimino::S => GREEN,
+            Tetrimino::T => PURPLE,
+            Tetrimino::Z => RED,
         }
     }
 
@@ -51,11 +52,28 @@ impl Tetrimino {
                 vec2(2.0, 0.0),
                 vec2(1.0, 0.0),
             ],
-            // this isn't really suppose to be here, squares don't change during rotation..
+            Tetrimino::J => [
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(1.0, 1.0),
+                vec2(1.0, 0.0),
+            ],
+            Tetrimino::L => [
+                vec2(0.0, 0.0),
+                vec2(-1.0, 0.0),
+                vec2(-1.0, 1.0),
+                vec2(1.0, 0.0),
+            ],
             Tetrimino::O => [
                 vec2(0.0, 0.0),
                 vec2(1.0, 1.0),
                 vec2(0.0, 1.0),
+                vec2(1.0, 0.0),
+            ],
+            Tetrimino::S => [
+                vec2(0.0, 0.0),
+                vec2(0.0, 1.0),
+                vec2(-1.0, 1.0),
                 vec2(1.0, 0.0),
             ],
             Tetrimino::T => [
@@ -64,29 +82,11 @@ impl Tetrimino {
                 vec2(0.0, 1.0),
                 vec2(1.0, 0.0),
             ],
-            Tetrimino::S => [
+            Tetrimino::Z => [
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
                 vec2(1.0, 1.0),
                 vec2(0.0, 1.0),
-            ],
-            Tetrimino::Z => [
-                vec2(0.0, 0.0),
-                vec2(-1.0, 0.0),
-                vec2(-1.0, 1.0),
-                vec2(1.0, 0.0),
-            ],
-            Tetrimino::J => [
-                vec2(0.0, 0.0),
-                vec2(-1.0, 0.0),
-                vec2(-1.0, 1.0),
-                vec2(1.0, 0.0),
-            ],
-            Tetrimino::L => [
-                vec2(0.0, 0.0),
-                vec2(-1.0, 0.0),
-                vec2(1.0, 1.0),
-                vec2(1.0, 0.0),
             ],
         }
     }
@@ -181,5 +181,5 @@ pub enum GameState {
     Playing,
     GameOver,
     Paused,
-    OpenSettings
+    OpenSettings,
 }
