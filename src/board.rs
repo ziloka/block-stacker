@@ -2,31 +2,40 @@ use std::ops::{Add, Sub};
 
 use macroquad::{
     prelude::{draw_rectangle, is_key_down, is_key_pressed, vec2, Color, Vec2, GRAY},
+    rand::{gen_range, srand},
     time::get_time,
 };
 
-use crate::consts::{GameState, Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
+use crate::consts::{GameState, Piece, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH, Tetrimino};
 use crate::settings::Settings;
+use crate::generator::Generator;
 
 pub struct Board {
-    pub left_top_corner: Vec2,
-    pub right_bottom_corner: Vec2,
-    pub time: f64,
-    pub active_piece: Piece,
+    left_top_corner: Vec2,
+    right_bottom_corner: Vec2,
+    generator: Generator,
+    time: f64,
+    active_piece: Piece,
+    preview_pieces: [Tetrimino; 7],
     pub game_state: GameState,
     pub settings: Settings,
     positions: [[Option<Color>; WIDTH as usize]; HEIGHT as usize],
 }
 
+const CELL_INIT: Option<Color> = None;
+const ROW_INIT: [Option<Color>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
+
 impl Board {
-    pub fn new(left_top_corner: Vec2, right_bottom_corner: Vec2) -> Self {
-        const CELL_INIT: Option<Color> = None;
-        const ROW_INIT: [Option<Color>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
+    pub fn new(seed: u64, left_top_corner: Vec2, right_bottom_corner: Vec2) -> Self {
+        srand(seed);
         let tetrimino_type =
-            TETRIMINO_TYPES[macroquad::rand::gen_range::<usize>(0, TETRIMINO_TYPES.len())];
-        Self {
+            TETRIMINO_TYPES[gen_range::<usize>(0, TETRIMINO_TYPES.len())];
+        let mut generator = Generator::new(seed);
+        let tetriminos = generator.get_new_sequence_of_tetriminos();
+        let mut board = Self {
             left_top_corner: left_top_corner,
             right_bottom_corner: right_bottom_corner,
+            generator: generator,
             time: get_time() * 1000.0,
             active_piece: Piece {
                 tetrimino: tetrimino_type,
@@ -42,15 +51,18 @@ impl Board {
                     .collect(),
                 rotation_index: 0,
             },
+            preview_pieces: tetriminos,
             game_state: GameState::Playing,
             settings: Settings::default(),
             // https://stackoverflow.com/a/53930630
             positions: [ROW_INIT; HEIGHT as usize],
-        }
+        };
+        board.set_next_tetrimino_as_active_piece();
+        board
     }
 
     pub fn handle_movement(&mut self) {
-        let current_time = macroquad::time::get_time() * 1000.0; // time in miliseconds since the start of the program
+        let current_time = get_time() * 1000.0; // time in miliseconds since the start of the program
         if (is_key_down(self.settings.controls.left)
             || is_key_down(self.settings.controls.right)
             || is_key_down(self.settings.controls.soft_drop))
@@ -89,8 +101,9 @@ impl Board {
             // the hard drop
             let mut y_offset = 0.0;
             for y in 0..HEIGHT as i32 {
-                if !self.conflict(vec2(0.0, (y as f32) * BLOCK_SIZE)) {
-                    y_offset = (y as f32) * BLOCK_SIZE as f32;
+                let y = y as f32;
+                if !self.conflict(vec2(0.0, y * BLOCK_SIZE)) {
+                    y_offset = y * BLOCK_SIZE as f32;
                 }
             }
             for dot in self.active_piece.dots.iter_mut() {
@@ -103,9 +116,9 @@ impl Board {
         self.clear_lines();
     }
 
-    fn new_tetrimino(&mut self) {
+    fn set_next_tetrimino_as_active_piece(&mut self) {
         let tetrimino_type =
-            TETRIMINO_TYPES[macroquad::rand::gen_range::<usize>(0, TETRIMINO_TYPES.len())];
+            self.preview_pieces[0];
         self.active_piece = Piece {
             tetrimino: tetrimino_type,
             dots: tetrimino_type
@@ -120,6 +133,14 @@ impl Board {
                 .collect(),
             rotation_index: 0,
         };
+        self.add_tetrimino_preview_piece();
+    }
+
+    fn add_tetrimino_preview_piece(&mut self) {
+        for i in 1..self.preview_pieces.len() {
+            self.preview_pieces[i - 1] = self.preview_pieces[i];
+        }
+        self.preview_pieces[self.preview_pieces.len() - 1] = self.generator.next();
     }
 
     pub fn draw_current_tetrimino(&self) {
@@ -219,11 +240,7 @@ impl Board {
 
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340
     fn offset_tetrimino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
-        let offset_data = match self.active_piece.tetrimino {
-            Tetrimino::O => crate::consts::Offset::O.to_vec(),
-            Tetrimino::I => crate::consts::Offset::I.to_vec(),
-            _ => crate::consts::Offset::JLSTZ.to_vec(),
-        };
+        let offset_data = self.active_piece.tetrimino.get_offset_data();
 
         let mut end_offset = vec2(0.0, 0.0);
         let mut move_possible = false;
@@ -252,7 +269,7 @@ impl Board {
             self.positions[row as usize][column as usize] =
                 Some(self.active_piece.tetrimino.get_color());
         }
-        self.new_tetrimino();
+        self.set_next_tetrimino_as_active_piece();
     }
 
     pub fn clear_lines(&mut self) {

@@ -90,87 +90,88 @@ impl Tetrimino {
             ],
         }
     }
+
+    // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L36-L92
+    // offset data for the tetrimino wallkicks
+    pub fn get_offset_data(&self) -> Vec<[Vec2; 4]> {
+        match *self {
+            Tetrimino::I => [
+                [
+                    vec2(0.0, 0.0),
+                    vec2(-1.0, 0.0),
+                    vec2(-1.0, 1.0),
+                    vec2(0.0, 1.0),
+                ],
+                [
+                    vec2(-1.0, 0.0),
+                    vec2(0.0, 0.0),
+                    vec2(1.0, 1.0),
+                    vec2(0.0, 1.0),
+                ],
+                [
+                    vec2(2.0, 0.0),
+                    vec2(0.0, 0.0),
+                    vec2(-2.0, 1.0),
+                    vec2(0.0, 1.0),
+                ],
+                [
+                    vec2(-1.0, 0.0),
+                    vec2(0.0, 1.0),
+                    vec2(1.0, 0.0),
+                    vec2(0.0, -1.0),
+                ],
+                [
+                    vec2(2.0, 0.0),
+                    vec2(0.0, -2.0),
+                    vec2(-2.0, 0.0),
+                    vec2(0.0, 2.0),
+                ],
+            ]
+            .to_vec(),
+            Tetrimino::O => [[
+                vec2(0.0, 0.0),
+                vec2(0.0, -1.0),
+                vec2(-1.0, -1.0),
+                vec2(-1.0, 0.0),
+            ]]
+            .to_vec(),
+            _ => [
+                [
+                    vec2(0.0, 0.0),
+                    vec2(0.0, 0.0),
+                    vec2(0.0, 0.0),
+                    vec2(0.0, 0.0),
+                ],
+                [
+                    vec2(0.0, 0.0),
+                    vec2(1.0, 0.0),
+                    vec2(0.0, 0.0),
+                    vec2(-1.0, 0.0),
+                ],
+                [
+                    vec2(0.0, 0.0),
+                    vec2(1.0, -1.0),
+                    vec2(0.0, 0.0),
+                    vec2(-1.0, -1.0),
+                ],
+                [
+                    vec2(0.0, 0.0),
+                    vec2(0.0, 2.0),
+                    vec2(0.0, 0.0),
+                    vec2(0.0, 2.0),
+                ],
+                [
+                    vec2(0.0, 0.0),
+                    vec2(1.0, 2.0),
+                    vec2(0.0, 0.0),
+                    vec2(-1.0, 2.0),
+                ],
+            ]
+            .to_vec(),
+        }
+    }
 }
 
-// https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L36-L92
-// offset data for the tetrimino wallkicks
-pub struct Offset {}
-
-impl Offset {
-    pub const JLSTZ: [[Vec2; 4]; 5] = [
-        [
-            vec2(0.0, 0.0),
-            vec2(0.0, 0.0),
-            vec2(0.0, 0.0),
-            vec2(0.0, 0.0),
-        ],
-        [
-            vec2(0.0, 0.0),
-            vec2(1.0, 0.0),
-            vec2(0.0, 0.0),
-            vec2(-1.0, 0.0),
-        ],
-        [
-            vec2(0.0, 0.0),
-            vec2(1.0, -1.0),
-            vec2(0.0, 0.0),
-            vec2(-1.0, -1.0),
-        ],
-        [
-            vec2(0.0, 0.0),
-            vec2(0.0, 2.0),
-            vec2(0.0, 0.0),
-            vec2(0.0, 2.0),
-        ],
-        [
-            vec2(0.0, 0.0),
-            vec2(1.0, 2.0),
-            vec2(0.0, 0.0),
-            vec2(-1.0, 2.0),
-        ],
-    ];
-    pub const I: [[Vec2; 4]; 5] = [
-        [
-            vec2(0.0, 0.0),
-            vec2(-1.0, 0.0),
-            vec2(-1.0, 1.0),
-            vec2(0.0, 1.0),
-        ],
-        [
-            vec2(-1.0, 0.0),
-            vec2(0.0, 0.0),
-            vec2(1.0, 1.0),
-            vec2(0.0, 1.0),
-        ],
-        [
-            vec2(2.0, 0.0),
-            vec2(0.0, 0.0),
-            vec2(-2.0, 1.0),
-            vec2(0.0, 1.0),
-        ],
-        [
-            vec2(-1.0, 0.0),
-            vec2(0.0, 1.0),
-            vec2(1.0, 0.0),
-            vec2(0.0, -1.0),
-        ],
-        [
-            vec2(2.0, 0.0),
-            vec2(0.0, -2.0),
-            vec2(-2.0, 0.0),
-            vec2(0.0, 2.0),
-        ],
-    ];
-
-    pub const O: [[Vec2; 4]; 1] = [[
-        vec2(0.0, 0.0),
-        vec2(0.0, -1.0),
-        vec2(-1.0, -1.0),
-        vec2(-1.0, 0.0),
-    ]];
-}
-
-#[derive(Debug)]
 pub struct Piece {
     pub tetrimino: Tetrimino,
     pub dots: Vec<Vec2>,

@@ -1,9 +1,10 @@
 use macroquad::{
-    prelude::{vec2, BLACK, WHITE},
-    rand,
+    prelude::{vec2, BLACK, WHITE, is_key_pressed},
     text::draw_text,
     time::get_fps,
     window::{clear_background, next_frame},
+    miniquad::date::now,
+    main
 };
 
 mod consts;
@@ -13,11 +14,12 @@ mod board;
 use board::Board;
 
 mod settings;
+mod generator;
 
-#[macroquad::main("Tetris")]
+#[main("Tetris")]
 async fn main() {
-    rand::srand(macroquad::miniquad::date::now() as u64);
     let mut board = Board::new(
+      now() as u64,
         vec2(200.0, 20.0),
         vec2(200.0 + WIDTH * BLOCK_SIZE, 20.0 + HEIGHT * BLOCK_SIZE),
     );
@@ -54,7 +56,7 @@ async fn main() {
 }
 
 fn handle_keyboard_input(board: &mut Board) {
-    if macroquad::input::is_key_pressed(macroquad::input::KeyCode::Escape) {
+    if is_key_pressed(macroquad::input::KeyCode::Escape) {
         match board.game_state {
             GameState::Playing => {
                 board.game_state = GameState::OpenSettings;
