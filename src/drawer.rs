@@ -3,7 +3,7 @@ use macroquad::prelude::{draw_rectangle, Color, Vec2, GRAY};
 use crate::consts::{Piece, BLOCK_SIZE, HEIGHT, WIDTH};
 
 pub struct Drawer {
-  pub left_top_corner: Vec2,
+    pub left_top_corner: Vec2,
 }
 
 impl Drawer {

@@ -1,6 +1,10 @@
 use macroquad::{
     miniquad::{graphics::GraphicsContext, EventHandler, KeyMods, TouchPhase},
-    prelude::{get_last_key_pressed, utils::{repeat_all_miniquad_input, register_input_subscriber}, vec2, KeyCode, MouseButton},
+    prelude::{
+        get_last_key_pressed,
+        utils::{register_input_subscriber, repeat_all_miniquad_input},
+        vec2, KeyCode, MouseButton,
+    },
     ui::{hash, root_ui, widgets::Window},
 };
 
@@ -18,9 +22,11 @@ pub struct Settings {
     pub handles: Handles,
     pub controls: Controls,
     focused_on: Option<FocusedOn>,
-    subscriber_id: usize
+    subscriber_id: usize,
 }
 
+// https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml?context=3
+// https://www.reddit.com/r/Tetris/comments/13uqby/comment/c77ev43/?context=3
 pub struct Handles {
     pub das: f32, // Delayed Auto Shift in miliseconds
     pub arr: f32, // Auto Repeat Rate in miliseconds
@@ -38,7 +44,6 @@ pub struct Controls {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            // https://www.reddit.com/r/Tetris/comments/frbii6/jstris_das_arr_in_tetrio/
             handles: Handles {
                 das: 133.0,
                 arr: 10.0,
@@ -52,7 +57,7 @@ impl Default for Settings {
                 rotate_counterclockwise: KeyCode::Z,
             },
             focused_on: None,
-            subscriber_id: register_input_subscriber()
+            subscriber_id: register_input_subscriber(),
         }
     }
 }
@@ -62,7 +67,7 @@ impl Settings {
         Window::new(hash!(), vec2(0., 0.), vec2(300., 800.))
             .label("Settings")
             .titlebar(true)
-            .ui(&mut *root_ui(), |ui| {
+            .ui(&mut root_ui(), |ui| {
                 ui.tree_node(hash!(), "handles", |ui| {
                     ui.slider(hash!(), "DAS (frames)", 20.0..0., &mut self.handles.das);
                     ui.slider(hash!(), "ARR (frames)", 0.0..5., &mut self.handles.arr);
@@ -116,26 +121,26 @@ impl Settings {
                     }
                 });
             });
-            repeat_all_miniquad_input( self, self.subscriber_id);
+        repeat_all_miniquad_input(self, self.subscriber_id);
     }
 }
 
 impl EventHandler for Settings {
     fn update(&mut self, _ctx: &mut GraphicsContext) {
-      println!("update");
+        println!("update");
     }
     fn draw(&mut self, _ctx: &mut GraphicsContext) {
-      println!("draw");
+        println!("draw");
     }
 
     fn resize_event(&mut self, _ctx: &mut GraphicsContext, _width: f32, _height: f32) {
-      println!("resize event");
+        println!("resize event");
     }
     fn mouse_motion_event(&mut self, _ctx: &mut GraphicsContext, _x: f32, _y: f32) {
-      println!("mouse motion event");
+        println!("mouse motion event");
     }
     fn mouse_wheel_event(&mut self, _ctx: &mut GraphicsContext, _x: f32, _y: f32) {
-      println!("mouse wheel event");
+        println!("mouse wheel event");
     }
     fn mouse_button_down_event(
         &mut self,
@@ -144,7 +149,7 @@ impl EventHandler for Settings {
         _x: f32,
         _y: f32,
     ) {
-      println!("mouse button down event");
+        println!("mouse button down event");
     }
     fn mouse_button_up_event(
         &mut self,
@@ -153,7 +158,7 @@ impl EventHandler for Settings {
         _x: f32,
         _y: f32,
     ) {
-      println!("mouse button up event");
+        println!("mouse button up event");
     }
 
     fn char_event(
@@ -163,7 +168,7 @@ impl EventHandler for Settings {
         _keymods: KeyMods,
         _repeat: bool,
     ) {
-      println!("char event");
+        println!("char event");
     }
 
     fn key_down_event(
@@ -173,16 +178,23 @@ impl EventHandler for Settings {
         _keymods: KeyMods,
         _repeat: bool,
     ) {
-      println!("key down event");
+        println!("key down event");
     }
 
     fn key_up_event(&mut self, _ctx: &mut GraphicsContext, _keycode: KeyCode, _keymods: KeyMods) {
-      println!("key up event");
+        println!("key up event");
     }
 
     /// Default implementation emulates mouse clicks
-    fn touch_event(&mut self, ctx: &mut GraphicsContext, phase: TouchPhase, _id: u64, x: f32, y: f32) {
-      println!("touch event");
+    fn touch_event(
+        &mut self,
+        ctx: &mut GraphicsContext,
+        phase: TouchPhase,
+        _id: u64,
+        x: f32,
+        y: f32,
+    ) {
+        println!("touch event");
         if phase == TouchPhase::Started {
             self.mouse_button_down_event(ctx, MouseButton::Left, x, y);
         }
@@ -200,19 +212,19 @@ impl EventHandler for Settings {
     /// Note that these events are delivered regardless of input focus and not in pixels, but in
     /// hardware units instead. And those units may be different from pixels depending on the target platform
     fn raw_mouse_motion(&mut self, _ctx: &mut GraphicsContext, _dx: f32, _dy: f32) {
-      println!("raw mouse motion");
+        println!("raw mouse motion");
     }
 
     /// Window has been minimized
     /// Right now is only implemented on Android, and is called on a Pause ndk callback
     fn window_minimized_event(&mut self, _ctx: &mut GraphicsContext) {
-      println!("window minimized event");
+        println!("window minimized event");
     }
 
     /// Window has been restored
     /// Right now is only implemented on Android, and is called on a Resume ndk callback
     fn window_restored_event(&mut self, _ctx: &mut GraphicsContext) {
-      println!("window restored event");
+        println!("window restored event");
     }
 
     /// This event is sent when the userclicks the window's close button
@@ -221,7 +233,7 @@ impl EventHandler for Settings {
     /// ctx.cancel_quit() to cancel the quit.
     /// If the event is ignored, the application will quit as usual.
     fn quit_requested_event(&mut self, _ctx: &mut GraphicsContext) {
-      println!("quit requested event");
+        println!("quit requested event");
     }
 
     /// A file has been dropped over the application.
@@ -230,6 +242,6 @@ impl EventHandler for Settings {
     /// `ctx.dropped_file_path()`, and for wasm targets the file bytes
     /// can be requested with `ctx.dropped_file_bytes()`.
     fn files_dropped_event(&mut self, _ctx: &mut GraphicsContext) {
-      println!("files dropped event");
+        println!("files dropped event");
     }
 }

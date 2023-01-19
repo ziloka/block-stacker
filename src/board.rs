@@ -1,26 +1,28 @@
 use std::ops::{Add, Sub};
 
 use macroquad::{
-    prelude::{is_key_down, is_key_pressed, vec2, Color, Vec2},
+    prelude::{vec2, Color, Vec2},
     rand::srand,
-    time::get_time,
 };
 
-use crate::consts::{GameState, Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
-use crate::drawer::Drawer;
-use crate::generator::Generator;
-use crate::settings::Settings;
+use crate::{
+    consts::{GameState, Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH},
+    drawer::Drawer,
+    generator::Generator,
+    movement::Movement,
+    settings::Settings,
+};
 
 pub struct Board {
-    left_top_corner: Vec2,
-    right_bottom_corner: Vec2,
-    generator: Generator,
-    time: f64,
-    active_piece: Piece,
-    preview_pieces: [Tetrimino; 7],
-    pub drawer: Drawer,
     pub game_state: GameState,
     pub settings: Settings,
+    pub active_piece: Piece,
+    pub movement: Movement,
+    left_top_corner: Vec2,
+    right_bottom_corner: Vec2,
+    drawer: Drawer,
+    generator: Generator,
+    preview_pieces: [Tetrimino; 7],
     positions: [[Option<Color>; WIDTH as usize]; HEIGHT as usize],
 }
 
@@ -49,17 +51,15 @@ impl Board {
         let mut generator = Generator::new(seed);
         let tetriminos = generator.get_new_sequence_of_tetriminos();
         let mut board = Self {
-            left_top_corner: left_top_corner,
-            right_bottom_corner: right_bottom_corner,
-            generator: generator,
-            time: get_time() * 1000.0,
-            active_piece: active_piece,
-            drawer: Drawer {
-                left_top_corner: left_top_corner,
-            },
-            preview_pieces: tetriminos,
             game_state: GameState::Playing,
             settings: Settings::default(),
+            active_piece,
+            movement: Movement::default(),
+            left_top_corner,
+            right_bottom_corner,
+            drawer: Drawer { left_top_corner },
+            generator,
+            preview_pieces: tetriminos,
             // https://stackoverflow.com/a/53930630
             positions,
         };
@@ -73,61 +73,6 @@ impl Board {
 
     pub fn draw_current_tetrimino(&self) {
         self.drawer.draw_current_tetrimino(&self.active_piece);
-    }
-
-    pub fn handle_movement(&mut self) {
-        let current_time = get_time() * 1000.0; // time in miliseconds since the start of the program
-        if (is_key_down(self.settings.controls.left)
-            || is_key_down(self.settings.controls.right)
-            || is_key_down(self.settings.controls.soft_drop))
-            && (current_time - self.time > self.settings.handles.das as f64
-                || ((!is_key_pressed(self.settings.controls.left)
-                    || !is_key_pressed(self.settings.controls.right)
-                    || !is_key_pressed(self.settings.controls.soft_drop))
-                    && current_time - self.time > self.settings.handles.arr as f64))
-        {
-            if is_key_down(self.settings.controls.left) && !self.conflict(vec2(-BLOCK_SIZE, 0.0)) {
-                for dot in self.active_piece.dots.iter_mut() {
-                    dot.x -= BLOCK_SIZE;
-                }
-            } else if is_key_down(self.settings.controls.right)
-                && !self.conflict(vec2(BLOCK_SIZE, 0.0))
-            {
-                for dot in self.active_piece.dots.iter_mut() {
-                    dot.x += BLOCK_SIZE;
-                }
-            } else if is_key_down(self.settings.controls.soft_drop)
-                && !self.conflict(vec2(0.0, BLOCK_SIZE))
-            {
-                for dot in self.active_piece.dots.iter_mut() {
-                    dot.y += BLOCK_SIZE;
-                }
-            }
-            self.time = current_time;
-        }
-
-        // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L140-L147
-        if is_key_pressed(self.settings.controls.rotate_clockwise) {
-            self.rotate_tetrimino(true, true); // rotate clockwise
-        } else if is_key_pressed(self.settings.controls.rotate_counterclockwise) {
-            self.rotate_tetrimino(false, true); // rotate clockwise
-        } else if is_key_pressed(self.settings.controls.hard_drop) {
-            // the hard drop
-            let mut y_offset = 0.0;
-            for y in 0..HEIGHT as i32 {
-                let y = y as f32;
-                if !self.conflict(vec2(0.0, y * BLOCK_SIZE)) {
-                    y_offset = y * BLOCK_SIZE as f32;
-                }
-            }
-            for dot in self.active_piece.dots.iter_mut() {
-                dot.y += y_offset;
-            }
-            self.set_active_tetrimino_position();
-        }
-
-        // handle line clears
-        self.clear_lines();
     }
 
     fn set_next_tetrimino_as_active_piece(&mut self) {
@@ -218,9 +163,10 @@ impl Board {
 
         let mut end_offset = vec2(0.0, 0.0);
         let mut move_possible = false;
-        for test_index in 0..offset_data.len() {
-            let offset_value1 = offset_data[test_index][old_rotation_index as usize];
-            let offset_value2 = offset_data[test_index][new_rotation_index as usize];
+
+        for offset_element in offset_data {
+            let offset_value1 = offset_element[old_rotation_index as usize];
+            let offset_value2 = offset_element[new_rotation_index as usize];
             end_offset = offset_value2.sub(offset_value1);
             if !self.conflict(end_offset) {
                 move_possible = true;
@@ -234,14 +180,13 @@ impl Board {
             }
         }
 
-        return move_possible;
+        move_possible
     }
 
     pub fn set_active_tetrimino_position(&mut self) {
         for absolute_position in &self.active_piece.dots {
             let (row, column) = self.get_relative_position_on_board(*absolute_position);
-            self.positions[row as usize][column as usize] =
-                Some(self.active_piece.tetrimino.get_color());
+            self.positions[row][column] = Some(self.active_piece.tetrimino.get_color());
         }
         self.set_next_tetrimino_as_active_piece();
     }

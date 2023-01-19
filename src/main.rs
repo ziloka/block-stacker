@@ -11,11 +11,13 @@ mod board;
 mod consts;
 mod drawer;
 mod generator;
+mod movement;
 mod settings;
 mod utils;
 
 use board::Board;
 use consts::{GameState, BLOCK_SIZE, HEIGHT, WIDTH};
+use movement::Movement;
 
 #[main("Tetris")]
 async fn main() {
@@ -24,16 +26,9 @@ async fn main() {
         vec2(200.0, 20.0),
         vec2(200.0 + WIDTH * BLOCK_SIZE, 20.0 + HEIGHT * BLOCK_SIZE),
     );
+    let mut movement = Movement::default();
 
     loop {
-        draw_text(
-            format!("fps: {}", get_fps()).as_str(),
-            10.0,
-            20.0,
-            20.0,
-            WHITE,
-        );
-
         match board.game_state {
             GameState::OpenSettings => {
                 board.settings.draw_menu();
@@ -42,7 +37,7 @@ async fn main() {
                 clear_background(BLACK);
                 board.draw_tetriminos();
                 board.draw_current_tetrimino();
-                board.handle_movement();
+                movement.handle(&mut board);
             }
             GameState::Paused => {
                 todo!();
@@ -52,7 +47,13 @@ async fn main() {
             }
         }
         handle_keyboard_input(&mut board);
-
+        draw_text(
+            format!("fps: {}", get_fps()).as_str(),
+            10.0,
+            20.0,
+            20.0,
+            WHITE,
+        );
         next_frame().await;
     }
 }
