@@ -63,7 +63,7 @@ impl Board {
             // https://stackoverflow.com/a/53930630
             positions,
         };
-        // board.set_next_tetrimino_as_active_piece();
+        board.set_next_tetrimino_as_active_piece();
         board
     }
 
@@ -175,17 +175,17 @@ impl Board {
         }
 
         // TODO: implement wallkicks / figure out why this doesn't work
-        // if move_possible {
-        //   // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
-        //     if !self.conflict(end_offset) {
-        //       if end_offset == vec2(0.0, -1.0) {
-        //         for dot in self.active_piece.dots.iter_mut() {
-        //           *dot = dot.add(end_offset);
-        //         }
-        //         self.set_active_tetrimino_position();
-        //       }
-        //     }
-        // }
+        if move_possible {
+          // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
+            if !self.conflict(end_offset) {
+              if end_offset == vec2(0.0, -1.0) {
+                for dot in self.active_piece.dots.iter_mut() {
+                  *dot = dot.add(end_offset * BLOCK_SIZE);
+                }
+                self.set_active_tetrimino_position();
+              }
+            }
+        }
 
         move_possible
     }
