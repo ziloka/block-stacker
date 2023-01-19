@@ -15,6 +15,7 @@ enum FocusedOn {
     HardDrop,
     RotateClockwise,
     RotateCounterclockwise,
+    Hold
 }
 
 // https://tetris.wiki/DAS
@@ -39,6 +40,7 @@ pub struct Controls {
     pub hard_drop: KeyCode,
     pub rotate_clockwise: KeyCode,
     pub rotate_counterclockwise: KeyCode,
+    pub hold: KeyCode,
 }
 
 impl Default for Settings {
@@ -55,6 +57,7 @@ impl Default for Settings {
                 hard_drop: KeyCode::Space,
                 rotate_clockwise: KeyCode::Up,
                 rotate_counterclockwise: KeyCode::Z,
+                hold: KeyCode::C,
             },
             focused_on: None,
             subscriber_id: register_input_subscriber(),
@@ -101,7 +104,15 @@ impl Settings {
                     ) {
                         self.focused_on = Some(FocusedOn::RotateCounterclockwise);
                     }
-
+                    if ui.button(
+                      None,
+                      format!(
+                          "Hold: {:?}",
+                          self.controls.hold
+                      ),
+                  ) {
+                      self.focused_on = Some(FocusedOn::Hold);
+                  }
                     if let Some(focused_on) = &self.focused_on {
                         if let Some(keycode) = get_last_key_pressed() {
                             match focused_on {
@@ -115,6 +126,8 @@ impl Settings {
                                 FocusedOn::RotateCounterclockwise => {
                                     self.controls.rotate_counterclockwise = keycode
                                 }
+                                FocusedOn::Hold => self.controls.hold = keycode
+                                
                             }
                             self.focused_on = None;
                         }

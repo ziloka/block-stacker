@@ -10,12 +10,12 @@ use crate::{
     consts::{BLOCK_SIZE, HEIGHT},
 };
 
-pub struct Movement {
+pub struct Input {
     holding: bool,
     time: f64, // the time the last movement was made
 }
 
-impl default::Default for Movement {
+impl default::Default for Input {
     fn default() -> Self {
         Self {
             holding: false,
@@ -24,7 +24,7 @@ impl default::Default for Movement {
     }
 }
 
-impl Movement {
+impl Input {
     // handles movement
     pub fn handle(&mut self, board: &mut Board) {
         // println!("time: {}, das: {}", self.time % board.settings.handles.das as f64, board.settings.handles.das);
@@ -79,6 +79,8 @@ impl Movement {
                 dot.y += y_offset;
             }
             board.set_active_tetrimino_position();
+        } else if is_key_pressed(board.settings.controls.hold) {
+            board.hold_tetrimino();
         }
 
         // handle line clears

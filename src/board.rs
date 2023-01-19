@@ -9,7 +9,7 @@ use crate::{
     consts::{GameState, Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH},
     drawer::Drawer,
     generator::Generator,
-    movement::Movement,
+    input::Input,
     settings::Settings,
 };
 
@@ -17,7 +17,8 @@ pub struct Board {
     pub game_state: GameState,
     pub settings: Settings,
     pub active_piece: Piece,
-    pub movement: Movement,
+    pub hold_piece: Option<Piece>,
+    pub movement: Input,
     left_top_corner: Vec2,
     right_bottom_corner: Vec2,
     drawer: Drawer,
@@ -54,7 +55,8 @@ impl Board {
             game_state: GameState::Playing,
             settings: Settings::default(),
             active_piece,
-            movement: Movement::default(),
+            hold_piece: None,
+            movement: Input::default(),
             left_top_corner,
             right_bottom_corner,
             drawer: Drawer { left_top_corner },
@@ -73,6 +75,29 @@ impl Board {
 
     pub fn draw_current_tetrimino(&self) {
         self.drawer.draw_current_tetrimino(&self.active_piece);
+    }
+
+    pub fn hold_tetrimino(&mut self) {
+        if self.hold_piece.is_none() {
+            self.hold_piece = Some(self.active_piece.clone());
+            self.set_next_tetrimino_as_active_piece();
+        } else {
+            let mut hold_piece = self.hold_piece.clone().unwrap();
+            hold_piece.dots = hold_piece
+                .tetrimino
+                .get_structure()
+                .iter()
+                .map(|pos| {
+                    vec2(
+                        self.left_top_corner.x + (WIDTH / 2.0 * BLOCK_SIZE) + pos.x * BLOCK_SIZE,
+                        self.left_top_corner.y + pos.y * BLOCK_SIZE,
+                    )
+                })
+                .collect();
+            hold_piece.rotation_index = 0;
+            self.hold_piece = Some(self.active_piece.clone());
+            self.active_piece = hold_piece;
+        }
     }
 
     fn set_next_tetrimino_as_active_piece(&mut self) {
@@ -176,14 +201,12 @@ impl Board {
 
         // TODO: implement wallkicks / figure out why this doesn't work
         if move_possible {
-          // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
-            if !self.conflict(end_offset) {
-              if end_offset == vec2(0.0, -1.0) {
+            // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
+            if !self.conflict(end_offset) && end_offset == vec2(0.0, -1.0) {
                 for dot in self.active_piece.dots.iter_mut() {
-                  *dot = dot.add(end_offset * BLOCK_SIZE);
+                    *dot = dot.add(end_offset * BLOCK_SIZE);
                 }
                 self.set_active_tetrimino_position();
-              }
             }
         }
 

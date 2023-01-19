@@ -7,6 +7,7 @@ pub struct Drawer {
 }
 
 impl Drawer {
+
     pub fn draw_current_tetrimino(&self, active_piece: &Piece) {
         // draw current block
         active_piece.dots.iter().for_each(|position| {

@@ -172,7 +172,7 @@ impl Tetrimino {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Piece {
     pub tetrimino: Tetrimino,
     pub dots: Vec<Vec2>,
