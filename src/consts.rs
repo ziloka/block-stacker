@@ -48,9 +48,9 @@ impl Tetrimino {
         match *self {
             Tetrimino::I => [
                 vec2(0.0, 0.0),
-                vec2(0.0, -1.0),
-                vec2(0.0, 2.0),
-                vec2(0.0, 1.0),
+                vec2(-1.0, 0.0),
+                vec2(2.0, 0.0),
+                vec2(1.0, 0.0),
             ],
             Tetrimino::J => [
                 vec2(0.0, 0.0),
@@ -172,6 +172,7 @@ impl Tetrimino {
     }
 }
 
+#[derive(Debug)]
 pub struct Piece {
     pub tetrimino: Tetrimino,
     pub dots: Vec<Vec2>,
