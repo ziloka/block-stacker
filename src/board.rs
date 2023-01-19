@@ -6,7 +6,7 @@ use macroquad::{
 };
 
 use crate::{
-    consts::{GameState, Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH},
+    consts::{GameState, Piece, Tetrimino, HEIGHT, TETRIMINO_TYPES, WIDTH},
     drawer::Drawer,
     generator::Generator,
     input::Input,
@@ -19,8 +19,6 @@ pub struct Board {
     pub active_piece: Piece,
     pub hold_piece: Option<Piece>,
     pub movement: Input,
-    left_top_corner: Vec2,
-    right_bottom_corner: Vec2,
     drawer: Drawer,
     generator: Generator,
     preview_pieces: [Tetrimino; 7],
@@ -31,7 +29,7 @@ const CELL_INIT: Option<Color> = None;
 const ROW_INIT: [Option<Color>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
 
 impl Board {
-    pub fn new(seed: u64, left_top_corner: Vec2, right_bottom_corner: Vec2) -> Self {
+    pub fn new(seed: u64, left_top_corner: Vec2) -> Self {
         srand(seed);
         let positions = [ROW_INIT; HEIGHT as usize];
         // this first place gets replaced so it doesn't matter what it is
@@ -40,12 +38,7 @@ impl Board {
             dots: TETRIMINO_TYPES[0]
                 .get_structure()
                 .iter()
-                .map(|pos| {
-                    vec2(
-                        left_top_corner.x + (WIDTH / 2.0 * BLOCK_SIZE) + pos.x * BLOCK_SIZE,
-                        left_top_corner.y + pos.y * BLOCK_SIZE,
-                    )
-                })
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
                 .collect(),
             rotation_index: 0,
         };
@@ -57,9 +50,7 @@ impl Board {
             active_piece,
             hold_piece: None,
             movement: Input::default(),
-            left_top_corner,
-            right_bottom_corner,
-            drawer: Drawer { left_top_corner },
+            drawer: Drawer::new(left_top_corner),
             generator,
             preview_pieces: tetriminos,
             // https://stackoverflow.com/a/53930630
@@ -69,12 +60,11 @@ impl Board {
         board
     }
 
-    pub fn draw_tetriminos(&self) {
+    pub fn draw(&self) {
         self.drawer.draw_tetriminos(&self.positions);
-    }
-
-    pub fn draw_current_tetrimino(&self) {
         self.drawer.draw_current_tetrimino(&self.active_piece);
+        self.drawer.draw_preview_pieces(&self.preview_pieces);
+        self.drawer.draw_hold_piece(&self.hold_piece);
     }
 
     pub fn hold_tetrimino(&mut self) {
@@ -87,12 +77,7 @@ impl Board {
                 .tetrimino
                 .get_structure()
                 .iter()
-                .map(|pos| {
-                    vec2(
-                        self.left_top_corner.x + (WIDTH / 2.0 * BLOCK_SIZE) + pos.x * BLOCK_SIZE,
-                        self.left_top_corner.y + pos.y * BLOCK_SIZE,
-                    )
-                })
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
                 .collect();
             hold_piece.rotation_index = 0;
             self.hold_piece = Some(self.active_piece.clone());
@@ -106,12 +91,7 @@ impl Board {
             dots: self.preview_pieces[0]
                 .get_structure()
                 .iter()
-                .map(|pos| {
-                    vec2(
-                        self.left_top_corner.x + (WIDTH / 2.0 * BLOCK_SIZE) + pos.x * BLOCK_SIZE,
-                        self.left_top_corner.y + pos.y * BLOCK_SIZE,
-                    )
-                })
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
                 .collect(),
             rotation_index: 0,
         };
@@ -125,31 +105,20 @@ impl Board {
         self.preview_pieces[self.preview_pieces.len() - 1] = self.generator.next();
     }
 
-    pub fn get_relative_position_on_board(&self, absolute_position: Vec2) -> (usize, usize) {
-        let relative_position = self
-            .left_top_corner
-            .abs()
-            .sub(absolute_position.abs())
-            .abs();
-        let row = (relative_position.y / BLOCK_SIZE) as usize;
-        let column = (relative_position.x / BLOCK_SIZE) as usize;
-        (row, column)
-    }
-
     // and x and y position are based off of the top left corner of the piece
     pub fn conflict(&self, relative_offset: Vec2) -> bool {
         self.active_piece
             .dots
             .iter()
             .map(|relative_position| relative_position.add(relative_offset))
-            .any(|absolute| {
-                let (row, column) = self.get_relative_position_on_board(absolute);
+            .any(|relative| {
+                let Vec2 { x: column, y: row } = relative;
                 (
-                    absolute.x < self.left_top_corner.x // for the left side
-               || absolute.x >=self.right_bottom_corner.x // for the right side
-               || absolute.y >= self.right_bottom_corner.y
+                    relative.x < 0.0 // for the left side
+               || relative.x >= WIDTH // for the right side
+               || relative.y >= HEIGHT
                     // for the floor (bottom)
-                ) || self.positions[row][column].is_some()
+                ) || self.positions[row as usize][column as usize].is_some()
             })
     }
 
@@ -204,7 +173,7 @@ impl Board {
             // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
             if !self.conflict(end_offset) && end_offset == vec2(0.0, -1.0) {
                 for dot in self.active_piece.dots.iter_mut() {
-                    *dot = dot.add(end_offset * BLOCK_SIZE);
+                    *dot = dot.add(end_offset);
                 }
                 self.set_active_tetrimino_position();
             }
@@ -214,9 +183,10 @@ impl Board {
     }
 
     pub fn set_active_tetrimino_position(&mut self) {
-        for absolute_position in &self.active_piece.dots {
-            let (row, column) = self.get_relative_position_on_board(*absolute_position);
-            self.positions[row][column] = Some(self.active_piece.tetrimino.get_color());
+        for relative_position in &self.active_piece.dots {
+            let Vec2 { x: column, y: row } = relative_position.clone();
+            self.positions[row as usize][column as usize] =
+                Some(self.active_piece.tetrimino.get_color());
         }
         self.set_next_tetrimino_as_active_piece();
     }

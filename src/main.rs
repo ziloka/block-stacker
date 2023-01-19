@@ -16,16 +16,13 @@ mod settings;
 mod utils;
 
 use board::Board;
-use consts::{GameState, BLOCK_SIZE, HEIGHT, WIDTH};
+use consts::GameState;
 use input::Input;
 
 #[main("Tetris")]
 async fn main() {
-    let mut board = Board::new(
-        now() as u64,
-        vec2(200.0, 20.0),
-        vec2(200.0 + WIDTH * BLOCK_SIZE, 20.0 + HEIGHT * BLOCK_SIZE),
-    );
+    let left_top_corner = vec2(200.0, 40.0);
+    let mut board = Board::new(now() as u64, left_top_corner);
     let mut input = Input::default();
 
     loop {
@@ -35,8 +32,7 @@ async fn main() {
             }
             GameState::Playing => {
                 clear_background(BLACK);
-                board.draw_tetriminos();
-                board.draw_current_tetrimino();
+                board.draw();
                 input.handle(&mut board);
             }
             GameState::Paused => {

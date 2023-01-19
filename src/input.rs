@@ -5,10 +5,7 @@ use macroquad::{
     time::get_time,
 };
 
-use crate::{
-    board::Board,
-    consts::{BLOCK_SIZE, HEIGHT},
-};
+use crate::{board::Board, consts::HEIGHT};
 
 pub struct Input {
     holding: bool,
@@ -34,22 +31,20 @@ impl Input {
                 && (self.time % board.settings.handles.arr as f64)
                     < board.settings.handles.arr as f64)
         {
-            if is_key_down(board.settings.controls.left) && !board.conflict(vec2(-BLOCK_SIZE, 0.0))
-            {
+            if is_key_down(board.settings.controls.left) && !board.conflict(vec2(-1.0, 0.0)) {
                 for dot in board.active_piece.dots.iter_mut() {
-                    dot.x -= BLOCK_SIZE;
+                    dot.x -= 1.0;
                 }
-            } else if is_key_down(board.settings.controls.right)
-                && !board.conflict(vec2(BLOCK_SIZE, 0.0))
+            } else if is_key_down(board.settings.controls.right) && !board.conflict(vec2(1.0, 0.0))
             {
                 for dot in board.active_piece.dots.iter_mut() {
-                    dot.x += BLOCK_SIZE;
+                    dot.x += 1.0;
                 }
             } else if is_key_down(board.settings.controls.soft_drop)
-                && !board.conflict(vec2(0.0, BLOCK_SIZE))
+                && !board.conflict(vec2(0.0, 1.0))
             {
                 for dot in board.active_piece.dots.iter_mut() {
-                    dot.y += BLOCK_SIZE;
+                    dot.y += 1.0;
                 }
             }
         }
@@ -71,8 +66,8 @@ impl Input {
             let mut y_offset = 0.0;
             for y in 0..HEIGHT as i32 {
                 let y = y as f32;
-                if !board.conflict(vec2(0.0, y * BLOCK_SIZE)) {
-                    y_offset = y * BLOCK_SIZE;
+                if !board.conflict(vec2(0.0, y)) {
+                    y_offset = y;
                 }
             }
             for dot in board.active_piece.dots.iter_mut() {

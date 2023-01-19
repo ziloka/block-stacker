@@ -15,7 +15,7 @@ enum FocusedOn {
     HardDrop,
     RotateClockwise,
     RotateCounterclockwise,
-    Hold
+    Hold,
 }
 
 // https://tetris.wiki/DAS
@@ -104,15 +104,9 @@ impl Settings {
                     ) {
                         self.focused_on = Some(FocusedOn::RotateCounterclockwise);
                     }
-                    if ui.button(
-                      None,
-                      format!(
-                          "Hold: {:?}",
-                          self.controls.hold
-                      ),
-                  ) {
-                      self.focused_on = Some(FocusedOn::Hold);
-                  }
+                    if ui.button(None, format!("Hold: {:?}", self.controls.hold)) {
+                        self.focused_on = Some(FocusedOn::Hold);
+                    }
                     if let Some(focused_on) = &self.focused_on {
                         if let Some(keycode) = get_last_key_pressed() {
                             match focused_on {
@@ -126,8 +120,7 @@ impl Settings {
                                 FocusedOn::RotateCounterclockwise => {
                                     self.controls.rotate_counterclockwise = keycode
                                 }
-                                FocusedOn::Hold => self.controls.hold = keycode
-                                
+                                FocusedOn::Hold => self.controls.hold = keycode,
                             }
                             self.focused_on = None;
                         }
@@ -150,10 +143,10 @@ impl EventHandler for Settings {
         println!("resize event");
     }
     fn mouse_motion_event(&mut self, _ctx: &mut GraphicsContext, _x: f32, _y: f32) {
-        println!("mouse motion event");
+        // println!("mouse motion event");
     }
     fn mouse_wheel_event(&mut self, _ctx: &mut GraphicsContext, _x: f32, _y: f32) {
-        println!("mouse wheel event");
+        // println!("mouse wheel event");
     }
     fn mouse_button_down_event(
         &mut self,

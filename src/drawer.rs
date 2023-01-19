@@ -1,19 +1,24 @@
-use macroquad::prelude::{draw_rectangle, Color, Vec2, GRAY};
+use macroquad::prelude::{draw_rectangle, vec2, Color, Vec2, GRAY};
 
-use crate::consts::{Piece, BLOCK_SIZE, HEIGHT, WIDTH};
+use crate::consts::{Piece, Tetrimino, BLOCK_SIZE, HEIGHT, WIDTH};
 
 pub struct Drawer {
     pub left_top_corner: Vec2,
 }
 
 impl Drawer {
+    pub fn new(left_top_corner: Vec2) -> Self {
+        Self {
+            left_top_corner
+        }
+    }
 
     pub fn draw_current_tetrimino(&self, active_piece: &Piece) {
         // draw current block
         active_piece.dots.iter().for_each(|position| {
             draw_rectangle(
-                position.x,
-                position.y,
+                self.left_top_corner.x + position.x * BLOCK_SIZE,
+                self.left_top_corner.y + position.y * BLOCK_SIZE,
                 BLOCK_SIZE,
                 BLOCK_SIZE,
                 active_piece.tetrimino.get_color(),
@@ -43,6 +48,37 @@ impl Drawer {
                     );
                 }
             }
+        }
+    }
+
+    pub fn draw_preview_pieces(&self, preview_pieces: &[Tetrimino; 7]) {
+        preview_pieces
+            .iter()
+            .enumerate()
+            .for_each(|(i, tetrimino)| {
+                tetrimino.get_structure().iter().for_each(|position| {
+                    draw_rectangle(
+                        self.left_top_corner.x + (WIDTH + 2.0 + position.x) * BLOCK_SIZE,
+                        self.left_top_corner.y + (i as f32 * 3.0 + position.y) * BLOCK_SIZE,
+                        BLOCK_SIZE,
+                        BLOCK_SIZE,
+                        tetrimino.get_color(),
+                    );
+                });
+            });
+    }
+
+    pub fn draw_hold_piece(&self, hold_piece: &Option<Piece>) {
+        if let Some(piece) = hold_piece {
+            piece.dots.iter().for_each(|position| {
+                draw_rectangle(
+                    self.left_top_corner.x - position.x * BLOCK_SIZE + BLOCK_SIZE,
+                    self.left_top_corner.y - position.y * BLOCK_SIZE + BLOCK_SIZE,
+                    BLOCK_SIZE,
+                    BLOCK_SIZE,
+                    piece.tetrimino.get_color(),
+                );
+            });
         }
     }
 }
