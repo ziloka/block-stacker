@@ -1,14 +1,15 @@
 use std::ops::{Add, Sub};
 
 use macroquad::{
-    prelude::{draw_rectangle, is_key_down, is_key_pressed, vec2, Color, Vec2, GRAY},
-    rand::{gen_range, srand},
+    prelude::{is_key_down, is_key_pressed, vec2, Color, Vec2},
+    rand::srand,
     time::get_time,
 };
 
-use crate::consts::{GameState, Piece, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH, Tetrimino};
-use crate::settings::Settings;
+use crate::consts::{GameState, Piece, Tetrimino, BLOCK_SIZE, HEIGHT, TETRIMINO_TYPES, WIDTH};
+use crate::drawer::Drawer;
 use crate::generator::Generator;
+use crate::settings::Settings;
 
 pub struct Board {
     left_top_corner: Vec2,
@@ -17,6 +18,7 @@ pub struct Board {
     time: f64,
     active_piece: Piece,
     preview_pieces: [Tetrimino; 7],
+    pub drawer: Drawer,
     pub game_state: GameState,
     pub settings: Settings,
     positions: [[Option<Color>; WIDTH as usize]; HEIGHT as usize],
@@ -28,8 +30,22 @@ const ROW_INIT: [Option<Color>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
 impl Board {
     pub fn new(seed: u64, left_top_corner: Vec2, right_bottom_corner: Vec2) -> Self {
         srand(seed);
-        let tetrimino_type =
-            TETRIMINO_TYPES[gen_range::<usize>(0, TETRIMINO_TYPES.len())];
+        let positions = [ROW_INIT; HEIGHT as usize];
+        // this first place gets replaced so it doesn't matter what it is
+        let active_piece = Piece {
+            tetrimino: TETRIMINO_TYPES[0],
+            dots: TETRIMINO_TYPES[0]
+                .get_structure()
+                .into_iter()
+                .map(|pos| {
+                    vec2(
+                        left_top_corner.x + (WIDTH / 2.0 * BLOCK_SIZE) + pos.x * BLOCK_SIZE,
+                        left_top_corner.y + pos.y * BLOCK_SIZE,
+                    )
+                })
+                .collect(),
+            rotation_index: 0,
+        };
         let mut generator = Generator::new(seed);
         let tetriminos = generator.get_new_sequence_of_tetriminos();
         let mut board = Self {
@@ -37,28 +53,26 @@ impl Board {
             right_bottom_corner: right_bottom_corner,
             generator: generator,
             time: get_time() * 1000.0,
-            active_piece: Piece {
-                tetrimino: tetrimino_type,
-                dots: tetrimino_type
-                    .get_structure()
-                    .into_iter()
-                    .map(|pos| {
-                        vec2(
-                            left_top_corner.x + (WIDTH / 2.0 * BLOCK_SIZE) + pos.x * BLOCK_SIZE,
-                            left_top_corner.y + pos.y * BLOCK_SIZE,
-                        )
-                    })
-                    .collect(),
-                rotation_index: 0,
+            active_piece: active_piece,
+            drawer: Drawer {
+                left_top_corner: left_top_corner,
             },
             preview_pieces: tetriminos,
             game_state: GameState::Playing,
             settings: Settings::default(),
             // https://stackoverflow.com/a/53930630
-            positions: [ROW_INIT; HEIGHT as usize],
+            positions,
         };
         board.set_next_tetrimino_as_active_piece();
         board
+    }
+
+    pub fn draw_tetriminos(&self) {
+        self.drawer.draw_tetriminos(&self.positions);
+    }
+
+    pub fn draw_current_tetrimino(&self) {
+        self.drawer.draw_current_tetrimino(&self.active_piece);
     }
 
     pub fn handle_movement(&mut self) {
@@ -117,11 +131,9 @@ impl Board {
     }
 
     fn set_next_tetrimino_as_active_piece(&mut self) {
-        let tetrimino_type =
-            self.preview_pieces[0];
         self.active_piece = Piece {
-            tetrimino: tetrimino_type,
-            dots: tetrimino_type
+            tetrimino: self.preview_pieces[0],
+            dots: self.preview_pieces[0]
                 .get_structure()
                 .iter()
                 .map(|pos| {
@@ -141,44 +153,6 @@ impl Board {
             self.preview_pieces[i - 1] = self.preview_pieces[i];
         }
         self.preview_pieces[self.preview_pieces.len() - 1] = self.generator.next();
-    }
-
-    pub fn draw_current_tetrimino(&self) {
-        // draw current block
-        self.active_piece.dots.iter().for_each(|position| {
-            draw_rectangle(
-                position.x,
-                position.y,
-                BLOCK_SIZE,
-                BLOCK_SIZE,
-                self.active_piece.tetrimino.get_color(),
-            );
-        });
-    }
-
-    pub fn draw_tetriminos(&self) {
-        draw_rectangle(
-            self.left_top_corner.x,
-            self.left_top_corner.y,
-            WIDTH * BLOCK_SIZE,
-            HEIGHT * BLOCK_SIZE,
-            GRAY,
-        );
-
-        // draw all the blocks that are already on the board
-        for (y, row) in self.positions.iter().enumerate() {
-            for (x, color) in row.iter().enumerate() {
-                if let Some(color) = color {
-                    draw_rectangle(
-                        self.left_top_corner.x + x as f32 * BLOCK_SIZE,
-                        self.left_top_corner.y + y as f32 * BLOCK_SIZE,
-                        BLOCK_SIZE,
-                        BLOCK_SIZE,
-                        *color,
-                    );
-                }
-            }
-        }
     }
 
     pub fn get_relative_position_on_board(&self, absolute_position: Vec2) -> (usize, usize) {

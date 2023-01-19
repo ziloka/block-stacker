@@ -8,8 +8,5 @@ RUN rustup target add wasm32-unknown-unknown \
 
 # Install macroquad & egui debian/ubuntu dependencies
 # https://github.com/not-fl3/macroquad#linux
-# https://github.com/emilk/egui#demo
 RUN apt-get update \
     && apt-get install -y pkg-config libx11-dev libxi-dev libgl1-mesa-dev libasound2-dev
-
-RUN apt-get install -y neofetch zip
