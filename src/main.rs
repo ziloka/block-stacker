@@ -21,7 +21,7 @@ use input::Input;
 
 #[main("Tetris")]
 async fn main() {
-    let left_top_corner = vec2(200.0, 40.0);
+    let left_top_corner = vec2(200.0, 10.0);
     let mut board = Board::new(now() as u64, left_top_corner);
     let mut input = Input::default();
 

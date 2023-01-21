@@ -1,4 +1,4 @@
-use macroquad::prelude::{draw_rectangle, vec2, Color, Vec2, GRAY};
+use macroquad::prelude::{draw_rectangle, Color, Vec2, GRAY};
 
 use crate::consts::{Piece, Tetrimino, BLOCK_SIZE, HEIGHT, WIDTH};
 
@@ -70,9 +70,9 @@ impl Drawer {
 
     pub fn draw_hold_piece(&self, hold_piece: &Option<Piece>) {
         if let Some(piece) = hold_piece {
-            piece.dots.iter().for_each(|position| {
+            piece.tetrimino.get_structure().iter().for_each(|position| {
                 draw_rectangle(
-                    self.left_top_corner.x - position.x * BLOCK_SIZE + BLOCK_SIZE,
+                    self.left_top_corner.x - position.x * BLOCK_SIZE + BLOCK_SIZE * -4.0,
                     self.left_top_corner.y - position.y * BLOCK_SIZE + BLOCK_SIZE,
                     BLOCK_SIZE,
                     BLOCK_SIZE,

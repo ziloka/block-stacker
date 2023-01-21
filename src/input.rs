@@ -24,7 +24,11 @@ impl default::Default for Input {
 impl Input {
     // handles movement
     pub fn handle(&mut self, board: &mut Board) {
-        // println!("time: {}, das: {}", self.time % board.settings.handles.das as f64, board.settings.handles.das);
+
+        self.holding = is_key_pressed(board.settings.controls.left)
+            || is_key_pressed(board.settings.controls.right)
+            || is_key_pressed(board.settings.controls.soft_drop);
+
         if !self.holding
             && (self.time % board.settings.handles.das as f64) < board.settings.handles.das as f64
             || (self.holding
@@ -47,13 +51,6 @@ impl Input {
                     dot.y += 1.0;
                 }
             }
-        }
-
-        self.holding = is_key_down(board.settings.controls.left)
-            || is_key_down(board.settings.controls.right)
-            || is_key_down(board.settings.controls.soft_drop);
-        if self.holding {
-            self.time = get_time() * 1000.0;
         }
 
         // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L140-L147
@@ -80,5 +77,8 @@ impl Input {
 
         // handle line clears
         board.clear_lines();
+
+        // update time
+        self.time = get_time() * 1000.0;
     }
 }

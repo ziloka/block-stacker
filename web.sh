@@ -1,4 +1,6 @@
 rustup target add wasm32-unknown-unknown
+rustup toolchain install nightly
+rustup component add rust-src --toolchain nightly
 cargo +nightly build -Z build-std=std,panic_abort --target wasm32-unknown-unknown --release
 
 # Recommended way
@@ -37,5 +39,12 @@ echo "<html lang=\"en\">
 </body>
 </html>" > index.html
 
+echo "[advanced]
+
+[[advanced.headers]]
+source = \"**/*.{wasm,jpg,jpeg,png,ico,gif}\"
+headers.Cache-Control = \"max-age=0;\"
+headers.Strict-Transport-Security = \"max-age=0; includeSubDomains; preload\"" > config.toml
+
 echo "Running application on http://localhost:8080"
-static-web-server --port 8080 --root .
+static-web-server --config-file config.toml --log-level "trace" --port 8080 --root .
