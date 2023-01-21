@@ -16,12 +16,15 @@ impl tetris::drawer::Drawer for Drawer {
                 self.left_top_corner.y + position.y * BLOCK_SIZE,
                 BLOCK_SIZE,
                 BLOCK_SIZE,
-                Color::new(r as f32, g as f32, b as f32, 0.0),
+                Color::from_rgba(r, g, b, 255),
             );
         });
     }
 
-    fn draw_tetriminos(&self, positions: &[[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize]) {
+    fn draw_tetriminos(
+        &self,
+        positions: &[[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
+    ) {
         draw_rectangle(
             self.left_top_corner.x,
             self.left_top_corner.y,
@@ -40,7 +43,7 @@ impl tetris::drawer::Drawer for Drawer {
                         self.left_top_corner.y + y as f32 * BLOCK_SIZE,
                         BLOCK_SIZE,
                         BLOCK_SIZE,
-                        Color::new(r as f32, g as f32, b as f32, 0.0),
+                        Color::from_rgba(r, g, b, 255),
                     );
                 }
             }
@@ -59,7 +62,7 @@ impl tetris::drawer::Drawer for Drawer {
                         self.left_top_corner.y + (i as f32 * 3.0 + position.y) * BLOCK_SIZE,
                         BLOCK_SIZE,
                         BLOCK_SIZE,
-                        Color::new(r as f32, g as f32, b as f32, 0.0),
+                        Color::from_rgba(r, g, b, 255),
                     );
                 });
             });
@@ -74,7 +77,7 @@ impl tetris::drawer::Drawer for Drawer {
                     self.left_top_corner.y - position.y * BLOCK_SIZE + BLOCK_SIZE,
                     BLOCK_SIZE,
                     BLOCK_SIZE,
-                    Color::new(r as f32, g as f32, b as f32, 0.0),
+                    Color::from_rgba(r, g, b, 255),
                 );
             });
         }

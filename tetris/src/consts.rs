@@ -1,17 +1,14 @@
-use std::ops::{Add, Sub, Div, Mul};
+use std::ops::{Add, Div, Mul, Sub};
 
-#[derive(Clone, Copy, Debug)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 pub struct Vec2 {
     pub x: f32,
-    pub y: f32
+    pub y: f32,
 }
 
 pub fn vec2(x: f32, y: f32) -> Vec2 {
-    Vec2 {
-        x,
-        y
-    }
-} 
+    Vec2 { x, y }
+}
 
 impl Add<Vec2> for Vec2 {
     type Output = Vec2;
@@ -84,12 +81,12 @@ impl Tetrimino {
     // RGB value of color
     pub fn get_color(&self) -> (u8, u8, u8) {
         match *self {
-            Tetrimino::I => (0, 181, 226),
+            Tetrimino::I => (0, 255, 255),
             Tetrimino::J => (0, 0, 255),
-            Tetrimino::L => (255, 165, 0),
+            Tetrimino::L => (255, 129, 0),
             Tetrimino::O => (255, 255, 0),
             Tetrimino::S => (0, 255, 0),
-            Tetrimino::T => (218, 112, 214),
+            Tetrimino::T => (255, 0, 255),
             Tetrimino::Z => (255, 0, 0),
         }
     }
