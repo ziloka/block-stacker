@@ -1,19 +1,14 @@
-use macroquad::prelude::{draw_rectangle, Color, Vec2, GRAY};
+use macroquad::prelude::{draw_rectangle, Color, GRAY};
 
-use crate::consts::{Piece, Tetrimino, BLOCK_SIZE, HEIGHT, WIDTH};
+use tetris::consts::{Piece, Tetrimino, Vec2, BLOCK_SIZE, HEIGHT, WIDTH};
 
 pub struct Drawer {
     pub left_top_corner: Vec2,
 }
 
-impl Drawer {
-    pub fn new(left_top_corner: Vec2) -> Self {
-        Self {
-            left_top_corner
-        }
-    }
-
-    pub fn draw_current_tetrimino(&self, active_piece: &Piece) {
+impl tetris::drawer::Drawer for Drawer {
+    fn draw_current_tetrimino(&self, active_piece: &Piece) {
+        let (r, g, b) = active_piece.tetrimino.get_color();
         // draw current block
         active_piece.dots.iter().for_each(|position| {
             draw_rectangle(
@@ -21,12 +16,12 @@ impl Drawer {
                 self.left_top_corner.y + position.y * BLOCK_SIZE,
                 BLOCK_SIZE,
                 BLOCK_SIZE,
-                active_piece.tetrimino.get_color(),
+                Color::new(r as f32, g as f32, b as f32, 0.0),
             );
         });
     }
 
-    pub fn draw_tetriminos(&self, positions: &[[Option<Color>; WIDTH as usize]; HEIGHT as usize]) {
+    fn draw_tetriminos(&self, positions: &[[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize]) {
         draw_rectangle(
             self.left_top_corner.x,
             self.left_top_corner.y,
@@ -39,44 +34,47 @@ impl Drawer {
         for (y, row) in positions.iter().enumerate() {
             for (x, color) in row.iter().enumerate() {
                 if let Some(color) = color {
+                    let (r, g, b) = *color;
                     draw_rectangle(
                         self.left_top_corner.x + x as f32 * BLOCK_SIZE,
                         self.left_top_corner.y + y as f32 * BLOCK_SIZE,
                         BLOCK_SIZE,
                         BLOCK_SIZE,
-                        *color,
+                        Color::new(r as f32, g as f32, b as f32, 0.0),
                     );
                 }
             }
         }
     }
 
-    pub fn draw_preview_pieces(&self, preview_pieces: &[Tetrimino; 7]) {
+    fn draw_preview_pieces(&self, preview_pieces: &[Tetrimino; 7]) {
         preview_pieces
             .iter()
             .enumerate()
             .for_each(|(i, tetrimino)| {
                 tetrimino.get_structure().iter().for_each(|position| {
+                    let (r, g, b) = tetrimino.get_color();
                     draw_rectangle(
                         self.left_top_corner.x + (WIDTH + 2.0 + position.x) * BLOCK_SIZE,
                         self.left_top_corner.y + (i as f32 * 3.0 + position.y) * BLOCK_SIZE,
                         BLOCK_SIZE,
                         BLOCK_SIZE,
-                        tetrimino.get_color(),
+                        Color::new(r as f32, g as f32, b as f32, 0.0),
                     );
                 });
             });
     }
 
-    pub fn draw_hold_piece(&self, hold_piece: &Option<Piece>) {
+    fn draw_hold_piece(&self, hold_piece: &Option<Piece>) {
         if let Some(piece) = hold_piece {
             piece.tetrimino.get_structure().iter().for_each(|position| {
+                let (r, g, b) = piece.tetrimino.get_color();
                 draw_rectangle(
                     self.left_top_corner.x - position.x * BLOCK_SIZE + BLOCK_SIZE * -4.0,
                     self.left_top_corner.y - position.y * BLOCK_SIZE + BLOCK_SIZE,
                     BLOCK_SIZE,
                     BLOCK_SIZE,
-                    piece.tetrimino.get_color(),
+                    Color::new(r as f32, g as f32, b as f32, 0.0),
                 );
             });
         }

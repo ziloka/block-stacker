@@ -1,36 +1,23 @@
 use std::ops::{Add, Sub};
 
-use macroquad::{
-    prelude::{vec2, Color, Vec2},
-    rand::srand,
-};
-
 use crate::{
-    consts::{GameState, Piece, Tetrimino, HEIGHT, TETRIMINO_TYPES, WIDTH},
-    drawer::Drawer,
-    generator::Generator,
-    input::Input,
-    settings::Settings,
+    consts::{GameState, Piece, Tetrimino, Vec2, vec2, HEIGHT, TETRIMINO_TYPES, WIDTH},
+    generator::Generator, drawer::Drawer,
 };
 
 pub struct Board {
     pub game_state: GameState,
-    pub settings: Settings,
     pub active_piece: Piece,
     pub hold_piece: Option<Piece>,
-    pub movement: Input,
-    drawer: Drawer,
     generator: Generator,
     preview_pieces: [Tetrimino; 7],
-    positions: [[Option<Color>; WIDTH as usize]; HEIGHT as usize],
+    positions: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
 }
 
-const CELL_INIT: Option<Color> = None;
-const ROW_INIT: [Option<Color>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
-
 impl Board {
-    pub fn new(seed: u64, left_top_corner: Vec2) -> Self {
-        srand(seed);
+    pub fn new(seed: usize) -> Self {
+        const CELL_INIT: Option<(u8, u8, u8)> = None;
+        const ROW_INIT: [Option<(u8, u8, u8)>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
         let positions = [ROW_INIT; HEIGHT as usize];
         // this first place gets replaced so it doesn't matter what it is
         let active_piece = Piece {
@@ -46,11 +33,8 @@ impl Board {
         let tetriminos = generator.get_new_sequence_of_tetriminos();
         let mut board = Self {
             game_state: GameState::Playing,
-            settings: Settings::default(),
             active_piece,
             hold_piece: None,
-            movement: Input::default(),
-            drawer: Drawer::new(left_top_corner),
             generator,
             preview_pieces: tetriminos,
             // https://stackoverflow.com/a/53930630
@@ -60,11 +44,11 @@ impl Board {
         board
     }
 
-    pub fn draw(&self) {
-        self.drawer.draw_tetriminos(&self.positions);
-        self.drawer.draw_current_tetrimino(&self.active_piece);
-        self.drawer.draw_preview_pieces(&self.preview_pieces);
-        self.drawer.draw_hold_piece(&self.hold_piece);
+    pub fn draw<T>(&self, drawer: &T) where T: Drawer {
+        drawer.draw_tetriminos(&self.positions);
+        drawer.draw_current_tetrimino(&self.active_piece);
+        drawer.draw_preview_pieces(&self.preview_pieces);
+        drawer.draw_hold_piece(&self.hold_piece);
     }
 
     pub fn hold_tetrimino(&mut self) {

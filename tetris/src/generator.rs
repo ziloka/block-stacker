@@ -1,24 +1,29 @@
 use crate::consts::{Tetrimino, TETRIMINO_TYPES};
-use crate::utils::shuffle;
+use crate::utils::Random;
 
 // https://tetris.fandom.com/wiki/Random_Generator
 pub struct Generator {
-    seed: u64,
+    random: Random,
     bag: [Tetrimino; 7],
-    next: i8,
+    next: usize,
 }
 
 impl Generator {
-    pub fn new(seed: u64) -> Self {
+    pub fn new(seed: usize) -> Self {
+        let mut random = Random::new(seed);
+        let mut bag = TETRIMINO_TYPES;
+        random.shuffle(&mut bag);
         Self {
-            seed,
-            bag: get_new_sequence_of_tetriminos(),
+            random: random,
+            bag: bag,
             next: 0,
         }
     }
 
     pub fn get_new_sequence_of_tetriminos(&mut self) -> [Tetrimino; 7] {
-        get_new_sequence_of_tetriminos()
+        let mut bag = TETRIMINO_TYPES;
+        self.random.shuffle(&mut bag);
+        bag
     }
 
     pub fn next(&mut self) -> Tetrimino {
@@ -34,8 +39,3 @@ impl Generator {
     }
 }
 
-fn get_new_sequence_of_tetriminos() -> [Tetrimino; 7] {
-    let mut bag = TETRIMINO_TYPES;
-    shuffle(&mut bag);
-    bag
-}

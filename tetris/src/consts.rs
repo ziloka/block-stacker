@@ -1,8 +1,59 @@
-use macroquad::{
-    color::{Color, BLUE, GREEN, ORANGE, PURPLE, RED, SKYBLUE, YELLOW},
-    prelude::{vec2, Vec2},
-};
+use std::ops::{Add, Sub, Div, Mul};
 
+#[derive(Clone, Copy, Debug)]
+pub struct Vec2 {
+    pub x: f32,
+    pub y: f32
+}
+
+pub fn vec2(x: f32, y: f32) -> Vec2 {
+    Vec2 {
+        x,
+        y
+    }
+} 
+
+impl Add<Vec2> for Vec2 {
+    type Output = Vec2;
+    fn add(self, rhs: Vec2) -> Self::Output {
+        Vec2 {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+impl Sub<Vec2> for Vec2 {
+    type Output = Vec2;
+    fn sub(self, rhs: Vec2) -> Self::Output {
+        Vec2 {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+        }
+    }
+}
+
+impl Div<Vec2> for Vec2 {
+    type Output = Vec2;
+    fn div(self, rhs: Vec2) -> Self::Output {
+        Vec2 {
+            x: self.x / rhs.x,
+            y: self.y / rhs.y,
+        }
+    }
+}
+
+impl Mul<Vec2> for Vec2 {
+    type Output = Vec2;
+    fn mul(self, rhs: Vec2) -> Self::Output {
+        Vec2 {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+        }
+    }
+}
+
+pub const GRAY: (u8, u8, u8) = (128, 128, 128);
 pub const HEIGHT: f32 = 20.0;
 pub const WIDTH: f32 = 10.0;
 pub const BLOCK_SIZE: f32 = 30.0;
@@ -30,15 +81,16 @@ pub enum Tetrimino {
 }
 
 impl Tetrimino {
-    pub fn get_color(&self) -> Color {
+    // RGB value of color
+    pub fn get_color(&self) -> (u8, u8, u8) {
         match *self {
-            Tetrimino::I => SKYBLUE,
-            Tetrimino::J => BLUE,
-            Tetrimino::L => ORANGE,
-            Tetrimino::O => YELLOW,
-            Tetrimino::S => GREEN,
-            Tetrimino::T => PURPLE,
-            Tetrimino::Z => RED,
+            Tetrimino::I => (0, 181, 226),
+            Tetrimino::J => (0, 0, 255),
+            Tetrimino::L => (255, 165, 0),
+            Tetrimino::O => (255, 255, 0),
+            Tetrimino::S => (0, 255, 0),
+            Tetrimino::T => (218, 112, 214),
+            Tetrimino::Z => (255, 0, 0),
         }
     }
 

@@ -1,39 +1,34 @@
 use macroquad::{
     main,
-    miniquad::date::now,
-    prelude::{is_key_pressed, vec2, BLACK, WHITE},
+    prelude::{is_key_pressed, BLACK, WHITE},
     text::draw_text,
     time::get_fps,
     window::{clear_background, next_frame},
 };
 
-mod board;
-mod consts;
+use tetris::{board::Board, consts::{vec2, GameState}};
+
 mod drawer;
-mod generator;
 mod input;
 mod settings;
-mod utils;
+mod game;
 
-use board::Board;
-use consts::GameState;
-use input::Input;
+use game::Game;
 
 #[main("Tetris")]
 async fn main() {
     let left_top_corner = vec2(200.0, 10.0);
-    let mut board = Board::new(now() as u64, left_top_corner);
-    let mut input = Input::default();
+    let mut game = Game::new(left_top_corner);
 
     loop {
-        match board.game_state {
+        match game.board.game_state {
             GameState::OpenSettings => {
-                board.settings.draw_menu();
+                game.input.settings.draw_menu();
             }
             GameState::Playing => {
                 clear_background(BLACK);
-                board.draw();
-                input.handle(&mut board);
+                game.board.draw(&game.drawer);
+                game.input.handle(&mut game.board);
             }
             GameState::Paused => {
                 todo!();
@@ -42,7 +37,7 @@ async fn main() {
                 todo!();
             }
         }
-        handle_keyboard_input(&mut board);
+        handle_keyboard_input(&mut game.board);
         draw_text(
             format!("fps: {}", get_fps()).as_str(),
             10.0,
