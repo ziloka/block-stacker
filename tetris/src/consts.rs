@@ -55,19 +55,19 @@ pub const HEIGHT: f32 = 20.0;
 pub const WIDTH: f32 = 10.0;
 pub const BLOCK_SIZE: f32 = 30.0;
 
-pub const TETRIMINO_TYPES: [Tetrimino; 7] = [
-    Tetrimino::I,
-    Tetrimino::J,
-    Tetrimino::L,
-    Tetrimino::O,
-    Tetrimino::S,
-    Tetrimino::T,
-    Tetrimino::Z,
+pub const TETROMINO_TYPES: [Tetromino; 7] = [
+    Tetromino::I,
+    Tetromino::J,
+    Tetromino::L,
+    Tetromino::O,
+    Tetromino::S,
+    Tetromino::T,
+    Tetromino::Z,
 ];
 
 // https://en.wikipedia.org/wiki/Tetromino
 #[derive(Clone, Copy, Debug)]
-pub enum Tetrimino {
+pub enum Tetromino {
     I,
     J,
     L,
@@ -77,17 +77,17 @@ pub enum Tetrimino {
     Z,
 }
 
-impl Tetrimino {
+impl Tetromino {
     // RGB value of color
     pub fn get_color(&self) -> (u8, u8, u8) {
         match *self {
-            Tetrimino::I => (0, 255, 255),
-            Tetrimino::J => (0, 0, 255),
-            Tetrimino::L => (255, 129, 0),
-            Tetrimino::O => (255, 255, 0),
-            Tetrimino::S => (0, 255, 0),
-            Tetrimino::T => (255, 0, 255),
-            Tetrimino::Z => (255, 0, 0),
+            Tetromino::I => (0, 255, 255),
+            Tetromino::J => (0, 0, 255),
+            Tetromino::L => (255, 129, 0),
+            Tetromino::O => (255, 255, 0),
+            Tetromino::S => (0, 255, 0),
+            Tetromino::T => (255, 0, 255),
+            Tetromino::Z => (255, 0, 0),
         }
     }
 
@@ -95,43 +95,43 @@ impl Tetrimino {
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L48-L101
     pub fn get_structure(&self) -> [Vec2; 4] {
         match *self {
-            Tetrimino::I => [
+            Tetromino::I => [
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
                 vec2(2.0, 0.0),
                 vec2(1.0, 0.0),
             ],
-            Tetrimino::J => [
+            Tetromino::J => [
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
                 vec2(1.0, 1.0),
                 vec2(1.0, 0.0),
             ],
-            Tetrimino::L => [
+            Tetromino::L => [
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
                 vec2(-1.0, 1.0),
                 vec2(1.0, 0.0),
             ],
-            Tetrimino::O => [
+            Tetromino::O => [
                 vec2(0.0, 0.0),
                 vec2(1.0, 1.0),
                 vec2(0.0, 1.0),
                 vec2(1.0, 0.0),
             ],
-            Tetrimino::S => [
+            Tetromino::S => [
                 vec2(0.0, 0.0),
                 vec2(0.0, 1.0),
                 vec2(-1.0, 1.0),
                 vec2(1.0, 0.0),
             ],
-            Tetrimino::T => [
+            Tetromino::T => [
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
                 vec2(0.0, 1.0),
                 vec2(1.0, 0.0),
             ],
-            Tetrimino::Z => [
+            Tetromino::Z => [
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
                 vec2(1.0, 1.0),
@@ -141,10 +141,10 @@ impl Tetrimino {
     }
 
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L36-L92
-    // offset data for the tetrimino wallkicks
+    // offset data for the Tetromino wallkicks
     pub fn get_offset_data(&self) -> Vec<[Vec2; 4]> {
         match *self {
-            Tetrimino::I => [
+            Tetromino::I => [
                 [
                     vec2(0.0, 0.0),
                     vec2(-1.0, 0.0),
@@ -177,7 +177,7 @@ impl Tetrimino {
                 ],
             ]
             .to_vec(),
-            Tetrimino::O => [[
+            Tetromino::O => [[
                 vec2(0.0, 0.0),
                 vec2(0.0, -1.0),
                 vec2(-1.0, -1.0),
@@ -223,7 +223,7 @@ impl Tetrimino {
 
 #[derive(Clone, Debug)]
 pub struct Piece {
-    pub tetrimino: Tetrimino,
+    pub tetromino: Tetromino,
     pub dots: Vec<Vec2>,
     pub rotation_index: i8,
 }

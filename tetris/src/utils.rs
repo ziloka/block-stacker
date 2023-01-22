@@ -16,7 +16,7 @@ impl Random {
             r#mod: 10,
             multiply: 7,
             increment: 5,
-            seed: seed,
+            seed,
         }
     }
 

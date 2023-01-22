@@ -59,9 +59,9 @@ impl Input {
 
         // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L140-L147
         if is_key_pressed(self.settings.controls.rotate_clockwise) {
-            board.rotate_tetrimino(true, true); // rotate clockwise
+            board.rotate_tetromino(true, true); // rotate clockwise
         } else if is_key_pressed(self.settings.controls.rotate_counterclockwise) {
-            board.rotate_tetrimino(false, true); // rotate clockwise
+            board.rotate_tetromino(false, true); // rotate clockwise
         } else if is_key_pressed(self.settings.controls.hard_drop) {
             // the hard drop
             let mut y_offset = 0.0;
@@ -74,9 +74,9 @@ impl Input {
             for dot in board.active_piece.dots.iter_mut() {
                 dot.y += y_offset;
             }
-            board.set_active_tetrimino_position();
+            board.set_active_tetromino_position();
         } else if is_key_pressed(self.settings.controls.hold) {
-            board.hold_tetrimino();
+            board.hold_tetromino();
         }
 
         // handle line clears

@@ -1,41 +1,44 @@
-use crate::consts::{Tetrimino, TETRIMINO_TYPES};
+use crate::consts::{Tetromino, TETROMINO_TYPES};
 use crate::utils::Random;
 
 // https://tetris.fandom.com/wiki/Random_Generator
 pub struct Generator {
     random: Random,
-    bag: [Tetrimino; 7],
-    next: usize,
+    bag: [Tetromino; 7],
+    index: usize,
 }
 
 impl Generator {
     pub fn new(seed: usize) -> Self {
         let mut random = Random::new(seed);
-        let mut bag = TETRIMINO_TYPES;
+        let mut bag = TETROMINO_TYPES;
         random.shuffle(&mut bag);
         Self {
-            random: random,
-            bag: bag,
-            next: 0,
+            random,
+            bag,
+            index: 0,
         }
     }
 
-    pub fn get_new_sequence_of_tetriminos(&mut self) -> [Tetrimino; 7] {
-        let mut bag = TETRIMINO_TYPES;
+    pub fn get_new_sequence_of_tetrominos(&mut self) -> [Tetromino; 7] {
+        let mut bag = TETROMINO_TYPES;
         self.random.shuffle(&mut bag);
         bag
     }
+}
 
-    pub fn next(&mut self) -> Tetrimino {
-        if self.next == 7 {
-            self.bag = self.get_new_sequence_of_tetriminos();
-            self.next = 0;
-        }
+impl Iterator for Generator {
+    type Item = Tetromino;
 
-        let tetrimino = self.bag[self.next as usize];
-        self.next += 1;
-
-        tetrimino
+    fn next(&mut self) -> Option<Tetromino> {
+        let res = if let Some(tetromino) = self.bag.get(self.index).copied() {
+            tetromino
+        } else {
+            self.bag = self.get_new_sequence_of_tetrominos();
+            self.bag[0]
+        };
+        self.index += 1;
+        Some(res)
     }
 }
 

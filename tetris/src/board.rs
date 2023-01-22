@@ -1,7 +1,7 @@
 use std::ops::{Add, Sub};
 
 use crate::{
-    consts::{GameState, Piece, Tetrimino, Vec2, vec2, HEIGHT, TETRIMINO_TYPES, WIDTH},
+    consts::{GameState, Piece, Tetromino, Vec2, vec2, HEIGHT, TETROMINO_TYPES, WIDTH},
     generator::Generator, drawer::Drawer,
 };
 
@@ -10,7 +10,7 @@ pub struct Board {
     pub active_piece: Piece,
     pub hold_piece: Option<Piece>,
     generator: Generator,
-    preview_pieces: [Tetrimino; 7],
+    preview_pieces: [Tetromino; 7],
     positions: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
 }
 
@@ -21,8 +21,8 @@ impl Board {
         let positions = [ROW_INIT; HEIGHT as usize];
         // this first place gets replaced so it doesn't matter what it is
         let active_piece = Piece {
-            tetrimino: TETRIMINO_TYPES[0],
-            dots: TETRIMINO_TYPES[0]
+            tetromino: TETROMINO_TYPES[0],
+            dots: TETROMINO_TYPES[0]
                 .get_structure()
                 .iter()
                 .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
@@ -30,35 +30,35 @@ impl Board {
             rotation_index: 0,
         };
         let mut generator = Generator::new(seed);
-        let tetriminos = generator.get_new_sequence_of_tetriminos();
+        let tetrominos = generator.get_new_sequence_of_tetrominos();
         let mut board = Self {
             game_state: GameState::Playing,
             active_piece,
             hold_piece: None,
             generator,
-            preview_pieces: tetriminos,
+            preview_pieces: tetrominos,
             // https://stackoverflow.com/a/53930630
             positions,
         };
-        board.set_next_tetrimino_as_active_piece();
+        board.set_next_tetromino_as_active_piece();
         board
     }
 
-    pub fn draw<T>(&self, drawer: &T) where T: Drawer {
-        drawer.draw_tetriminos(&self.positions);
-        drawer.draw_current_tetrimino(&self.active_piece);
+    pub fn draw(&self, drawer: &impl Drawer) {
+        drawer.draw_tetrominos(&self.positions);
+        drawer.draw_current_tetromino(&self.active_piece);
         drawer.draw_preview_pieces(&self.preview_pieces);
         drawer.draw_hold_piece(&self.hold_piece);
     }
 
-    pub fn hold_tetrimino(&mut self) {
+    pub fn hold_tetromino(&mut self) {
         if self.hold_piece.is_none() {
             self.hold_piece = Some(self.active_piece.clone());
-            self.set_next_tetrimino_as_active_piece();
+            self.set_next_tetromino_as_active_piece();
         } else {
             let mut hold_piece = self.hold_piece.clone().unwrap();
             hold_piece.dots = hold_piece
-                .tetrimino
+                .tetromino
                 .get_structure()
                 .iter()
                 .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
@@ -69,9 +69,9 @@ impl Board {
         }
     }
 
-    fn set_next_tetrimino_as_active_piece(&mut self) {
+    fn set_next_tetromino_as_active_piece(&mut self) {
         self.active_piece = Piece {
-            tetrimino: self.preview_pieces[0],
+            tetromino: self.preview_pieces[0],
             dots: self.preview_pieces[0]
                 .get_structure()
                 .iter()
@@ -79,14 +79,14 @@ impl Board {
                 .collect(),
             rotation_index: 0,
         };
-        self.add_tetrimino_preview_piece();
+        self.add_tetromino_preview_piece();
     }
 
-    fn add_tetrimino_preview_piece(&mut self) {
+    fn add_tetromino_preview_piece(&mut self) {
         for i in 1..self.preview_pieces.len() {
             self.preview_pieces[i - 1] = self.preview_pieces[i];
         }
-        self.preview_pieces[self.preview_pieces.len() - 1] = self.generator.next();
+        self.preview_pieces[self.preview_pieces.len() - 1] = self.generator.next().unwrap();
     }
 
     // and x and y position are based off of the top left corner of the piece
@@ -107,7 +107,7 @@ impl Board {
     }
 
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L249-L278
-    pub fn rotate_tetrimino(&mut self, clockwise: bool, should_offset: bool) {
+    pub fn rotate_tetromino(&mut self, clockwise: bool, should_offset: bool) {
         let old_rotation_index = self.active_piece.rotation_index;
         self.active_piece.rotation_index += if clockwise { 1 } else { -1 };
         self.active_piece.rotation_index = self.mod_helper(self.active_piece.rotation_index, 4);
@@ -125,9 +125,9 @@ impl Board {
             );
         }
         if should_offset
-            && !self.offset_tetrimino(old_rotation_index, self.active_piece.rotation_index)
+            && !self.offset_tetromino(old_rotation_index, self.active_piece.rotation_index)
         {
-            self.rotate_tetrimino(!clockwise, false)
+            self.rotate_tetromino(!clockwise, false)
         }
     }
 
@@ -136,8 +136,8 @@ impl Board {
     }
 
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340
-    fn offset_tetrimino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
-        let offset_data = self.active_piece.tetrimino.get_offset_data();
+    fn offset_tetromino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
+        let offset_data = self.active_piece.tetromino.get_offset_data();
 
         let mut end_offset = vec2(0.0, 0.0);
         let mut move_possible = false;
@@ -166,13 +166,13 @@ impl Board {
         move_possible
     }
 
-    pub fn set_active_tetrimino_position(&mut self) {
+    pub fn set_active_tetromino_position(&mut self) {
         for relative_position in &self.active_piece.dots {
-            let Vec2 { x: column, y: row } = relative_position.clone();
+            let Vec2 { x: column, y: row } = *relative_position;
             self.positions[row as usize][column as usize] =
-                Some(self.active_piece.tetrimino.get_color());
+                Some(self.active_piece.tetromino.get_color());
         }
-        self.set_next_tetrimino_as_active_piece();
+        self.set_next_tetromino_as_active_piece();
     }
 
     pub fn clear_lines(&mut self) {

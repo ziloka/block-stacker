@@ -1,14 +1,14 @@
 use macroquad::prelude::{draw_rectangle, Color, GRAY};
 
-use tetris::consts::{Piece, Tetrimino, Vec2, BLOCK_SIZE, HEIGHT, WIDTH};
+use tetris::consts::{Piece, Tetromino, Vec2, BLOCK_SIZE, HEIGHT, WIDTH};
 
 pub struct Drawer {
     pub left_top_corner: Vec2,
 }
 
 impl tetris::drawer::Drawer for Drawer {
-    fn draw_current_tetrimino(&self, active_piece: &Piece) {
-        let (r, g, b) = active_piece.tetrimino.get_color();
+    fn draw_current_tetromino(&self, active_piece: &Piece) {
+        let (r, g, b) = active_piece.tetromino.get_color();
         // draw current block
         active_piece.dots.iter().for_each(|position| {
             draw_rectangle(
@@ -21,7 +21,7 @@ impl tetris::drawer::Drawer for Drawer {
         });
     }
 
-    fn draw_tetriminos(
+    fn draw_tetrominos(
         &self,
         positions: &[[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
     ) {
@@ -50,13 +50,13 @@ impl tetris::drawer::Drawer for Drawer {
         }
     }
 
-    fn draw_preview_pieces(&self, preview_pieces: &[Tetrimino; 7]) {
+    fn draw_preview_pieces(&self, preview_pieces: &[Tetromino; 7]) {
         preview_pieces
             .iter()
             .enumerate()
-            .for_each(|(i, tetrimino)| {
-                tetrimino.get_structure().iter().for_each(|position| {
-                    let (r, g, b) = tetrimino.get_color();
+            .for_each(|(i, tetromino)| {
+                tetromino.get_structure().iter().for_each(|position| {
+                    let (r, g, b) = tetromino.get_color();
                     draw_rectangle(
                         self.left_top_corner.x + (WIDTH + 2.0 + position.x) * BLOCK_SIZE,
                         self.left_top_corner.y + (i as f32 * 3.0 + position.y) * BLOCK_SIZE,
@@ -70,8 +70,8 @@ impl tetris::drawer::Drawer for Drawer {
 
     fn draw_hold_piece(&self, hold_piece: &Option<Piece>) {
         if let Some(piece) = hold_piece {
-            piece.tetrimino.get_structure().iter().for_each(|position| {
-                let (r, g, b) = piece.tetrimino.get_color();
+            piece.tetromino.get_structure().iter().for_each(|position| {
+                let (r, g, b) = piece.tetromino.get_color();
                 draw_rectangle(
                     self.left_top_corner.x - position.x * BLOCK_SIZE + BLOCK_SIZE * -4.0,
                     self.left_top_corner.y - position.y * BLOCK_SIZE + BLOCK_SIZE,
