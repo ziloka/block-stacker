@@ -4,7 +4,7 @@
 
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=1871308106107e6b5abe96158e9ea82a
 pub struct Random {
-    r#mod: usize, // m > 0 (the modulus is positive)
+    modulus: usize, // m > 0 (the modulus is positive)
     multiply: usize, // 0 < a < m (the multiplier is positive but less than the modulus)
     increment: usize, // 0 ≤ b < m (the increment is non negative but less than the modulus)
     pub seed: usize, // 0 ≤ X0 < m (the seed is non negative but less than the modulus)
@@ -13,7 +13,7 @@ pub struct Random {
 impl Random {
     pub fn new(seed: usize) -> Self {
         Self {
-            r#mod: 10,
+            modulus: 10,
             multiply: 7,
             increment: 5,
             seed,
@@ -21,7 +21,7 @@ impl Random {
     }
 
     pub fn next(&mut self) -> usize {
-        let num = ((self.seed * self.multiply) + self.increment) % self.r#mod;
+        let num = ((self.seed * self.multiply) + self.increment) % self.modulus;
         self.seed = num;
         num
     }

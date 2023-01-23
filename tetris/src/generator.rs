@@ -34,8 +34,9 @@ impl Iterator for Generator {
         let res = if let Some(tetromino) = self.bag.get(self.index).copied() {
             tetromino
         } else {
+            self.index = 0;
             self.bag = self.get_new_sequence_of_tetrominos();
-            self.bag[0]
+            self.bag[self.index]
         };
         self.index += 1;
         Some(res)
