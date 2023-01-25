@@ -5,7 +5,10 @@ use macroquad::{
     time::get_time,
 };
 
-use tetris::{board::Board, consts::{HEIGHT, vec2}};
+use tetris::{
+    board::Board,
+    consts::{vec2, HEIGHT},
+};
 
 use crate::settings::Settings;
 
@@ -20,7 +23,7 @@ impl default::Default for Input {
         Self {
             holding: false,
             time: get_time() * 1000.0,
-            settings: Settings::default()
+            settings: Settings::default(),
         }
     }
 }
@@ -28,23 +31,20 @@ impl default::Default for Input {
 impl Input {
     // handles movement
     pub fn handle(&mut self, board: &mut Board) {
+        self.holding = is_key_down(self.settings.controls.left)
+            || is_key_down(self.settings.controls.right)
+            || is_key_down(self.settings.controls.soft_drop);
 
-        self.holding = is_key_pressed(self.settings.controls.left)
-            || is_key_pressed(self.settings.controls.right)
-            || is_key_pressed(self.settings.controls.soft_drop);
+        let das = self.settings.handles.das as f64;
+        let arr = self.settings.handles.arr as f64;
+        let time = self.time;
 
-        if !self.holding
-            && (self.time % self.settings.handles.das as f64) < self.settings.handles.das as f64
-            || (self.holding
-                && (self.time % self.settings.handles.arr as f64)
-                    < self.settings.handles.arr as f64)
-        {
+        if (!self.holding && (time % das) <= das) || (self.holding && time % arr <= arr) {
             if is_key_down(self.settings.controls.left) && !board.conflict(vec2(-1.0, 0.0)) {
                 for dot in board.active_piece.dots.iter_mut() {
                     dot.x -= 1.0;
                 }
-            } else if is_key_down(self.settings.controls.right) && !board.conflict(vec2(1.0, 0.0))
-            {
+            } else if is_key_down(self.settings.controls.right) && !board.conflict(vec2(1.0, 0.0)) {
                 for dot in board.active_piece.dots.iter_mut() {
                     dot.x += 1.0;
                 }

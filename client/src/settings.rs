@@ -48,7 +48,9 @@ impl Default for Settings {
         Self {
             handles: Handles {
                 das: 133.0,
-                arr: 10.0,
+                // arr: 10.0,
+                // das: 50000000000000000.0,
+                arr: 10.0
             },
             controls: Controls {
                 left: KeyCode::Left,
@@ -72,8 +74,8 @@ impl Settings {
             .titlebar(true)
             .ui(&mut root_ui(), |ui| {
                 ui.tree_node(hash!(), "handles", |ui| {
-                    ui.slider(hash!(), "DAS (frames)", 0.0..20.0, &mut self.handles.das);
-                    ui.slider(hash!(), "ARR (frames)", 0.0..5., &mut self.handles.arr);
+                    ui.slider(hash!(), "DAS (frames)", 0.0..200.0, &mut self.handles.das);
+                    ui.slider(hash!(), "ARR (frames)", 0.0..50., &mut self.handles.arr);
                 });
                 ui.separator();
                 ui.tree_node(hash!(), "controls", |ui| {
