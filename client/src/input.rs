@@ -2,7 +2,7 @@ use std::default;
 
 use macroquad::{
     prelude::{is_key_down, is_key_pressed},
-    time::get_time,
+    time::get_time, miniquad::date::now,
 };
 
 use tetris::{
@@ -77,6 +77,10 @@ impl Input {
             board.set_active_tetromino_position();
         } else if is_key_pressed(self.settings.controls.hold) {
             board.hold_tetromino();
+        } else if is_key_pressed(self.settings.controls.restart) {
+            // println!("restarted, now: {}", now() as usize);
+            *board = Board::new(now() as usize);
+            // board.draw();
         }
 
         // handle line clears

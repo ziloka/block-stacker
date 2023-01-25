@@ -140,6 +140,7 @@ impl Tetromino {
         }
     }
 
+    // https://tetris.wiki/Super_Rotation_System
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L36-L92
     // offset data for the Tetromino wallkicks
     pub fn get_offset_data(&self) -> Vec<[Vec2; 4]> {

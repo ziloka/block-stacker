@@ -1,5 +1,5 @@
 use crate::consts::{Tetromino, TETROMINO_TYPES};
-use crate::utils::Random;
+use crate::random::Random;
 
 // https://tetris.fandom.com/wiki/Random_Generator
 pub struct Generator {
@@ -10,7 +10,7 @@ pub struct Generator {
 
 impl Generator {
     pub fn new(seed: usize) -> Self {
-        let mut random = Random::new(seed);
+        let mut random = Random::new(seed as u64);
         let mut bag = TETROMINO_TYPES;
         random.shuffle(&mut bag);
         Self {

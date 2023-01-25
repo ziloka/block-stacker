@@ -8,16 +8,6 @@ use macroquad::{
     ui::{hash, root_ui, widgets::Window},
 };
 
-enum FocusedOn {
-    Left,
-    Right,
-    SoftDrop,
-    HardDrop,
-    RotateClockwise,
-    RotateCounterclockwise,
-    Hold,
-}
-
 // https://tetris.wiki/DAS
 pub struct Settings {
     pub handles: Handles,
@@ -41,15 +31,26 @@ pub struct Controls {
     pub rotate_clockwise: KeyCode,
     pub rotate_counterclockwise: KeyCode,
     pub hold: KeyCode,
+    pub restart: KeyCode
 }
+
+enum FocusedOn {
+    Left,
+    Right,
+    SoftDrop,
+    HardDrop,
+    RotateClockwise,
+    RotateCounterclockwise,
+    Hold,
+    Restart,
+}
+
 
 impl Default for Settings {
     fn default() -> Self {
         Self {
             handles: Handles {
                 das: 133.0,
-                // arr: 10.0,
-                // das: 50000000000000000.0,
                 arr: 10.0
             },
             controls: Controls {
@@ -60,6 +61,7 @@ impl Default for Settings {
                 rotate_clockwise: KeyCode::Up,
                 rotate_counterclockwise: KeyCode::Z,
                 hold: KeyCode::C,
+                restart: KeyCode::R,
             },
             focused_on: None,
             subscriber_id: register_input_subscriber(),
@@ -109,6 +111,9 @@ impl Settings {
                     if ui.button(None, format!("Hold: {:?}", self.controls.hold)) {
                         self.focused_on = Some(FocusedOn::Hold);
                     }
+                    if ui.button(None, format!("Restart: {:?}", self.controls.restart)) {
+                        self.focused_on = Some(FocusedOn::Restart);
+                    }
                     if let Some(focused_on) = &self.focused_on {
                         if let Some(keycode) = get_last_key_pressed() {
                             match focused_on {
@@ -123,6 +128,7 @@ impl Settings {
                                     self.controls.rotate_counterclockwise = keycode
                                 }
                                 FocusedOn::Hold => self.controls.hold = keycode,
+                                FocusedOn::Restart => self.controls.restart = keycode,
                             }
                             self.focused_on = None;
                         }
