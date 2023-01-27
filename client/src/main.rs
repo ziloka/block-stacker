@@ -27,8 +27,8 @@ async fn main() {
             }
             GameState::Playing => {
                 clear_background(BLACK);
-                game.board.draw(&game.drawer);
                 game.input.handle(&mut game.board);
+                game.board.draw(&game.drawer);
             }
             GameState::Paused => {
                 todo!();

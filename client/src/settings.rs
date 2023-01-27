@@ -31,7 +31,7 @@ pub struct Controls {
     pub rotate_clockwise: KeyCode,
     pub rotate_counterclockwise: KeyCode,
     pub hold: KeyCode,
-    pub restart: KeyCode
+    pub restart: KeyCode,
 }
 
 enum FocusedOn {
@@ -45,14 +45,10 @@ enum FocusedOn {
     Restart,
 }
 
-
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            handles: Handles {
-                das: 133.0,
-                arr: 10.0
-            },
+            handles: Handles { das: 8.6, arr: 0.6 },
             controls: Controls {
                 left: KeyCode::Left,
                 right: KeyCode::Right,

@@ -2,7 +2,7 @@ use std::default;
 
 use macroquad::{
     prelude::{is_key_down, is_key_pressed},
-    time::get_time, miniquad::date::now,
+    miniquad::date::now,
 };
 
 use tetris::{
@@ -15,21 +15,21 @@ use crate::settings::Settings;
 pub struct Input {
     pub settings: Settings,
     holding: bool,
-    time: f64, // the time the last movement was made
+    frame: f64, // the time the last movement was made
 }
 
 impl default::Default for Input {
     fn default() -> Self {
         Self {
-            holding: false,
-            time: get_time() * 1000.0,
             settings: Settings::default(),
+            holding: false,
+            frame: 0.0
         }
     }
 }
 
 impl Input {
-    // handles movement
+    // handles movement for every frame
     pub fn handle(&mut self, board: &mut Board) {
         self.holding = is_key_down(self.settings.controls.left)
             || is_key_down(self.settings.controls.right)
@@ -37,9 +37,9 @@ impl Input {
 
         let das = self.settings.handles.das as f64;
         let arr = self.settings.handles.arr as f64;
-        let time = self.time;
+        let frame = self.frame;
 
-        if (!self.holding && (time % das) <= das) || (self.holding && time % arr <= arr) {
+        if (!self.holding && frame % das <= das) || (self.holding && frame % arr <= arr) {
             if is_key_down(self.settings.controls.left) && !board.conflict(vec2(-1.0, 0.0)) {
                 for dot in board.active_piece.dots.iter_mut() {
                     dot.x -= 1.0;
@@ -78,15 +78,13 @@ impl Input {
         } else if is_key_pressed(self.settings.controls.hold) {
             board.hold_tetromino();
         } else if is_key_pressed(self.settings.controls.restart) {
-            // println!("restarted, now: {}", now() as usize);
             *board = Board::new(now() as usize);
-            // board.draw();
         }
 
         // handle line clears
         board.clear_lines();
 
-        // update time
-        self.time = get_time() * 1000.0;
+        // update frame
+        self.frame = self.frame + 1.0;
     }
 }

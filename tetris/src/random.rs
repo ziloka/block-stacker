@@ -6,9 +6,9 @@ use std::ops::{Bound, RangeBounds};
 
 // https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=36592888875f26e22e132e1ad164433c
 pub struct Random {
-    modulus: usize, // m > 0 (the modulus is positive)
-    multiply: usize, // 0 < a < m (the multiplier is positive but less than the modulus)
-    increment: usize, // 0 ≤ b < m (the increment is non negative but less than the modulus)
+    modulus: u64, // m > 0 (the modulus is positive)
+    multiply: u64, // 0 < a < m (the multiplier is positive but less than the modulus)
+    increment: u64, // 0 ≤ b < m (the increment is non negative but less than the modulus)
     pub seed: u64, // 0 ≤ X0 < m (the seed is non negative but less than the modulus)
 }
 
