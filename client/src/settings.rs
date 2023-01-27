@@ -108,7 +108,7 @@ impl Settings {
                         self.focused_on = Some(FocusedOn::Hold);
                     }
                     if ui.button(None, format!("Restart: {:?}", self.controls.restart)) {
-                        self.focused_on = Some(FocusedOn::Restart);
+                        self. focused_on = Some(FocusedOn::Restart);
                     }
                     if let Some(focused_on) = &self.focused_on {
                         if let Some(keycode) = get_last_key_pressed() {
