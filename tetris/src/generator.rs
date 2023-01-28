@@ -42,4 +42,3 @@ impl Iterator for Generator {
         Some(res)
     }
 }
-

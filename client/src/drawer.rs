@@ -1,4 +1,7 @@
-use macroquad::{prelude::{draw_rectangle, Color, GRAY, BLACK}, shapes::draw_rectangle_lines};
+use macroquad::{
+    prelude::{draw_rectangle, Color, BLACK, GRAY},
+    shapes::draw_rectangle_lines,
+};
 
 use tetris::consts::{Piece, Tetromino, Vec2, BLOCK_SIZE, HEIGHT, WIDTH};
 
@@ -13,13 +16,7 @@ impl tetris::drawer::Drawer for Drawer {
         active_piece.dots.iter().for_each(|position| {
             let x = self.left_top_corner.x + position.x * BLOCK_SIZE;
             let y = self.left_top_corner.y + position.y * BLOCK_SIZE;
-            draw_rectangle(
-                x,
-                y,
-                BLOCK_SIZE,
-                BLOCK_SIZE,
-                Color::from_rgba(r, g, b, 255),
-            );
+            draw_rectangle(x, y, BLOCK_SIZE, BLOCK_SIZE, Color::from_rgba(r, g, b, 255));
 
             draw_rectangle_lines(x, y, BLOCK_SIZE, BLOCK_SIZE, 2.0, BLACK);
         });
@@ -44,15 +41,9 @@ impl tetris::drawer::Drawer for Drawer {
                 let y = self.left_top_corner.y + y as f32 * BLOCK_SIZE;
                 if let Some(color) = color {
                     let (r, g, b) = *color;
-                    draw_rectangle(
-                        x,
-                        y,
-                        BLOCK_SIZE,
-                        BLOCK_SIZE,
-                        Color::from_rgba(r, g, b, 255),
-                    );
+                    draw_rectangle(x, y, BLOCK_SIZE, BLOCK_SIZE, Color::from_rgba(r, g, b, 255));
                 }
-                draw_rectangle_lines(x as f32, y as f32, BLOCK_SIZE, BLOCK_SIZE, 2.0, BLACK);
+                draw_rectangle_lines(x, y, BLOCK_SIZE, BLOCK_SIZE, 2.0, BLACK);
             }
         }
     }
@@ -66,13 +57,7 @@ impl tetris::drawer::Drawer for Drawer {
                     let x = self.left_top_corner.x + (WIDTH + 2.0 + position.x) * BLOCK_SIZE;
                     let y = self.left_top_corner.y + (i as f32 * 3.0 + position.y) * BLOCK_SIZE;
                     let (r, g, b) = tetromino.get_color();
-                    draw_rectangle(
-                        x,
-                        y,
-                        BLOCK_SIZE,
-                        BLOCK_SIZE,
-                        Color::from_rgba(r, g, b, 255),
-                    );
+                    draw_rectangle(x, y, BLOCK_SIZE, BLOCK_SIZE, Color::from_rgba(r, g, b, 255));
 
                     draw_rectangle_lines(x, y, BLOCK_SIZE, BLOCK_SIZE, 2.0, BLACK);
                 });
@@ -85,13 +70,7 @@ impl tetris::drawer::Drawer for Drawer {
                 let x = self.left_top_corner.x - position.x * BLOCK_SIZE + BLOCK_SIZE * -4.0;
                 let y = self.left_top_corner.y - position.y * BLOCK_SIZE + BLOCK_SIZE;
                 let (r, g, b) = piece.tetromino.get_color();
-                draw_rectangle(
-                    x,
-                    y,
-                    BLOCK_SIZE,
-                    BLOCK_SIZE,
-                    Color::from_rgba(r, g, b, 255),
-                );
+                draw_rectangle(x, y, BLOCK_SIZE, BLOCK_SIZE, Color::from_rgba(r, g, b, 255));
 
                 draw_rectangle_lines(x, y, BLOCK_SIZE, BLOCK_SIZE, 2.0, BLACK);
             });

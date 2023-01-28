@@ -1,8 +1,9 @@
 use std::ops::{Add, Sub};
 
 use crate::{
-    consts::{GameState, Piece, Tetromino, Vec2, vec2, HEIGHT, TETROMINO_TYPES, WIDTH},
-    generator::Generator, drawer::Drawer,
+    consts::{vec2, GameState, Piece, Tetromino, Vec2, HEIGHT, TETROMINO_TYPES, WIDTH},
+    drawer::Drawer,
+    generator::Generator,
 };
 
 pub struct Board {

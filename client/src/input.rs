@@ -1,8 +1,12 @@
 use std::default;
 
 use macroquad::{
-    prelude::{is_key_down, is_key_pressed, MouseButton, KeyCode, utils::{repeat_all_miniquad_input, register_input_subscriber}},
-    miniquad::{graphics::GraphicsContext, EventHandler, KeyMods, TouchPhase, date::now},
+    miniquad::{date::now, graphics::GraphicsContext, EventHandler, KeyMods, TouchPhase},
+    prelude::{
+        is_key_down, is_key_pressed,
+        utils::{register_input_subscriber, repeat_all_miniquad_input},
+        KeyCode, MouseButton,
+    },
 };
 
 use tetris::{
@@ -25,7 +29,7 @@ impl default::Default for Input {
             settings: Settings::default(),
             holding: false,
             frame: 0.0,
-            subscriber_id: register_input_subscriber()
+            subscriber_id: register_input_subscriber(),
         }
     }
 }
@@ -89,7 +93,7 @@ impl Input {
         repeat_all_miniquad_input(self, self.subscriber_id);
 
         // update frame
-        self.frame = self.frame + 1.0;
+        self.frame += 1.0;
     }
 }
 

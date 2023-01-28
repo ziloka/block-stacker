@@ -6,12 +6,15 @@ use macroquad::{
     window::{clear_background, next_frame},
 };
 
-use tetris::{board::Board, consts::{vec2, GameState}};
+use tetris::{
+    board::Board,
+    consts::{vec2, GameState},
+};
 
 mod drawer;
+mod game;
 mod input;
 mod settings;
-mod game;
 
 use game::Game;
 
