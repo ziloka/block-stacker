@@ -121,14 +121,15 @@ impl Board {
                 [vec2(0.0, 1.0), vec2(-1.0, 0.0)]
             };
             *pos = vec2(
-                (rot_matrix[0].x * relative_pos.x) + (rot_matrix[1].x * relative_pos.y) + origin.x,
-                (rot_matrix[0].y * relative_pos.x) + (rot_matrix[1].y * relative_pos.y) + origin.y,
-            );
+                (rot_matrix[0].x * relative_pos.x) + (rot_matrix[1].x * relative_pos.y),
+                (rot_matrix[0].y * relative_pos.x) + (rot_matrix[1].y * relative_pos.y),
+            ).add(origin);
         }
+
         if should_offset
             && !self.offset_tetromino(old_rotation_index, self.active_piece.rotation_index)
         {
-            self.rotate_tetromino(!clockwise, false)
+            self.rotate_tetromino(!clockwise, false);
         }
     }
 
@@ -139,14 +140,13 @@ impl Board {
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340
     fn offset_tetromino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
         let offset_data = self.active_piece.tetromino.get_offset_data();
-
         let mut end_offset = vec2(0.0, 0.0);
         let mut move_possible = false;
-
+        
         for offset_element in offset_data {
             let offset_value1 = offset_element[old_rotation_index as usize];
             let offset_value2 = offset_element[new_rotation_index as usize];
-            end_offset = offset_value2.sub(offset_value1);
+            end_offset = offset_value1.sub(offset_value2);
             if !self.conflict(end_offset) {
                 move_possible = true;
                 break;
@@ -155,13 +155,12 @@ impl Board {
 
         // TODO: implement wallkicks / figure out why this doesn't work
         if move_possible {
-            // println!("offset: {:?}", end_offset);
+            // println!("offset: {:?} condition: {:?}", end_offset, self.conflict(end_offset));
             // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
-            if !self.conflict(end_offset) && end_offset == vec2(0.0, -1.0) {
+            if !self.conflict(end_offset) {
                 for dot in self.active_piece.dots.iter_mut() {
                     *dot = dot.add(end_offset);
                 }
-                // self.set_active_tetrimino_position();
             }
         }
 
