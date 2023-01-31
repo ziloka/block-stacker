@@ -143,40 +143,8 @@ impl Settings {
 }
 
 impl EventHandler for Settings {
-    fn update(&mut self, _ctx: &mut GraphicsContext) {
-        println!("update");
-    }
-    fn draw(&mut self, _ctx: &mut GraphicsContext) {
-        println!("draw");
-    }
-
-    fn resize_event(&mut self, _ctx: &mut GraphicsContext, _width: f32, _height: f32) {
-        println!("resize event");
-    }
-    fn mouse_motion_event(&mut self, _ctx: &mut GraphicsContext, _x: f32, _y: f32) {
-        // println!("mouse motion event");
-    }
-    fn mouse_wheel_event(&mut self, _ctx: &mut GraphicsContext, _x: f32, _y: f32) {
-        // println!("mouse wheel event");
-    }
-    fn mouse_button_down_event(
-        &mut self,
-        _ctx: &mut GraphicsContext,
-        _button: MouseButton,
-        _x: f32,
-        _y: f32,
-    ) {
-        println!("mouse button down event");
-    }
-    fn mouse_button_up_event(
-        &mut self,
-        _ctx: &mut GraphicsContext,
-        _button: MouseButton,
-        _x: f32,
-        _y: f32,
-    ) {
-        println!("mouse button up event");
-    }
+    fn update(&mut self, _ctx: &mut GraphicsContext) {}
+    fn draw(&mut self, _ctx: &mut GraphicsContext) {}
 
     fn char_event(
         &mut self,
@@ -185,80 +153,6 @@ impl EventHandler for Settings {
         _keymods: KeyMods,
         _repeat: bool,
     ) {
-        println!("char event");
-    }
-
-    fn key_down_event(
-        &mut self,
-        _ctx: &mut GraphicsContext,
-        _keycode: KeyCode,
-        _keymods: KeyMods,
-        _repeat: bool,
-    ) {
-        println!("key down event");
-    }
-
-    fn key_up_event(&mut self, _ctx: &mut GraphicsContext, _keycode: KeyCode, _keymods: KeyMods) {
-        println!("key up event");
-    }
-
-    /// Default implementation emulates mouse clicks
-    fn touch_event(
-        &mut self,
-        ctx: &mut GraphicsContext,
-        phase: TouchPhase,
-        _id: u64,
-        x: f32,
-        y: f32,
-    ) {
-        println!("touch event");
-        if phase == TouchPhase::Started {
-            self.mouse_button_down_event(ctx, MouseButton::Left, x, y);
-        }
-
-        if phase == TouchPhase::Ended {
-            self.mouse_button_up_event(ctx, MouseButton::Left, x, y);
-        }
-
-        if phase == TouchPhase::Moved {
-            self.mouse_motion_event(ctx, x, y);
-        }
-    }
-
-    /// Represents raw hardware mouse motion event
-    /// Note that these events are delivered regardless of input focus and not in pixels, but in
-    /// hardware units instead. And those units may be different from pixels depending on the target platform
-    fn raw_mouse_motion(&mut self, _ctx: &mut GraphicsContext, _dx: f32, _dy: f32) {
-        println!("raw mouse motion");
-    }
-
-    /// Window has been minimized
-    /// Right now is only implemented on Android, and is called on a Pause ndk callback
-    fn window_minimized_event(&mut self, _ctx: &mut GraphicsContext) {
-        println!("window minimized event");
-    }
-
-    /// Window has been restored
-    /// Right now is only implemented on Android, and is called on a Resume ndk callback
-    fn window_restored_event(&mut self, _ctx: &mut GraphicsContext) {
-        println!("window restored event");
-    }
-
-    /// This event is sent when the userclicks the window's close button
-    /// or application code calls the ctx.request_quit() function. The event
-    /// handler callback code can handle this event by calling
-    /// ctx.cancel_quit() to cancel the quit.
-    /// If the event is ignored, the application will quit as usual.
-    fn quit_requested_event(&mut self, _ctx: &mut GraphicsContext) {
-        println!("quit requested event");
-    }
-
-    /// A file has been dropped over the application.
-    /// Applications can request the number of dropped files with
-    /// `ctx.dropped_file_count()`, path of an individual file with
-    /// `ctx.dropped_file_path()`, and for wasm targets the file bytes
-    /// can be requested with `ctx.dropped_file_bytes()`.
-    fn files_dropped_event(&mut self, _ctx: &mut GraphicsContext) {
-        println!("files dropped event");
+        // println!("char event");
     }
 }

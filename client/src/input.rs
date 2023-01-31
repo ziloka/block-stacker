@@ -39,8 +39,6 @@ impl Input {
         let arr = self.settings.handles.arr as f64;
         let frame = self.frame;
 
-        // println!("left: {}, right: {}, soft_drop: {}", is_key_down(self.settings.controls.left), is_key_down(self.settings.controls.right), is_key_down(self.settings.controls.soft_drop));
-
         if (!self.holding && frame % das <= das) || (self.holding && frame % arr <= arr) {
             if is_key_down(self.settings.controls.left)
                 && !board.conflict(&board.active_piece.dots, vec2(-1.0, 0.0), true)
@@ -78,8 +76,9 @@ impl Input {
             let mut y_offset = 0.0;
             for y in 0..HEIGHT as i32 {
                 let y = y as f32;
-                if !board.conflict(&board.active_piece.dots, vec2(0.0, y), true) {
-                    y_offset = y;
+                if board.conflict(&board.active_piece.dots, vec2(0.0, y), true) {
+                    y_offset = y - 1.0;
+                    break;
                 }
             }
             for dot in board.active_piece.dots.iter_mut() {
