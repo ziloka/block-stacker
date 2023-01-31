@@ -102,15 +102,23 @@ impl Tetromino {
                 vec2(1.0, 0.0),
             ],
             Tetromino::J => [
+                // vec2(0.0, 1.0),
+                // vec2(-1.0, 1.0),
+                // vec2(-1.0, 0.0),
+                // vec2(1.0, 1.0),
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
-                vec2(1.0, 1.0),
+                vec2(-1.0, -1.0),
                 vec2(1.0, 0.0),
             ],
             Tetromino::L => [
+                // vec2(0.0, 1.0),
+                // vec2(-1.0, 1.0),
+                // vec2(1.0, 0.0),
+                // vec2(1.0, 1.0),
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
-                vec2(-1.0, 1.0),
+                vec2(1.0, -1.0),
                 vec2(1.0, 0.0),
             ],
             Tetromino::O => [
@@ -147,10 +155,10 @@ impl Tetromino {
         match *self {
             Tetromino::I => [
                 [
-                    vec2(0.0, 0.0),
-                    vec2(-1.0, 0.0),
-                    vec2(-1.0, 1.0),
-                    vec2(0.0, 1.0),
+                    vec2(0.0, 0.0),  // spawn state (O)
+                    vec2(-1.0, 0.0), // state (R) resulting from a clockwise rotation ("right") from spawn
+                    vec2(-1.0, 1.0), // state (2) resulting from 2 successive rotations in either direction from spawn.
+                    vec2(0.0, 1.0), // state (L) resulting from a counter-clockwise ("left") rotation from spawn
                 ],
                 [
                     vec2(-1.0, 0.0),

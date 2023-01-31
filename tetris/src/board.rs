@@ -26,7 +26,7 @@ impl Board {
             dots: TETROMINO_TYPES[0]
                 .get_structure()
                 .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y + 1.0))
                 .collect(),
             rotation_index: 0,
         };
@@ -76,7 +76,7 @@ impl Board {
             dots: self.preview_pieces[0]
                 .get_structure()
                 .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y + 1.0))
                 .collect(),
             rotation_index: 0,
         };
@@ -91,9 +91,13 @@ impl Board {
     }
 
     // and x and y position are based off of the top left corner of the piece
-    pub fn conflict(&self, relative_offset: Vec2) -> bool {
-        self.active_piece
-            .dots
+    pub fn conflict(
+        &self,
+        positions: &Vec<Vec2>,
+        relative_offset: Vec2,
+        allow_overlapping_blocks: bool,
+    ) -> bool {
+        positions
             .iter()
             .map(|relative_position| relative_position.add(relative_offset))
             .any(|relative| {
@@ -103,15 +107,18 @@ impl Board {
                || relative.x >= WIDTH // for the right side
                || relative.y >= HEIGHT
                     // for the floor (bottom)
-                ) || self.positions[row as usize][column as usize].is_some()
+                ) || allow_overlapping_blocks
+                    && self.positions[row as usize][column as usize].is_some()
             })
     }
 
+    // https://harddrop.com/wiki/SRS
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L249-L278
     pub fn rotate_tetromino(&mut self, clockwise: bool, should_offset: bool) {
         let old_rotation_index = self.active_piece.rotation_index;
-        self.active_piece.rotation_index += if clockwise { 1 } else { -1 };
+        self.active_piece.rotation_index += if clockwise { -1 } else { 1 };
         self.active_piece.rotation_index = self.mod_helper(self.active_piece.rotation_index, 4);
+        println!("rotation index: {}", self.active_piece.rotation_index);
         let origin = self.active_piece.dots[0];
         for pos in &mut self.active_piece.dots {
             let relative_pos = pos.sub(origin);
@@ -123,7 +130,8 @@ impl Board {
             *pos = vec2(
                 (rot_matrix[0].x * relative_pos.x) + (rot_matrix[1].x * relative_pos.y),
                 (rot_matrix[0].y * relative_pos.x) + (rot_matrix[1].y * relative_pos.y),
-            ).add(origin);
+            )
+            .add(origin);
         }
 
         if should_offset
@@ -138,16 +146,21 @@ impl Board {
     }
 
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340
+    // https://github.com/fiorescarlatto/four-tris/blob/master/Tetris.au3#L3395-L3449
     fn offset_tetromino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
         let offset_data = self.active_piece.tetromino.get_offset_data();
         let mut end_offset = vec2(0.0, 0.0);
         let mut move_possible = false;
-        
+
         for offset_element in offset_data {
             let offset_value1 = offset_element[old_rotation_index as usize];
             let offset_value2 = offset_element[new_rotation_index as usize];
             end_offset = offset_value1.sub(offset_value2);
-            if !self.conflict(end_offset) {
+
+            if !self.conflict(&self.active_piece.dots, end_offset, true) {
+                // println!("{:?}", end_offset);
+                // println!("old: {}, new: {}", old_rotation_index, new_rotation_index);
+                // println!("offset #1: {:?}, #2: {:?}\n", offset_value1, offset_value2);
                 move_possible = true;
                 break;
             }
@@ -155,13 +168,14 @@ impl Board {
 
         // TODO: implement wallkicks / figure out why this doesn't work
         if move_possible {
-            // println!("offset: {:?} condition: {:?}", end_offset, self.conflict(end_offset));
+            // println!("before: {:?} ", self.active_piece.dots);
             // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
-            if !self.conflict(end_offset) {
-                for dot in self.active_piece.dots.iter_mut() {
-                    *dot = dot.add(end_offset);
-                }
+            // if !self.conflict(end_offset) {
+            for dot in self.active_piece.dots.iter_mut() {
+                *dot = dot.add(end_offset);
             }
+            // }
+            // println!("after: {:?} ", self.active_piece.dots);
         }
 
         move_possible
@@ -197,5 +211,13 @@ impl Board {
         for x in 0..self.positions[0].len() {
             self.positions[0][x] = None;
         }
+    }
+
+    pub fn add_brick(&mut self, x: usize, y: usize, color: (u8, u8, u8)) {
+        self.positions[y][x] = Some(color);
+    }
+
+    pub fn remove_brick(&mut self, x: usize, y: usize) {
+        self.positions[y][x] = None;
     }
 }

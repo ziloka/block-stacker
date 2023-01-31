@@ -1,6 +1,6 @@
 use macroquad::{
     main,
-    prelude::{is_key_pressed, BLACK, WHITE},
+    prelude::{is_key_pressed, is_mouse_button_down, mouse_position, MouseButton, BLACK, WHITE},
     text::draw_text,
     time::get_fps,
     window::{clear_background, next_frame},
@@ -8,7 +8,7 @@ use macroquad::{
 
 use tetris::{
     board::Board,
-    consts::{vec2, GameState},
+    consts::{vec2, GameState, Vec2, BLOCK_SIZE},
 };
 
 mod drawer;
@@ -30,6 +30,7 @@ async fn main() {
             }
             GameState::Playing => {
                 clear_background(BLACK);
+                modify_board_bricks(left_top_corner, &mut game.board);
                 game.input.handle(&mut game.board);
                 game.board.draw(&game.drawer);
             }
@@ -63,5 +64,22 @@ fn handle_keyboard_input(board: &mut Board) {
             }
             _ => panic!("Not implemented yet"),
         }
+    }
+}
+
+fn modify_board_bricks(left_top_corner: Vec2, board: &mut Board) {
+    let (x, y) = mouse_position();
+    let x = ((x - left_top_corner.x) / BLOCK_SIZE) as usize;
+    let y = ((y - left_top_corner.y) / BLOCK_SIZE) as usize;
+    let brick = vec![vec2(0.0, 0.0)];
+
+    if is_mouse_button_down(MouseButton::Left)
+        && !board.conflict(&brick, vec2(x as f32, y as f32), false)
+    {
+        board.add_brick(x, y, (105, 105, 105));
+    } else if is_mouse_button_down(MouseButton::Right)
+        && !board.conflict(&brick, vec2(x as f32, y as f32), false)
+    {
+        board.remove_brick(x, y);
     }
 }

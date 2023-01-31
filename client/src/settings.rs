@@ -30,6 +30,7 @@ pub struct Controls {
     pub hard_drop: KeyCode,
     pub rotate_clockwise: KeyCode,
     pub rotate_counterclockwise: KeyCode,
+    pub rotate_180: KeyCode,
     pub hold: KeyCode,
     pub restart: KeyCode,
 }
@@ -41,6 +42,7 @@ enum FocusedOn {
     HardDrop,
     RotateClockwise,
     RotateCounterclockwise,
+    Rotate180,
     Hold,
     Restart,
 }
@@ -56,6 +58,7 @@ impl Default for Settings {
                 hard_drop: KeyCode::Space,
                 rotate_clockwise: KeyCode::Up,
                 rotate_counterclockwise: KeyCode::Z,
+                rotate_180: KeyCode::A,
                 hold: KeyCode::C,
                 restart: KeyCode::R,
             },
@@ -104,6 +107,9 @@ impl Settings {
                     ) {
                         self.focused_on = Some(FocusedOn::RotateCounterclockwise);
                     }
+                    if ui.button(None, format!("Rotate 180: {:?}", self.controls.rotate_180)) {
+                        self.focused_on = Some(FocusedOn::Rotate180);
+                    }
                     if ui.button(None, format!("Hold: {:?}", self.controls.hold)) {
                         self.focused_on = Some(FocusedOn::Hold);
                     }
@@ -123,6 +129,7 @@ impl Settings {
                                 FocusedOn::RotateCounterclockwise => {
                                     self.controls.rotate_counterclockwise = keycode
                                 }
+                                FocusedOn::Rotate180 => self.controls.rotate_180 = keycode,
                                 FocusedOn::Hold => self.controls.hold = keycode,
                                 FocusedOn::Restart => self.controls.restart = keycode,
                             }
