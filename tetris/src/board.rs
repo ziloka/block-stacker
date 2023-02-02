@@ -153,24 +153,20 @@ impl Board {
     // https://github.com/fiorescarlatto/four-tris/blob/master/Tetris.au3#L3395-L3449
     fn offset_tetromino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
         let offset_data = self.active_piece.tetromino.get_offset_data();
-        let mut end_offset = vec2(0.0, 0.0);
         let mut move_possible = false;
 
         for offset_element in offset_data {
             let offset_value1 = offset_element[old_rotation_index as usize];
             let offset_value2 = offset_element[new_rotation_index as usize];
-            end_offset = vec2(offset_value1.x - offset_value2.x, offset_value1.y - offset_value2.y * -1.0);
+            let end_offset = vec2(offset_value1.x - offset_value2.x, offset_value1.y - offset_value2.y * -1.0);
 
             if !self.conflict(&self.active_piece.dots, end_offset, true) {
+                // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
+                for dot in self.active_piece.dots.iter_mut() {
+                    *dot = dot.add(end_offset);
+                }
                 move_possible = true;
                 break;
-            }
-        }
-
-        if move_possible {
-            // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
-            for dot in self.active_piece.dots.iter_mut() {
-                *dot = dot.add(end_offset);
             }
         }
 

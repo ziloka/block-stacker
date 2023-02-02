@@ -3,8 +3,6 @@ rustup toolchain install nightly
 rustup component add rust-src --toolchain nightly
 cargo +nightly build -Z build-std=std,panic_abort --target wasm32-unknown-unknown --release
 
-# Recommended way
-cargo install --git https://github.com/static-web-server/static-web-server
 cd target/wasm32-unknown-unknown/release
 
 echo "<html lang=\"en\">
@@ -41,5 +39,10 @@ source = \"**/*.{wasm,jpg,jpeg,png,ico,gif}\"
 headers.Cache-Control = \"max-age=0;\"
 headers.Strict-Transport-Security = \"max-age=0; includeSubDomains; preload\"" > config.toml
 
-echo "Running application on http://localhost:8080"
-static-web-server --config-file config.toml --log-level "trace" --port 8080 --root .
+# Recommended way
+if [ "$1" == "online" ]
+then
+    cargo install --git https://github.com/static-web-server/static-web-server
+    echo "Running application on http://localhost:8080"
+    static-web-server --config-file config.toml --log-level "trace" --port 8080 --root .
+fi
