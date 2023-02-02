@@ -141,8 +141,8 @@ impl Board {
     }
 
     // determine the rotation index of the tetromino
-    // returning 0 - O means it is in its spawn position 
-    // returning 1 - R means it is in a clockwise rotation ("right") from spawn 
+    // returning 0 - O means it is in its spawn position
+    // returning 1 - R means it is in a clockwise rotation ("right") from spawn
     // returning 2 - L means it is in a counter-clockwise rotation ("left") from spawn
     // returning 3 - 2 means it is in a 180 degree rotation from spawn
     fn mod_helper(&self, x: i8, m: i8) -> i8 {
@@ -158,7 +158,10 @@ impl Board {
         for offset_element in offset_data {
             let offset_value1 = offset_element[old_rotation_index as usize];
             let offset_value2 = offset_element[new_rotation_index as usize];
-            let end_offset = vec2(offset_value1.x - offset_value2.x, offset_value1.y - offset_value2.y * -1.0);
+            let end_offset = vec2(
+                offset_value1.x - offset_value2.x,
+                (offset_value1.y - offset_value2.y) * -1.0,
+            );
 
             if !self.conflict(&self.active_piece.dots, end_offset, true) {
                 // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247

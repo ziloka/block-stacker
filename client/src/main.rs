@@ -1,6 +1,10 @@
+use std::cell::Cell;
+
 use macroquad::{
     main,
-    prelude::{is_key_pressed, is_mouse_button_down, mouse_position, MouseButton, BLACK, WHITE},
+    prelude::{
+        is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK, WHITE,
+    },
     text::draw_text,
     time::get_fps,
     window::{clear_background, next_frame},
@@ -20,8 +24,9 @@ use game::Game;
 
 #[main("Tetris")]
 async fn main() {
+    let debug = Cell::new(false);
     let left_top_corner = vec2(200.0, 10.0);
-    let mut game = Game::new(left_top_corner);
+    let mut game = Game::new(left_top_corner, &debug);
 
     loop {
         match game.board.game_state {
@@ -41,7 +46,7 @@ async fn main() {
                 todo!();
             }
         }
-        handle_keyboard_input(&mut game.board);
+        handle_keyboard_input(&mut game.board, &debug);
         draw_text(
             format!("fps: {}", get_fps()).as_str(),
             10.0,
@@ -53,8 +58,8 @@ async fn main() {
     }
 }
 
-fn handle_keyboard_input(board: &mut Board) {
-    if is_key_pressed(macroquad::input::KeyCode::Escape) {
+fn handle_keyboard_input(board: &mut Board, debug: &Cell<bool>) {
+    if is_key_pressed(KeyCode::Escape) {
         match board.game_state {
             GameState::Playing => {
                 board.game_state = GameState::OpenSettings;
@@ -64,6 +69,8 @@ fn handle_keyboard_input(board: &mut Board) {
             }
             _ => panic!("Not implemented yet"),
         }
+    } else if is_key_pressed(KeyCode::F3) {
+        debug.set(!debug.get());
     }
 }
 

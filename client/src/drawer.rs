@@ -1,17 +1,38 @@
+use std::cell::Cell;
+
 use macroquad::{
-    prelude::{draw_rectangle, Color, BLACK, GRAY},
-    shapes::draw_rectangle_lines,
+    prelude::{draw_rectangle, Color, BLACK, GRAY, WHITE},
+    shapes::{draw_circle_lines, draw_rectangle_lines},
 };
 
 use tetris::consts::{Piece, Tetromino, Vec2, BLOCK_SIZE, HEIGHT, WIDTH};
 
-pub struct Drawer {
+pub struct Drawer<'a> {
     pub left_top_corner: Vec2,
+    pub debug: &'a Cell<bool>,
 }
 
-impl tetris::drawer::Drawer for Drawer {
+impl<'a> tetris::drawer::Drawer for Drawer<'a> {
     fn draw_current_tetromino(&self, active_piece: &Piece) {
         let (r, g, b) = active_piece.tetromino.get_color();
+        let origin = active_piece.dots[0];
+
+        if self.debug.get() {
+            // this is just for debugging purposes (ensure pieces are in the true SRS rotations)
+            // https://harddrop.com/wiki/File:SRS-true-rotations.png
+            let (min, max) = match active_piece.tetromino {
+                Tetromino::I => (-2, 2),
+                _ => (-1, 1),
+            };
+            for i in min..=max {
+                for j in min..=max {
+                    let x = self.left_top_corner.x + (origin.x + i as f32) * BLOCK_SIZE;
+                    let y = self.left_top_corner.y + (origin.y + j as f32) * BLOCK_SIZE;
+                    draw_rectangle(x, y, BLOCK_SIZE, BLOCK_SIZE, BLACK);
+                }
+            }
+        }
+
         // draw current block
         active_piece.dots.iter().for_each(|position| {
             let x = self.left_top_corner.x + position.x * BLOCK_SIZE;
@@ -20,6 +41,17 @@ impl tetris::drawer::Drawer for Drawer {
 
             draw_rectangle_lines(x, y, BLOCK_SIZE, BLOCK_SIZE, 2.0, BLACK);
         });
+
+        if self.debug.get() {
+            // draw origin circle on active_piece (continued debug purposes)
+            draw_circle_lines(
+                self.left_top_corner.x + origin.x * BLOCK_SIZE + BLOCK_SIZE / 2.0,
+                self.left_top_corner.y + origin.y * BLOCK_SIZE + BLOCK_SIZE / 2.0,
+                BLOCK_SIZE / 2.0,
+                2.0,
+                WHITE,
+            )
+        }
     }
 
     fn draw_tetrominos(
