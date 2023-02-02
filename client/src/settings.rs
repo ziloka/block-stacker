@@ -1,9 +1,9 @@
 use macroquad::{
-    miniquad::{graphics::GraphicsContext, EventHandler, KeyMods, TouchPhase},
+    miniquad::{graphics::GraphicsContext, EventHandler, KeyMods},
     prelude::{
         get_last_key_pressed,
         utils::{register_input_subscriber, repeat_all_miniquad_input},
-        vec2, KeyCode, MouseButton,
+        vec2, KeyCode,
     },
     ui::{hash, root_ui, widgets::Window},
 };
@@ -153,6 +153,5 @@ impl EventHandler for Settings {
         _keymods: KeyMods,
         _repeat: bool,
     ) {
-        // println!("char event");
     }
 }

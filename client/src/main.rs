@@ -69,8 +69,8 @@ fn handle_keyboard_input(board: &mut Board) {
 
 fn modify_board_bricks(left_top_corner: Vec2, board: &mut Board) {
     let (x, y) = mouse_position();
-    let x = ((x - left_top_corner.x) / BLOCK_SIZE) as usize;
-    let y = ((y - left_top_corner.y) / BLOCK_SIZE) as usize;
+    let x = ((x - left_top_corner.x) / BLOCK_SIZE).floor() as usize;
+    let y = ((y - left_top_corner.y) / BLOCK_SIZE).floor() as usize;
     let brick = vec![vec2(0.0, 0.0)];
 
     if is_mouse_button_down(MouseButton::Left)

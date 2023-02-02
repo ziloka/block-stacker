@@ -118,7 +118,6 @@ impl Board {
         let old_rotation_index = self.active_piece.rotation_index;
         self.active_piece.rotation_index += if clockwise { -1 } else { 1 };
         self.active_piece.rotation_index = self.mod_helper(self.active_piece.rotation_index, 4);
-        println!("rotation index: {}", self.active_piece.rotation_index);
         let origin = self.active_piece.dots[0];
         for pos in &mut self.active_piece.dots {
             let relative_pos = pos.sub(origin);
@@ -141,6 +140,11 @@ impl Board {
         }
     }
 
+    // determine the rotation index of the tetromino
+    // returning 0 - O means it is in its spawn position 
+    // returning 1 - R means it is in a clockwise rotation ("right") from spawn 
+    // returning 2 - L means it is in a counter-clockwise rotation ("left") from spawn
+    // returning 3 - 2 means it is in a 180 degree rotation from spawn
     fn mod_helper(&self, x: i8, m: i8) -> i8 {
         (x % m + m) % m
     }
@@ -155,18 +159,14 @@ impl Board {
         for offset_element in offset_data {
             let offset_value1 = offset_element[old_rotation_index as usize];
             let offset_value2 = offset_element[new_rotation_index as usize];
-            end_offset = offset_value1.sub(offset_value2);
+            end_offset = vec2(offset_value1.x - offset_value2.x, offset_value1.y - offset_value2.y * -1.0);
 
             if !self.conflict(&self.active_piece.dots, end_offset, true) {
-                // println!("{:?}", end_offset);
-                // println!("old: {}, new: {}", old_rotation_index, new_rotation_index);
-                // println!("offset #1: {:?}, #2: {:?}\n", offset_value1, offset_value2);
                 move_possible = true;
                 break;
             }
         }
 
-        // TODO: implement wallkicks / figure out why this doesn't work
         if move_possible {
             // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
             for dot in self.active_piece.dots.iter_mut() {
