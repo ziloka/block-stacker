@@ -11,11 +11,12 @@ pub struct Game<'a> {
 }
 
 impl<'a> Game<'a> {
-    pub fn new(left_top_corner: Vec2, debug: &'a Cell<bool>) -> Self {
+    pub fn new(left_top_corner: &'a Cell<Vec2>, block_size: &'a Cell<f32>, debug: &'a Cell<bool>) -> Self {
         Self {
             board: Board::new(now() as usize),
             drawer: Drawer {
                 left_top_corner,
+                block_size,
                 debug,
             },
             input: Input::default(),
