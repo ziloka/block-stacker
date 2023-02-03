@@ -96,7 +96,6 @@ impl Tetromino {
     pub fn get_structure(&self) -> [Vec2; 4] {
         match *self {
             Tetromino::I => [
-                // maybe fix? doesn't seem like it requires to be fixed
                 vec2(0.0, 0.0),
                 vec2(-1.0, 0.0),
                 vec2(2.0, 0.0),
@@ -117,16 +116,15 @@ impl Tetromino {
             Tetromino::O => [
                 // fix
                 vec2(0.0, 0.0),
-                vec2(1.0, 1.0),
-                vec2(0.0, 1.0),
+                vec2(1.0, -1.0),
+                vec2(0.0, -1.0),
                 vec2(1.0, 0.0),
             ],
             Tetromino::S => [
-                // fix
                 vec2(0.0, 0.0),
-                vec2(0.0, 1.0),
-                vec2(-1.0, 1.0),
-                vec2(1.0, 0.0),
+                vec2(0.0, -1.0),
+                vec2(-1.0, 0.0),
+                vec2(1.0, -1.0),
             ],
             Tetromino::T => [
                 vec2(0.0, 0.0),
@@ -135,11 +133,10 @@ impl Tetromino {
                 vec2(1.0, 0.0),
             ],
             Tetromino::Z => [
-                // fix
                 vec2(0.0, 0.0),
-                vec2(-1.0, 0.0),
-                vec2(1.0, 1.0),
-                vec2(0.0, 1.0),
+                vec2(-1.0, -1.0),
+                vec2(0.0, -1.0),
+                vec2(1.0, 0.0), 
             ],
         }
     }
