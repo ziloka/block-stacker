@@ -1,19 +1,17 @@
-use macroquad::{
-    miniquad::{graphics::GraphicsContext, EventHandler, KeyMods},
-    prelude::{
-        get_last_key_pressed,
-        utils::{register_input_subscriber, repeat_all_miniquad_input},
-        vec2, KeyCode,
-    },
-    ui::{hash, root_ui, widgets::Window},
-};
+use macroquad::prelude::KeyCode;
+
+use egui::{Key, Modifiers};
+use egui_bind::{Bind, KeyOrPointer};
+
+pub struct KeyInfo {
+    pub key: KeyCode,
+    binding: Binding,
+}
 
 // https://tetris.wiki/DAS
 pub struct Settings {
     pub handles: Handles,
     pub controls: Controls,
-    focused_on: Option<FocusedOn>,
-    subscriber_id: usize,
 }
 
 // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml?context=3
@@ -24,27 +22,15 @@ pub struct Handles {
 }
 
 pub struct Controls {
-    pub left: KeyCode,
-    pub right: KeyCode,
-    pub soft_drop: KeyCode,
-    pub hard_drop: KeyCode,
-    pub rotate_clockwise: KeyCode,
-    pub rotate_counterclockwise: KeyCode,
-    pub rotate_180: KeyCode,
-    pub hold: KeyCode,
-    pub restart: KeyCode,
-}
-
-enum FocusedOn {
-    Left,
-    Right,
-    SoftDrop,
-    HardDrop,
-    RotateClockwise,
-    RotateCounterclockwise,
-    Rotate180,
-    Hold,
-    Restart,
+    pub left: KeyInfo,
+    pub right: KeyInfo,
+    pub soft_drop: KeyInfo,
+    pub hard_drop: KeyInfo,
+    pub rotate_clockwise: KeyInfo,
+    pub rotate_counterclockwise: KeyInfo,
+    pub rotate_180: KeyInfo,
+    pub hold: KeyInfo,
+    pub restart: KeyInfo,
 }
 
 impl Default for Settings {
@@ -52,116 +38,209 @@ impl Default for Settings {
         Self {
             handles: Handles { das: 8.6, arr: 0.6 },
             controls: Controls {
-                left: KeyCode::Left,
-                right: KeyCode::Right,
-                soft_drop: KeyCode::Down,
-                hard_drop: KeyCode::Space,
-                rotate_clockwise: KeyCode::Up,
-                rotate_counterclockwise: KeyCode::Z,
-                rotate_180: KeyCode::A,
-                hold: KeyCode::C,
-                restart: KeyCode::R,
+                left: KeyInfo {
+                    key: KeyCode::Left,
+                    binding: None,
+                },
+                right: KeyInfo {
+                    key: KeyCode::Right,
+                    binding: None,
+                },
+                soft_drop: KeyInfo {
+                    key: KeyCode::Down,
+                    binding: None,
+                },
+                hard_drop: KeyInfo {
+                    key: KeyCode::Space,
+                    binding: None,
+                },
+                rotate_clockwise: KeyInfo {
+                    key: KeyCode::Up,
+                    binding: None,
+                },
+                rotate_counterclockwise: KeyInfo {
+                    key: KeyCode::Z,
+                    binding: None,
+                },
+                rotate_180: KeyInfo {
+                    key: KeyCode::A,
+                    binding: None,
+                },
+                hold: KeyInfo {
+                    key: KeyCode::C,
+                    binding: None,
+                },
+                restart: KeyInfo {
+                    key: KeyCode::R,
+                    binding: None,
+                },
             },
-            focused_on: None,
-            subscriber_id: register_input_subscriber(),
         }
     }
 }
 
+type Binding = Option<(KeyOrPointer, Modifiers)>;
+
 impl Settings {
     pub fn draw_menu(&mut self) {
-        Window::new(hash!(), vec2(0., 0.), vec2(300., 800.))
-            .label("Settings")
-            .titlebar(true)
-            .ui(&mut root_ui(), |ui| {
-                ui.tree_node(hash!(), "handles", |ui| {
-                    ui.slider(
-                        hash!(),
-                        "DAS (frames per movement)",
-                        0.0..200.0,
-                        &mut self.handles.das,
-                    );
-                    ui.slider(
-                        hash!(),
-                        "ARR (frames per movement)",
-                        0.0..50.,
-                        &mut self.handles.arr,
-                    );
-                });
+        egui_macroquad::ui(|egui_ctx| {
+            egui::Window::new("Settings").show(egui_ctx, |ui| {
+                ui.label("Handles");
+                ui.add(egui::Slider::new(&mut self.handles.das, 0.0..=20.0).text("DAS (ms)"));
+                ui.add(egui::Slider::new(&mut self.handles.arr, 0.0..=5.0).text("ARR (ms)"));
+
                 ui.separator();
-                ui.tree_node(hash!(), "controls", |ui| {
-                    if ui.button(None, format!("Move Left: {:?}", self.controls.left)) {
-                        self.focused_on = Some(FocusedOn::Left);
-                    }
-                    if ui.button(None, format!("Move Right: {:?}", self.controls.right)) {
-                        self.focused_on = Some(FocusedOn::Right);
-                    }
-                    if ui.button(None, format!("Soft Drop: {:?}", self.controls.soft_drop)) {
-                        self.focused_on = Some(FocusedOn::SoftDrop);
-                    }
-                    if ui.button(None, format!("Hard Drop: {:?}", self.controls.hard_drop)) {
-                        self.focused_on = Some(FocusedOn::HardDrop);
-                    }
-                    if ui.button(
-                        None,
-                        format!("Rotate Clockwise: {:?}", self.controls.rotate_clockwise),
-                    ) {
-                        self.focused_on = Some(FocusedOn::RotateClockwise);
-                    }
-                    if ui.button(
-                        None,
-                        format!(
-                            "Rotate Counterclockwise: {:?}",
-                            self.controls.rotate_counterclockwise
-                        ),
-                    ) {
-                        self.focused_on = Some(FocusedOn::RotateCounterclockwise);
-                    }
-                    if ui.button(None, format!("Rotate 180: {:?}", self.controls.rotate_180)) {
-                        self.focused_on = Some(FocusedOn::Rotate180);
-                    }
-                    if ui.button(None, format!("Hold: {:?}", self.controls.hold)) {
-                        self.focused_on = Some(FocusedOn::Hold);
-                    }
-                    if ui.button(None, format!("Restart: {:?}", self.controls.restart)) {
-                        self.focused_on = Some(FocusedOn::Restart);
-                    }
-                    if let Some(focused_on) = &self.focused_on {
-                        if let Some(keycode) = get_last_key_pressed() {
-                            match focused_on {
-                                FocusedOn::Left => self.controls.left = keycode,
-                                FocusedOn::Right => self.controls.right = keycode,
-                                FocusedOn::SoftDrop => self.controls.soft_drop = keycode,
-                                FocusedOn::HardDrop => self.controls.hard_drop = keycode,
-                                FocusedOn::RotateClockwise => {
-                                    self.controls.rotate_clockwise = keycode
-                                }
-                                FocusedOn::RotateCounterclockwise => {
-                                    self.controls.rotate_counterclockwise = keycode
-                                }
-                                FocusedOn::Rotate180 => self.controls.rotate_180 = keycode,
-                                FocusedOn::Hold => self.controls.hold = keycode,
-                                FocusedOn::Restart => self.controls.restart = keycode,
-                            }
-                            self.focused_on = None;
-                        }
-                    }
-                });
+                ui.label("Controls");
+                ui.separator();
+
+                ui.label("Left");
+
+                if ui
+                    .add(Bind::new("_left", &mut self.controls.left.binding))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.left;
+                    self.set_keybinding(&binding, &mut key);
+                }
+                ui.label("Right");
+                if ui
+                    .add(Bind::new("_right", &mut self.controls.right.binding))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.right;
+                    self.set_keybinding(&binding, &mut key);
+                }
+                ui.label("Soft Drop");
+                if ui
+                    .add(Bind::new(
+                        "_soft_drop",
+                        &mut self.controls.soft_drop.binding,
+                    ))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.soft_drop;
+                    self.set_keybinding(&binding, &mut key);
+                }
+                ui.label("Hard Drop");
+                if ui
+                    .add(Bind::new(
+                        "_hard_drop",
+                        &mut self.controls.hard_drop.binding,
+                    ))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.hard_drop;
+                    self.set_keybinding(&binding, &mut key);
+                }
+                ui.label("Rotate Clockwise");
+                if ui
+                    .add(Bind::new(
+                        "_rotate_clockwise",
+                        &mut self.controls.rotate_clockwise.binding,
+                    ))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.rotate_clockwise;
+                    self.set_keybinding(&binding, &mut key);
+                }
+                ui.label("Rotate Counter Clockwise");
+                if ui
+                    .add(Bind::new(
+                        "_rotate_counterclockwise",
+                        &mut self.controls.rotate_counterclockwise.binding,
+                    ))
+                    .changed()
+                {
+                    let KeyInfo { binding, mut key } = self.controls.rotate_counterclockwise;
+                    self.set_keybinding(&binding, &mut key);
+                }
             });
-        repeat_all_miniquad_input(self, self.subscriber_id);
+        });
+
+        egui_macroquad::draw();
+    }
+
+    fn set_keybinding(&self, binding: &Binding, key_code: &mut KeyCode) {
+        if let Some((KeyOrPointer::Key(key), _)) = binding {
+            *key_code = egui_key_to_macroquad_keycode(*key);
+        }
     }
 }
 
-impl EventHandler for Settings {
-    fn update(&mut self, _ctx: &mut GraphicsContext) {}
-    fn draw(&mut self, _ctx: &mut GraphicsContext) {}
-
-    fn char_event(
-        &mut self,
-        _ctx: &mut GraphicsContext,
-        _character: char,
-        _keymods: KeyMods,
-        _repeat: bool,
-    ) {
+fn egui_key_to_macroquad_keycode(key: Key) -> KeyCode {
+    match key {
+        Key::ArrowDown => KeyCode::Down,
+        Key::ArrowLeft => KeyCode::Left,
+        Key::ArrowRight => KeyCode::Right,
+        Key::ArrowUp => KeyCode::Up,
+        Key::Escape => KeyCode::Escape,
+        Key::Tab => KeyCode::Tab,
+        Key::Backspace => KeyCode::Backspace,
+        Key::Enter => KeyCode::Enter,
+        Key::Space => KeyCode::Space,
+        Key::Insert => KeyCode::Insert,
+        Key::Delete => KeyCode::Delete,
+        Key::Home => KeyCode::Home,
+        Key::End => KeyCode::End,
+        Key::PageUp => KeyCode::PageUp,
+        Key::PageDown => KeyCode::PageDown,
+        Key::Minus => KeyCode::Minus,
+        Key::PlusEquals => todo!(),
+        Key::Num0 => KeyCode::Key0,
+        Key::Num1 => KeyCode::Key1,
+        Key::Num2 => KeyCode::Key2,
+        Key::Num3 => KeyCode::Key3,
+        Key::Num4 => KeyCode::Key4,
+        Key::Num5 => KeyCode::Key5,
+        Key::Num6 => KeyCode::Key6,
+        Key::Num7 => KeyCode::Key7,
+        Key::Num8 => KeyCode::Key8,
+        Key::Num9 => KeyCode::Key9,
+        Key::A => KeyCode::A,
+        Key::B => KeyCode::B,
+        Key::C => KeyCode::C,
+        Key::D => KeyCode::D,
+        Key::E => KeyCode::E,
+        Key::F => KeyCode::F,
+        Key::G => KeyCode::G,
+        Key::H => KeyCode::H,
+        Key::I => KeyCode::I,
+        Key::J => KeyCode::J,
+        Key::K => KeyCode::K,
+        Key::L => KeyCode::L,
+        Key::M => KeyCode::M,
+        Key::N => KeyCode::N,
+        Key::O => KeyCode::O,
+        Key::P => KeyCode::P,
+        Key::Q => KeyCode::Q,
+        Key::R => KeyCode::R,
+        Key::S => KeyCode::S,
+        Key::T => KeyCode::T,
+        Key::U => KeyCode::U,
+        Key::V => KeyCode::V,
+        Key::W => KeyCode::W,
+        Key::X => KeyCode::X,
+        Key::Y => KeyCode::Y,
+        Key::Z => KeyCode::Z,
+        Key::F1 => KeyCode::F1,
+        Key::F2 => KeyCode::F2,
+        Key::F3 => KeyCode::F3,
+        Key::F4 => KeyCode::F4,
+        Key::F5 => KeyCode::F5,
+        Key::F6 => KeyCode::F6,
+        Key::F7 => KeyCode::F7,
+        Key::F8 => KeyCode::F8,
+        Key::F9 => KeyCode::F9,
+        Key::F10 => KeyCode::F10,
+        Key::F11 => KeyCode::F11,
+        Key::F12 => KeyCode::F12,
+        Key::F13 => KeyCode::F13,
+        Key::F14 => KeyCode::F14,
+        Key::F15 => KeyCode::F15,
+        Key::F16 => KeyCode::F16,
+        Key::F17 => KeyCode::F17,
+        Key::F18 => KeyCode::F18,
+        Key::F19 => KeyCode::F19,
+        Key::F20 => KeyCode::F20,
     }
 }
