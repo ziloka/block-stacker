@@ -19,8 +19,8 @@ pub struct Settings {
 // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml?context=3
 // https://www.reddit.com/r/Tetris/comments/13uqby/comment/c77ev43/?context=3
 pub struct Handles {
-    pub das: f32, // Delayed Auto Shift in frames
-    pub arr: f32, // Auto Repeat Rate in frames
+    pub das: f32, // Delayed Auto Shift in frames per movement
+    pub arr: f32, // Auto Repeat Rate in frames per movement
 }
 
 pub struct Controls {
@@ -75,8 +75,18 @@ impl Settings {
             .titlebar(true)
             .ui(&mut root_ui(), |ui| {
                 ui.tree_node(hash!(), "handles", |ui| {
-                    ui.slider(hash!(), "DAS (frames)", 0.0..200.0, &mut self.handles.das);
-                    ui.slider(hash!(), "ARR (frames)", 0.0..50., &mut self.handles.arr);
+                    ui.slider(
+                        hash!(),
+                        "DAS (frames per movement)",
+                        0.0..200.0,
+                        &mut self.handles.das,
+                    );
+                    ui.slider(
+                        hash!(),
+                        "ARR (frames per movement)",
+                        0.0..50.,
+                        &mut self.handles.arr,
+                    );
                 });
                 ui.separator();
                 ui.tree_node(hash!(), "controls", |ui| {

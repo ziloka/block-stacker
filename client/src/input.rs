@@ -1,5 +1,3 @@
-use std::default;
-
 use macroquad::{
     miniquad::date::now,
     prelude::{is_key_down, is_key_pressed},
@@ -12,34 +10,40 @@ use tetris::{
 
 use crate::settings::Settings;
 
+#[derive(Default)]
 pub struct Input {
     pub settings: Settings,
-    holding: bool,
-    frame: f64, // the time the last movement was made
-}
-
-impl default::Default for Input {
-    fn default() -> Self {
-        Self {
-            settings: Settings::default(),
-            holding: false,
-            frame: 0.0,
-        }
-    }
+    das: f64, // the frames that have passed since the last movement
+    arr: f64, // the frames that have passed since the last movement
 }
 
 impl Input {
     // handles movement for every frame
     pub fn handle(&mut self, board: &mut Board) {
-        self.holding = is_key_down(self.settings.controls.left)
+        let held_down = is_key_down(self.settings.controls.left)
             || is_key_down(self.settings.controls.right)
             || is_key_down(self.settings.controls.soft_drop);
 
+        let is_down = is_key_pressed(self.settings.controls.left)
+            || is_key_pressed(self.settings.controls.right)
+            || is_key_pressed(self.settings.controls.soft_drop);
+
         let das = self.settings.handles.das as f64;
         let arr = self.settings.handles.arr as f64;
-        let frame = self.frame;
 
-        if (!self.holding && frame % das <= das) || (self.holding && frame % arr <= arr) {
+        if held_down {
+            self.das += 1.0;
+        } else {
+            self.das = 0.0;
+        }
+
+        if is_down {
+            self.arr += 1.0;
+        } else {
+            self.arr = 0.0;
+        }
+
+        if self.das >= das || self.arr >= arr {
             if is_key_down(self.settings.controls.left)
                 && !board.conflict(&board.active_piece.dots, vec2(-1.0, 0.0), true)
             {
@@ -93,8 +97,5 @@ impl Input {
 
         // handle line clears
         board.clear_lines();
-
-        // update frame
-        self.frame += 1.0;
     }
 }

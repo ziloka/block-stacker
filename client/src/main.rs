@@ -30,7 +30,8 @@ async fn main() {
     let mut game = Game::new(&left_top_corner, &block_size, &debug);
 
     loop {
-        let block_size_temp = (screen_height() / (HEIGHT * 1.25)).min(screen_width() / (WIDTH * 1.25));
+        let block_size_temp =
+            (screen_height() / (HEIGHT * 1.25)).min(screen_width() / (WIDTH * 1.25));
         block_size.set(block_size_temp);
         left_top_corner.set(vec2(block_size_temp * 6.0, block_size_temp));
 
