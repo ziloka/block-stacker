@@ -20,13 +20,13 @@ pub struct Input {
 impl Input {
     // handles movement for every frame
     pub fn handle(&mut self, board: &mut Board) {
-        let held_down = is_key_down(self.settings.controls.left.key)
-            || is_key_down(self.settings.controls.right.key)
-            || is_key_down(self.settings.controls.soft_drop.key);
+        let held_down = is_key_down(self.settings.controls.left)
+            || is_key_down(self.settings.controls.right)
+            || is_key_down(self.settings.controls.soft_drop);
 
-        let is_down = is_key_pressed(self.settings.controls.left.key)
-            || is_key_pressed(self.settings.controls.right.key)
-            || is_key_pressed(self.settings.controls.soft_drop.key);
+        let is_down = is_key_pressed(self.settings.controls.left)
+            || is_key_pressed(self.settings.controls.right)
+            || is_key_pressed(self.settings.controls.soft_drop);
 
         let das = self.settings.handles.das as f64;
         let arr = self.settings.handles.arr as f64;
@@ -44,21 +44,21 @@ impl Input {
         }
 
         if self.das >= das || self.arr >= arr {
-            if is_key_down(self.settings.controls.left.key)
+            if is_key_down(self.settings.controls.left)
                 && !board.conflict(&board.active_piece.dots, vec2(-1.0, 0.0), true)
             {
                 for dot in board.active_piece.dots.iter_mut() {
                     dot.x -= 1.0;
                 }
             }
-            if is_key_down(self.settings.controls.right.key)
+            if is_key_down(self.settings.controls.right)
                 && !board.conflict(&board.active_piece.dots, vec2(1.0, 0.0), true)
             {
                 for dot in board.active_piece.dots.iter_mut() {
                     dot.x += 1.0;
                 }
             }
-            if is_key_down(self.settings.controls.soft_drop.key)
+            if is_key_down(self.settings.controls.soft_drop)
                 && !board.conflict(&board.active_piece.dots, vec2(0.0, 1.0), true)
             {
                 for dot in board.active_piece.dots.iter_mut() {
@@ -68,14 +68,14 @@ impl Input {
         }
 
         // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L140-L147
-        if is_key_pressed(self.settings.controls.rotate_clockwise.key) {
+        if is_key_pressed(self.settings.controls.rotate_clockwise) {
             board.rotate_tetromino(false, true);
-        } else if is_key_pressed(self.settings.controls.rotate_counterclockwise.key) {
+        } else if is_key_pressed(self.settings.controls.rotate_counterclockwise) {
             board.rotate_tetromino(true, true);
-        } else if is_key_pressed(self.settings.controls.rotate_180.key) {
+        } else if is_key_pressed(self.settings.controls.rotate_180) {
             board.rotate_tetromino(true, true);
             board.rotate_tetromino(true, true);
-        } else if is_key_pressed(self.settings.controls.hard_drop.key) {
+        } else if is_key_pressed(self.settings.controls.hard_drop) {
             // the hard drop
             let mut y_offset = 0.0;
             for y in 0..HEIGHT as i32 {
@@ -89,9 +89,9 @@ impl Input {
                 dot.y += y_offset;
             }
             board.set_active_tetromino_position();
-        } else if is_key_pressed(self.settings.controls.hold.key) {
+        } else if is_key_pressed(self.settings.controls.hold) {
             board.hold_tetromino();
-        } else if is_key_pressed(self.settings.controls.restart.key) {
+        } else if is_key_pressed(self.settings.controls.restart) {
             *board = Board::new(now() as usize);
         }
 
