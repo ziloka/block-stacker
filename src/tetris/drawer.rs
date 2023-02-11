@@ -1,4 +1,4 @@
-use crate::consts::{Piece, Tetromino, HEIGHT, WIDTH};
+use crate::tetris::consts::{Piece, Tetromino, HEIGHT, WIDTH};
 
 type Row = [Option<(u8, u8, u8)>; WIDTH as usize];
 pub trait Drawer {

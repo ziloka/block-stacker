@@ -1,5 +1,7 @@
-use crate::consts::{Tetromino, TETROMINO_TYPES};
-use crate::random::Random;
+use crate::tetris::{
+    consts::{Tetromino, TETROMINO_TYPES},
+    random::Random,
+};
 
 // https://tetris.fandom.com/wiki/Random_Generator
 pub struct Generator {

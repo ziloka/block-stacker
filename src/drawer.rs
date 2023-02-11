@@ -5,7 +5,7 @@ use macroquad::{
     shapes::{draw_circle_lines, draw_rectangle_lines},
 };
 
-use tetris::consts::{Piece, Tetromino, Vec2, HEIGHT, WIDTH};
+use crate::tetris::consts::{Piece, Tetromino, Vec2, HEIGHT, WIDTH};
 
 pub struct Drawer<'a> {
     pub left_top_corner: &'a Cell<Vec2>,
@@ -13,7 +13,7 @@ pub struct Drawer<'a> {
     pub debug: &'a Cell<bool>,
 }
 
-impl<'a> tetris::drawer::Drawer for Drawer<'a> {
+impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
     fn draw_current_tetromino(&self, active_piece: &Piece) {
         let left_top_corner = self.left_top_corner.get();
         let block_size = self.block_size.get();

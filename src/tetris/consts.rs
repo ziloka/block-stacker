@@ -228,9 +228,7 @@ pub struct Piece {
     pub rotation_index: i8,
 }
 
-pub enum GameState {
+pub enum State {
     Playing,
     GameOver,
-    Paused,
-    OpenSettings,
 }

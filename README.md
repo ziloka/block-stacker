@@ -1,6 +1,4 @@
-
-Goal: Open source modern tetris client
-A port of [four-tris](https://github.com/fiorescarlatto/four-tris)
+Something similar to [four-tris](https://github.com/fiorescarlatto/four-tris)
 
 # Notes
 

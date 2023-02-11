@@ -1,13 +1,13 @@
 use std::ops::{Add, Sub};
 
-use crate::{
-    consts::{vec2, GameState, Piece, Tetromino, Vec2, HEIGHT, TETROMINO_TYPES, WIDTH},
+use crate::tetris::{
+    consts::{vec2, Piece, State, Tetromino, Vec2, HEIGHT, TETROMINO_TYPES, WIDTH},
     drawer::Drawer,
     generator::Generator,
 };
 
 pub struct Board {
-    pub game_state: GameState,
+    pub game_state: State,
     pub active_piece: Piece,
     pub hold_piece: Option<Piece>,
     generator: Generator,
@@ -33,7 +33,7 @@ impl Board {
         let mut generator = Generator::new(seed);
         let tetrominos = generator.get_new_sequence_of_tetrominos();
         let mut board = Self {
-            game_state: GameState::Playing,
+            game_state: State::Playing,
             active_piece,
             hold_piece: None,
             generator,
@@ -71,7 +71,7 @@ impl Board {
     }
 
     fn set_next_tetromino_as_active_piece(&mut self) {
-        self.active_piece = Piece {
+        let piece = Piece {
             tetromino: self.preview_pieces[0],
             dots: self.preview_pieces[0]
                 .get_structure()
@@ -80,7 +80,12 @@ impl Board {
                 .collect(),
             rotation_index: 0,
         };
-        self.add_tetromino_preview_piece();
+        if self.conflict(&piece.dots, vec2(0.0, 0.0), false) {
+            self.game_state = State::GameOver;
+        } else {
+            self.active_piece = piece;
+            self.add_tetromino_preview_piece();
+        }
     }
 
     fn add_tetromino_preview_piece(&mut self) {

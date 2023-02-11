@@ -1,8 +1,11 @@
 use std::cell::Cell;
 
-use crate::{drawer::Drawer, input::Input};
+use crate::{
+    drawer::Drawer,
+    input::Input,
+    tetris::{board::Board, consts::Vec2},
+};
 use macroquad::miniquad::date::now;
-use tetris::{board::Board, consts::Vec2};
 
 pub struct Game<'a> {
     pub board: Board,

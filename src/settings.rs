@@ -63,7 +63,7 @@ impl Default for Settings {
                 restart: KeyCode::R,
             },
             focused_on: None,
-            subscriber_id: register_input_subscriber()
+            subscriber_id: register_input_subscriber(),
         }
     }
 }

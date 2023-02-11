@@ -10,15 +10,16 @@ use macroquad::{
     window::{clear_background, next_frame, screen_height, screen_width},
 };
 
-use tetris::{
-    board::Board,
-    consts::{vec2, GameState, Vec2, HEIGHT, WIDTH},
-};
-
 mod drawer;
 mod game;
 mod input;
 mod settings;
+mod tetris;
+
+use tetris::{
+    board::Board,
+    consts::{vec2, State, Vec2, GRAY, HEIGHT, WIDTH},
+};
 
 use game::Game;
 
@@ -27,6 +28,7 @@ async fn main() {
     let left_top_corner = Cell::new(vec2(200.0, 10.0));
     let block_size = Cell::new(30.0);
     let debug = Cell::new(false);
+    let mut open_settings = false;
     let mut game = Game::new(&left_top_corner, &block_size, &debug);
 
     loop {
@@ -35,24 +37,22 @@ async fn main() {
         block_size.set(block_size_temp);
         left_top_corner.set(vec2(block_size_temp * 6.0, block_size_temp));
 
-        match game.board.game_state {
-            GameState::OpenSettings => {
-                game.input.settings.draw_menu();
-            }
-            GameState::Playing => {
-                clear_background(BLACK);
-                modify_board_bricks(&left_top_corner, &mut game.board, &block_size);
-                game.input.handle(&mut game.board);
-                game.board.draw(&game.drawer);
-            }
-            GameState::Paused => {
-                todo!();
-            }
-            GameState::GameOver => {
-                todo!();
+        if open_settings {
+            game.input.settings.draw_menu();
+        } else {
+            match game.board.game_state {
+                State::Playing => {
+                    clear_background(BLACK);
+                    modify_board_bricks(&left_top_corner, &mut game.board, &block_size);
+                    game.input.handle(&mut game.board);
+                    game.board.draw(&game.drawer);
+                }
+                State::GameOver => {
+                    todo!();
+                }
             }
         }
-        handle_keyboard_input(&mut game.board, &debug);
+        handle_keyboard_input(&mut game.board, &debug, &mut open_settings);
         draw_text(
             format!("fps: {}", get_fps()).as_str(),
             10.0,
@@ -64,16 +64,13 @@ async fn main() {
     }
 }
 
-fn handle_keyboard_input(board: &mut Board, debug: &Cell<bool>) {
+fn handle_keyboard_input(board: &mut Board, debug: &Cell<bool>, open_settings: &mut bool) {
     if is_key_pressed(KeyCode::Escape) {
         match board.game_state {
-            GameState::Playing => {
-                board.game_state = GameState::OpenSettings;
+            State::Playing => {
+                *open_settings = !*open_settings;
             }
-            GameState::OpenSettings => {
-                board.game_state = GameState::Playing;
-            }
-            _ => panic!("Not implemented yet"),
+            _ => unimplemented!(),
         }
     } else if is_key_pressed(KeyCode::F3) {
         debug.set(!debug.get());
@@ -90,7 +87,7 @@ fn modify_board_bricks(left_top_corner: &Cell<Vec2>, board: &mut Board, block_si
     if is_mouse_button_down(MouseButton::Left)
         && !board.conflict(&brick, vec2(x as f32, y as f32), false)
     {
-        board.add_brick(x, y, (105, 105, 105));
+        board.add_brick(x, y, GRAY);
     } else if is_mouse_button_down(MouseButton::Right)
         && !board.conflict(&brick, vec2(x as f32, y as f32), false)
     {
