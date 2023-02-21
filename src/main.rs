@@ -18,10 +18,12 @@ mod tetris;
 
 use tetris::{
     board::Board,
-    consts::{vec2, State, Vec2, GRAY, HEIGHT, WIDTH},
+    consts::{vec2, State, Vec2, HEIGHT, WIDTH},
 };
 
 use game::Game;
+
+use crate::tetris::consts::CUSTOM_GARBAGE;
 
 #[main("Tetris")]
 async fn main() {
@@ -87,7 +89,7 @@ fn modify_board_bricks(left_top_corner: &Cell<Vec2>, board: &mut Board, block_si
     if is_mouse_button_down(MouseButton::Left)
         && !board.conflict(&brick, vec2(x as f32, y as f32), false)
     {
-        board.add_brick(x, y, GRAY);
+        board.add_brick(x, y, CUSTOM_GARBAGE);
     } else if is_mouse_button_down(MouseButton::Right)
         && !board.conflict(&brick, vec2(x as f32, y as f32), false)
     {

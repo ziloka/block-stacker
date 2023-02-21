@@ -95,8 +95,5 @@ impl Input {
         } else if is_key_pressed(self.settings.controls.restart) {
             *board = Board::new(now() as usize);
         }
-
-        // handle line clears
-        board.clear_lines();
     }
 }

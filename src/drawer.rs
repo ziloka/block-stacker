@@ -1,11 +1,11 @@
 use std::cell::Cell;
 
 use macroquad::{
-    prelude::{draw_rectangle, Color, BLACK, GRAY, WHITE},
+    prelude::{draw_rectangle, Color, BLACK, WHITE},
     shapes::{draw_circle_lines, draw_rectangle_lines},
 };
 
-use crate::tetris::consts::{Piece, Tetromino, Vec2, HEIGHT, WIDTH};
+use crate::tetris::consts::{Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH};
 
 pub struct Drawer<'a> {
     pub left_top_corner: &'a Cell<Vec2>,
@@ -70,7 +70,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             left_top_corner.y,
             WIDTH * block_size,
             HEIGHT * block_size,
-            GRAY,
+            Color::from_rgba(GRAY.0, GRAY.1, GRAY.2, 255),
         );
 
         // draw all the blocks that are already on the board

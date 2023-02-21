@@ -51,6 +51,7 @@ impl Mul<Vec2> for Vec2 {
 }
 
 pub const GRAY: (u8, u8, u8) = (128, 128, 128);
+pub const CUSTOM_GARBAGE: (u8, u8, u8) = (105, 105, 105);
 pub const HEIGHT: f32 = 20.0;
 pub const WIDTH: f32 = 10.0;
 
@@ -226,6 +227,7 @@ pub struct Piece {
     pub tetromino: Tetromino,
     pub dots: Vec<Vec2>,
     pub rotation_index: i8,
+    pub previous_rotation_index: Option<i8>,
 }
 
 pub enum State {

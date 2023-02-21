@@ -6,6 +6,8 @@ use crate::tetris::{
     generator::Generator,
 };
 
+use super::action::Action;
+
 pub struct Board {
     pub game_state: State,
     pub active_piece: Piece,
@@ -29,6 +31,7 @@ impl Board {
                 .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y + 1.0))
                 .collect(),
             rotation_index: 0,
+            previous_rotation_index: None,
         };
         let mut generator = Generator::new(seed);
         let tetrominos = generator.get_new_sequence_of_tetrominos();
@@ -79,6 +82,7 @@ impl Board {
                 .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y + 1.0))
                 .collect(),
             rotation_index: 0,
+            previous_rotation_index: None,
         };
         if self.conflict(&piece.dots, vec2(0.0, 0.0), false) {
             self.game_state = State::GameOver;
@@ -121,6 +125,7 @@ impl Board {
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L249-L278
     pub fn rotate_tetromino(&mut self, clockwise: bool, should_offset: bool) {
         let old_rotation_index = self.active_piece.rotation_index;
+        self.active_piece.previous_rotation_index = Some(old_rotation_index);
         self.active_piece.rotation_index += if clockwise { -1 } else { 1 };
         self.active_piece.rotation_index = self.mod_helper(self.active_piece.rotation_index, 4);
         let origin = self.active_piece.dots[0];
@@ -187,18 +192,62 @@ impl Board {
             self.positions[row as usize][column as usize] =
                 Some(self.active_piece.tetromino.get_color());
         }
+        self.clear_lines();
         self.set_next_tetromino_as_active_piece();
     }
 
-    pub fn clear_lines(&mut self) {
+    fn determine_action_performed(&self, lines_cleared: u8) -> Option<Action> {
+        if matches!(self.active_piece.tetromino, Tetromino::T) {
+            let Vec2 { x, y } = self.active_piece.dots[0];
+            let brick = vec![vec2(0.0, 0.0)];
+            let top_left_filled = self.conflict(&brick, vec2(x - 1.0, y - 1.0), false);
+            let top_right_filled = self.conflict(&brick, vec2(x + 1.0, y - 1.0), false);
+            let bottom_left_filled = self.conflict(&brick, vec2(x - 1.0, y + 1.0), false);
+            let bottom_right_filled = self.conflict(&brick, vec2(x + 1.0, y + 1.0), false);
+
+            if bottom_left_filled && bottom_left_filled && top_left_filled && !top_right_filled
+                || bottom_right_filled && bottom_left_filled && !top_left_filled && top_right_filled
+            {
+                if lines_cleared == 1 {
+                    return Some(Action::TSpinMiniSingle);
+                } else if lines_cleared == 2 {
+                    return Some(Action::TSpinMiniDouble);
+                }
+                return Some(Action::TSpinMiniNoLines);
+            }
+            if lines_cleared == 1 {
+                return Some(Action::TSpinSingle);
+            } else if lines_cleared == 2 {
+                return Some(Action::TSpinDouble);
+            } else if lines_cleared == 3 {
+                return Some(Action::TSpinTriple);
+            }
+        } else if lines_cleared == 1 {
+            return Some(Action::Single);
+        } else if lines_cleared == 2 {
+            return Some(Action::Double);
+        } else if lines_cleared == 3 {
+            return Some(Action::Triple);
+        } else if lines_cleared == 4 {
+            return Some(Action::Tetris);
+        }
+        None
+    }
+
+    fn clear_lines(&mut self) {
+        let mut lines_cleared = 0;
         let mut index = HEIGHT - 1.0;
         while index >= 0.0 {
             let row = self.positions[index as usize];
             if row.iter().all(|x| x.is_some()) {
                 self.clear_line(index as usize);
+                lines_cleared += 1;
             } else {
                 index -= 1.0;
             }
+        }
+        if let Some(action) = self.determine_action_performed(lines_cleared) {
+            println!("action: {}", action.to_string());
         }
     }
 
