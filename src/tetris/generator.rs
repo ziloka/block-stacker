@@ -1,4 +1,4 @@
-use crate::tetris::{
+use super::{
     consts::{Tetromino, TETROMINO_TYPES},
     random::Random,
 };

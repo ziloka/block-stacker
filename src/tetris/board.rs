@@ -1,24 +1,24 @@
 use std::ops::{Add, Sub};
 
-use crate::tetris::{
+use super::{
+    action::Action,
     consts::{vec2, Piece, State, Tetromino, Vec2, HEIGHT, TETROMINO_TYPES, WIDTH},
     drawer::Drawer,
     generator::Generator,
 };
 
-use super::action::Action;
-
-pub struct Board {
+pub struct Board<'a> {
     pub game_state: State,
     pub active_piece: Piece,
     pub hold_piece: Option<Piece>,
     generator: Generator,
+    pub drawer: &'a dyn Drawer,
     preview_pieces: [Tetromino; 7],
     positions: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
 }
 
-impl Board {
-    pub fn new(seed: usize) -> Self {
+impl<'a> Board<'a> {
+    pub fn new(drawer: &'a dyn Drawer, seed: usize) -> Self {
         const CELL_INIT: Option<(u8, u8, u8)> = None;
         const ROW_INIT: [Option<(u8, u8, u8)>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
         let positions = [ROW_INIT; HEIGHT as usize];
@@ -40,6 +40,7 @@ impl Board {
             active_piece,
             hold_piece: None,
             generator,
+            drawer,
             preview_pieces: tetrominos,
             // https://stackoverflow.com/a/53930630
             positions,
@@ -48,11 +49,11 @@ impl Board {
         board
     }
 
-    pub fn draw(&self, drawer: &impl Drawer) {
-        drawer.draw_tetrominos(&self.positions);
-        drawer.draw_current_tetromino(&self.active_piece);
-        drawer.draw_preview_pieces(&self.preview_pieces);
-        drawer.draw_hold_piece(&self.hold_piece);
+    pub fn draw(&self) {
+        self.drawer.draw_tetrominos(&self.positions);
+        self.drawer.draw_current_tetromino(&self.active_piece);
+        self.drawer.draw_preview_pieces(&self.preview_pieces);
+        self.drawer.draw_hold_piece(&self.hold_piece);
     }
 
     pub fn hold_tetromino(&mut self) {
@@ -205,9 +206,10 @@ impl Board {
             let bottom_left_filled = self.conflict(&brick, vec2(x - 1.0, y + 1.0), false);
             let bottom_right_filled = self.conflict(&brick, vec2(x + 1.0, y + 1.0), false);
 
-            if bottom_left_filled && bottom_left_filled && top_left_filled && !top_right_filled
-                || bottom_right_filled && bottom_left_filled && !top_left_filled && top_right_filled
+            if (bottom_left_filled && bottom_right_filled) && (top_left_filled && !top_right_filled || !top_left_filled && top_right_filled)
             {
+                // check if i was suppose to upgrade TSpinMini to regular Tspin
+                // T has to use the fifth, or the final, kick, a Mini T-Spin gets bumped to a T-Spin even if the corners were filled on the back rather than front
                 if lines_cleared == 1 {
                     return Some(Action::TSpinMiniSingle);
                 } else if lines_cleared == 2 {
@@ -222,6 +224,7 @@ impl Board {
             } else if lines_cleared == 3 {
                 return Some(Action::TSpinTriple);
             }
+            return Some(Action::TSpinNoLines);
         } else if lines_cleared == 1 {
             return Some(Action::Single);
         } else if lines_cleared == 2 {

@@ -16,22 +16,27 @@ mod input;
 mod settings;
 mod tetris;
 
-use tetris::{
-    board::Board,
-    consts::{vec2, State, Vec2, HEIGHT, WIDTH},
+use crate::{
+    drawer::Drawer,
+    game::Game,
+    tetris::{
+        board::Board,
+        consts::{vec2, State, Vec2, CUSTOM_GARBAGE, HEIGHT, WIDTH},
+    }
 };
-
-use game::Game;
-
-use crate::tetris::consts::CUSTOM_GARBAGE;
 
 #[main("Tetris")]
 async fn main() {
     let left_top_corner = Cell::new(vec2(200.0, 10.0));
     let block_size = Cell::new(30.0);
     let debug = Cell::new(false);
+    let drawer = Drawer {
+        left_top_corner: &left_top_corner,
+        block_size: &block_size,
+        debug: &debug
+    };
     let mut open_settings = false;
-    let mut game = Game::new(&left_top_corner, &block_size, &debug);
+    let mut game = Game::new(&drawer);
 
     loop {
         let block_size_temp =
@@ -47,7 +52,7 @@ async fn main() {
                     clear_background(BLACK);
                     modify_board_bricks(&left_top_corner, &mut game.board, &block_size);
                     game.input.handle(&mut game.board);
-                    game.board.draw(&game.drawer);
+                    game.board.draw();
                 }
                 State::GameOver => {
                     todo!();
