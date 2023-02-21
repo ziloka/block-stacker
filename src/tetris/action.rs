@@ -5,10 +5,10 @@ pub enum Action {
     Tetris, // line clear
     // https://tetris.wiki/T-Spin
     TSpinMiniNoLines,
-    TSpinNoLines,
     TSpinMiniSingle,
-    TSpinSingle,
     TSpinMiniDouble,
+    TSpinNoLines,
+    TSpinSingle,
     TSpinDouble,
     TSpinTriple,
     BackToBackDifficultLineClears,

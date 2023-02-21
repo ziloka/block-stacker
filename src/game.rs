@@ -10,9 +10,7 @@ pub struct Game<'a> {
 }
 
 impl<'a> Game<'a> {
-    pub fn new(
-        drawer: &'a dyn Drawer
-    ) -> Self {
+    pub fn new(drawer: &'a dyn Drawer) -> Self {
         Self {
             board: Board::new(drawer, now() as usize),
             input: Input::default(),

@@ -50,6 +50,16 @@ impl Mul<Vec2> for Vec2 {
     }
 }
 
+impl Mul<f32> for Vec2 {
+    type Output = Vec2;
+    fn mul(self, rhs: f32) -> Self::Output {
+        Vec2 {
+            x: self.x * rhs,
+            y: self.y * rhs,
+        }
+    }
+}
+
 pub const GRAY: (u8, u8, u8) = (128, 128, 128);
 pub const CUSTOM_GARBAGE: (u8, u8, u8) = (105, 105, 105);
 pub const HEIGHT: f32 = 20.0;
@@ -127,8 +137,8 @@ impl Tetromino {
             ],
             Tetromino::T => [
                 vec2(0.0, 0.0),
-                vec2(-1.0, 0.0),
                 vec2(0.0, -1.0),
+                vec2(-1.0, 0.0),
                 vec2(1.0, 0.0),
             ],
             Tetromino::Z => [
@@ -228,6 +238,7 @@ pub struct Piece {
     pub dots: Vec<Vec2>,
     pub rotation_index: i8,
     pub previous_rotation_index: Option<i8>,
+    pub previous_offset_kick: Option<usize>, // there are only 5 kicks
 }
 
 pub enum State {

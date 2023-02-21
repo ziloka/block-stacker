@@ -1,11 +1,12 @@
 use std::cell::Cell;
 
 use macroquad::{
-    prelude::{draw_rectangle, Color, BLACK, WHITE},
+    prelude::{draw_rectangle, Color, BLACK, GREEN, ORANGE, RED, VIOLET, WHITE},
     shapes::{draw_circle_lines, draw_rectangle_lines},
+    text::draw_text,
 };
 
-use crate::tetris::consts::{Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH};
+use crate::tetris::consts::{vec2, Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH};
 
 pub struct Drawer<'a> {
     pub left_top_corner: &'a Cell<Vec2>,
@@ -47,14 +48,70 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         });
 
         if debug {
-            // draw origin circle on active_piece (continued debug purposes)
+            // draw circle on origin on active_piece (continued debug purposes)
             draw_circle_lines(
                 left_top_corner.x + origin.x * block_size + block_size / 2.0,
                 left_top_corner.y + origin.y * block_size + block_size / 2.0,
                 block_size / 2.0,
                 2.0,
                 WHITE,
-            )
+            );
+
+            if matches!(active_piece.tetromino, Tetromino::T) {
+                let fl = left_top_corner + vec2(origin.x - 1.0, origin.y - 1.0) * block_size;
+                let fr = left_top_corner + vec2(origin.x + 1.0, origin.y - 1.0) * block_size;
+                let bl = left_top_corner + vec2(origin.x - 1.0, origin.y + 1.0) * block_size;
+                let br = left_top_corner + vec2(origin.x + 1.0, origin.y + 1.0) * block_size;
+
+                let (
+                    front_left_corner_filled,
+                    front_right_corner_filled,
+                    bottom_left_corner_filled,
+                    bottom_right_corner_filled,
+                ) = match active_piece.rotation_index {
+                    0 => (fl, fr, bl, br),
+                    1 => (fr, br, fl, bl),
+                    2 => (br, bl, fr, fl),
+                    _ => {
+                        // make the assumption its rotation index 3
+                        assert!(active_piece.rotation_index == 3);
+                        (bl, fl, br, fr)
+                    }
+                };
+
+                draw_rectangle_lines(
+                    front_left_corner_filled.x,
+                    front_left_corner_filled.y,
+                    block_size,
+                    block_size,
+                    5.0,
+                    RED,
+                );
+                draw_rectangle_lines(
+                    front_right_corner_filled.x,
+                    front_right_corner_filled.y,
+                    block_size,
+                    block_size,
+                    5.0,
+                    ORANGE,
+                );
+                draw_rectangle_lines(
+                    bottom_left_corner_filled.x,
+                    bottom_left_corner_filled.y,
+                    block_size,
+                    block_size,
+                    5.0,
+                    GREEN,
+                );
+                draw_rectangle_lines(
+                    bottom_right_corner_filled.x,
+                    bottom_right_corner_filled.y,
+                    block_size,
+                    block_size,
+                    5.0,
+                    VIOLET,
+                );
+            }
         }
     }
 
@@ -64,6 +121,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
     ) {
         let left_top_corner = self.left_top_corner.get();
         let block_size = self.block_size.get();
+        let debug = self.debug.get();
 
         draw_rectangle(
             left_top_corner.x,
@@ -83,6 +141,29 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                     draw_rectangle(x, y, block_size, block_size, Color::from_rgba(r, g, b, 255));
                 }
                 draw_rectangle_lines(x, y, block_size, block_size, 2.0, BLACK);
+            }
+        }
+
+        if debug {
+            // draw the indexs on the side of the board
+            for i in 0..(HEIGHT as u32) {
+                draw_text(
+                    &i.to_string(),
+                    left_top_corner.x - 20.0,
+                    (left_top_corner.y + i as f32 * block_size) + 15.0,
+                    20.0,
+                    WHITE,
+                );
+            }
+
+            for i in 0..(WIDTH as u32) {
+                draw_text(
+                    &i.to_string(),
+                    left_top_corner.x + i as f32 * block_size,
+                    left_top_corner.y + HEIGHT as f32 * block_size + 15.0,
+                    20.0,
+                    WHITE,
+                );
             }
         }
     }
@@ -120,5 +201,18 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 draw_rectangle_lines(x, y, block_size, block_size, 2.0, BLACK);
             });
         }
+    }
+
+    fn draw_action_text(&self, text: &str) {
+        let left_top_corner = self.left_top_corner.get();
+        let block_size = self.block_size.get();
+
+        draw_text(
+            text,
+            left_top_corner.x - 5.0 * block_size,
+            left_top_corner.y + (HEIGHT / 2.0) * block_size,
+            20.0,
+            WHITE,
+        );
     }
 }

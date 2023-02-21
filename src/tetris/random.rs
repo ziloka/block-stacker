@@ -20,7 +20,9 @@ impl Random {
 
     fn next(&mut self) -> usize {
         let oldstate = self.state;
-        self.state = oldstate.wrapping_mul(6364136223846793005) + self.inc;
+        self.state = oldstate
+            .wrapping_mul(6364136223846793005)
+            .wrapping_add(self.inc);
         let xorshifted = ((oldstate >> 18) ^ oldstate) >> 27;
         let rot = oldstate >> 59;
         (xorshifted as usize) >> rot | (xorshifted as usize) << ((-(rot as i64)) & 31)

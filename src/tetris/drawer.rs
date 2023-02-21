@@ -6,4 +6,5 @@ pub trait Drawer {
     fn draw_tetrominos(&self, positions: &[Row; HEIGHT as usize]);
     fn draw_preview_pieces(&self, preview_pieces: &[Tetromino; 7]);
     fn draw_hold_piece(&self, hold_piece: &Option<Piece>);
+    fn draw_action_text(&self, text: &str);
 }

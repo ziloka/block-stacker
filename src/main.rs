@@ -22,7 +22,7 @@ use crate::{
     tetris::{
         board::Board,
         consts::{vec2, State, Vec2, CUSTOM_GARBAGE, HEIGHT, WIDTH},
-    }
+    },
 };
 
 #[main("Tetris")]
@@ -33,7 +33,7 @@ async fn main() {
     let drawer = Drawer {
         left_top_corner: &left_top_corner,
         block_size: &block_size,
-        debug: &debug
+        debug: &debug,
     };
     let mut open_settings = false;
     let mut game = Game::new(&drawer);

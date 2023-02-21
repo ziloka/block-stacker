@@ -93,11 +93,7 @@ impl Input {
         } else if is_key_pressed(self.settings.controls.hold) {
             board.hold_tetromino();
         } else if is_key_pressed(self.settings.controls.restart) {
-            // *board = Board::new(&Drawer {
-            //     left_top_corner: board.drawer,
-            //     block_size,
-            //     debug,
-            // }, now() as usize);
+            board.restart(now() as usize);
         }
     }
 }
