@@ -101,6 +101,7 @@ impl Tetromino {
         }
     }
 
+    // https://harddrop.com/wiki/File:SRS-true-rotations.png
     // https://github.com/zigurous/unity-tetris-tutorial/blob/main/Assets/Scripts/Data.cs
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L48-L101
     pub fn get_structure(&self) -> [Vec2; 4] {

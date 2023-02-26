@@ -27,11 +27,11 @@ use crate::{
 
 #[main("Tetris")]
 async fn main() {
-    let left_top_corner = Cell::new(vec2(200.0, 10.0));
+    let bottom_left_corner = Cell::new(vec2(0.0, 0.0));
     let block_size = Cell::new(30.0);
     let debug = Cell::new(false);
     let drawer = Drawer {
-        left_top_corner: &left_top_corner,
+        bottom_left_corner: &bottom_left_corner,
         block_size: &block_size,
         debug: &debug,
     };
@@ -42,7 +42,7 @@ async fn main() {
         let block_size_temp =
             (screen_height() / (HEIGHT * 1.25)).min(screen_width() / (WIDTH * 1.25));
         block_size.set(block_size_temp);
-        left_top_corner.set(vec2(block_size_temp * 6.0, block_size_temp));
+        bottom_left_corner.set(vec2(block_size_temp * 6.0, block_size_temp * (HEIGHT + 2.0)));
 
         if open_settings {
             game.input.settings.draw_menu();
@@ -50,7 +50,7 @@ async fn main() {
             match game.board.game_state {
                 State::Playing => {
                     clear_background(BLACK);
-                    modify_board_bricks(&left_top_corner, &mut game.board, &block_size);
+                    modify_board_bricks(&bottom_left_corner, &mut game.board, &block_size);
                     game.input.handle(&mut game.board);
                     game.board.draw();
                 }
@@ -84,11 +84,12 @@ fn handle_keyboard_input(board: &mut Board, debug: &Cell<bool>, open_settings: &
     }
 }
 
-fn modify_board_bricks(left_top_corner: &Cell<Vec2>, board: &mut Board, block_size: &Cell<f32>) {
-    let left_top_corner = left_top_corner.get();
+fn modify_board_bricks(bottom_left_corner: &Cell<Vec2>, board: &mut Board, block_size: &Cell<f32>) {
+    let block_size = block_size.get();
+    let bottom_left_corner = bottom_left_corner.get();
     let (x, y) = mouse_position();
-    let x = ((x - left_top_corner.x) / block_size.get()).floor() as usize;
-    let y = ((y - left_top_corner.y) / block_size.get()).floor() as usize;
+    let x = ((x - bottom_left_corner.x) / block_size).floor() as usize;
+    let y = ((bottom_left_corner.y - y) / block_size).floor() as usize;
     let brick = vec![vec2(0.0, 0.0)];
 
     if is_mouse_button_down(MouseButton::Left)

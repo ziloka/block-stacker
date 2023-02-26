@@ -17,8 +17,9 @@ pub struct Board<'a> {
     pub active_piece: Piece,
     pub hold_piece: Option<Piece>,
     generator: Generator,
-    pub drawer: &'a dyn Drawer,
+    drawer: &'a dyn Drawer,
     preview_pieces: [Tetromino; 7],
+    // (0, 0) represents the bottom left corner, (WIDTH, HEIGHT) represents the top right corner
     positions: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
     last_action: Option<Action>,
 }
@@ -31,7 +32,7 @@ impl<'a> Board<'a> {
             dots: TETROMINO_TYPES[0]
                 .get_structure()
                 .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y + 1.0))
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
                 .collect(),
             rotation_index: 0,
             previous_rotation_index: None,
@@ -85,7 +86,7 @@ impl<'a> Board<'a> {
                 .tetromino
                 .get_structure()
                 .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y))
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
                 .collect();
             hold_piece.rotation_index = 0;
             self.hold_piece = Some(self.active_piece.clone());
@@ -99,7 +100,7 @@ impl<'a> Board<'a> {
             dots: self.preview_pieces[0]
                 .get_structure()
                 .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, pos.y + 1.0))
+                .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
                 .collect(),
             rotation_index: 0,
             previous_rotation_index: None,
@@ -123,21 +124,20 @@ impl<'a> Board<'a> {
     // and x and y position are based off of the top left corner of the piece
     pub fn conflict(
         &self,
-        positions: &[Vec2],
+        dots: &[Vec2],
         relative_offset: Vec2,
-        allow_overlapping_blocks: bool,
+        dont_allow_overlapping_blocks: bool,
     ) -> bool {
-        positions
-            .iter()
+        dots.iter()
             .map(|relative_position| relative_position.add(relative_offset))
             .any(|relative| {
                 let Vec2 { x: column, y: row } = relative;
                 (
                     relative.x < 0.0 // for the left side
-               || relative.x >= WIDTH // for the right side
-               || relative.y >= HEIGHT
+                 || relative.x >= WIDTH // for the right side
+                 || relative.y < 0.0
                     // for the floor (bottom)
-                ) || allow_overlapping_blocks
+                ) || dont_allow_overlapping_blocks
                     && self.positions[row as usize][column as usize].is_some()
             })
     }
@@ -147,7 +147,7 @@ impl<'a> Board<'a> {
     pub fn rotate_tetromino(&mut self, clockwise: bool, should_offset: bool) {
         let old_rotation_index = self.active_piece.rotation_index;
         self.active_piece.previous_rotation_index = Some(old_rotation_index);
-        self.active_piece.rotation_index += if clockwise { -1 } else { 1 };
+        self.active_piece.rotation_index += if clockwise { 1 } else { -1 };
         self.active_piece.rotation_index = self.mod_helper(self.active_piece.rotation_index, 4);
         let origin = self.active_piece.dots[0];
         for pos in &mut self.active_piece.dots {
@@ -191,7 +191,7 @@ impl<'a> Board<'a> {
             let offset_value2 = offset_element[new_rotation_index as usize];
             let end_offset = vec2(
                 offset_value1.x - offset_value2.x,
-                (offset_value1.y - offset_value2.y) * -1.0,
+                offset_value1.y - offset_value2.y,
             );
 
             if !self.conflict(&self.active_piece.dots, end_offset, true) {
@@ -224,29 +224,29 @@ impl<'a> Board<'a> {
             && self.active_piece.previous_rotation_index.is_some()
         {
             let Vec2 { x, y } = self.active_piece.dots[0];
-            let fl = self.conflict(&brick, vec2(x - 1.0, y - 1.0), true);
-            let fr = self.conflict(&brick, vec2(x + 1.0, y - 1.0), true);
-            let br = self.conflict(&brick, vec2(x + 1.0, y + 1.0), true);
-            let bl = self.conflict(&brick, vec2(x - 1.0, y + 1.0), true);
+            let fl = self.conflict(&brick, vec2(x - 1.0, y + 1.0), true);
+            let fr = self.conflict(&brick, vec2(x + 1.0, y + 1.0), true);
+            let br = self.conflict(&brick, vec2(x + 1.0, y - 1.0), true);
+            let bl = self.conflict(&brick, vec2(x - 1.0, y - 1.0), true);
 
             let (
                 front_left_corner_filled,
                 front_right_corner_filled,
-                bottom_right_corner_filled,
                 bottom_left_corner_filled,
+                bottom_right_corner_filled,
             ) = match self.active_piece.rotation_index {
-                0 => (fl, fr, br, bl),
-                1 => (bl, fl, fr, br),
-                2 => (br, bl, fl, fr),
+                0 => (fl, fr, bl, br),
+                1 => (br, fl, fr, bl),
+                2 => (bl, br, fl, fr),
                 _ => {
                     // make the assumption its rotation index 3
                     assert!(self.active_piece.rotation_index == 3);
-                    (fr, br, bl, fl)
+                    (fr, bl, br, fl)
                 }
             };
 
             if (front_left_corner_filled && front_right_corner_filled)
-                && (bottom_left_corner_filled ^ bottom_right_corner_filled)
+                && (bottom_left_corner_filled ^ bottom_right_corner_filled) // XOR operator
             {
                 if lines_cleared == 0 {
                     return Some(Action::TSpinNoLines);
@@ -262,7 +262,6 @@ impl<'a> Board<'a> {
             {
                 // check if i was suppose to upgrade TSpinMini to regular Tspin
                 // T has to use the fifth, or the final, kick, a Mini T-Spin gets bumped to a T-Spin even if the corners were filled on the back rather than front
-                // println!("type: {:?}", self.active_piece.previous_offset_kick);
                 if self.active_piece.previous_offset_kick.is_some()
                     && self.active_piece.previous_offset_kick.unwrap() == 4
                 {
@@ -303,31 +302,26 @@ impl<'a> Board<'a> {
             .positions
             .iter()
             .filter(|row| row.iter().all(|x| x.is_some()))
-            .collect::<Vec<&[Option<(u8, u8, u8)>; WIDTH as usize]>>()
+            .collect::<Vec<_>>()
             .len();
         if let Some(action) = self.determine_action_performed(line_clear_to_be_cleared) {
             self.last_action = Some(action);
         }
 
-        let mut index = HEIGHT - 1.0;
-        while index >= 0.0 {
+        let mut index = 0.0;
+        while index <= HEIGHT - 1.0 {
             let row = self.positions[index as usize];
             if row.iter().all(|x| x.is_some()) {
                 self.clear_line(index as usize);
             } else {
-                index -= 1.0;
+                index += 1.0;
             }
         }
     }
 
     fn clear_line(&mut self, row_index: usize) {
-        for y in (1..row_index + 1).rev() {
-            for x in 0..self.positions[y].len() {
-                self.positions[y][x] = self.positions[y - 1][x];
-            }
-        }
-        for x in 0..self.positions[0].len() {
-            self.positions[0][x] = None;
+        for y in row_index..HEIGHT as usize - 1 {
+            self.positions[y] = self.positions[y + 1];
         }
     }
 
