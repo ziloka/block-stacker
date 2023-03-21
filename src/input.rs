@@ -45,26 +45,14 @@ impl Input {
         }
 
         if self.das >= das || self.arr >= arr {
-            if is_key_down(self.settings.controls.left)
-                && !board.conflict(&board.active_piece.dots, vec2(-1.0, 0.0), true)
-            {
-                for dot in board.active_piece.dots.iter_mut() {
-                    dot.x -= 1.0;
-                }
+            if is_key_down(self.settings.controls.left) {
+                board.move_left();
             }
-            if is_key_down(self.settings.controls.right)
-                && !board.conflict(&board.active_piece.dots, vec2(1.0, 0.0), true)
-            {
-                for dot in board.active_piece.dots.iter_mut() {
-                    dot.x += 1.0;
-                }
+            if is_key_down(self.settings.controls.right) {
+                board.move_right();
             }
-            if is_key_down(self.settings.controls.soft_drop)
-                && !board.conflict(&board.active_piece.dots, vec2(0.0, -1.0), true)
-            {
-                for dot in board.active_piece.dots.iter_mut() {
-                    dot.y -= 1.0;
-                }
+            if is_key_down(self.settings.controls.soft_drop) {
+                board.soft_drop();
             }
         }
 
@@ -77,19 +65,7 @@ impl Input {
             board.rotate_tetromino(true, true);
             board.rotate_tetromino(true, true);
         } else if is_key_pressed(self.settings.controls.hard_drop) {
-            // the hard drop
-            let mut y_offset = 0.0;
-            for y in (0..HEIGHT as i32).rev() {
-                let y = y as f32 * -1.0;
-                if !board.conflict(&board.active_piece.dots, vec2(0.0, y), true) {
-                    y_offset = y;
-                    break;
-                }
-            }
-            for dot in board.active_piece.dots.iter_mut() {
-                dot.y += y_offset;
-            }
-            board.set_active_tetromino_position();
+            board.hard_drop();
         } else if is_key_pressed(self.settings.controls.hold) {
             board.hold_tetromino();
         } else if is_key_pressed(self.settings.controls.restart) {

@@ -42,7 +42,10 @@ async fn main() {
         let block_size_temp =
             (screen_height() / (HEIGHT * 1.25)).min(screen_width() / (WIDTH * 1.25));
         block_size.set(block_size_temp);
-        bottom_left_corner.set(vec2(block_size_temp * 6.0, block_size_temp * (HEIGHT + 2.0)));
+        bottom_left_corner.set(vec2(
+            block_size_temp * 6.0,
+            block_size_temp * (HEIGHT + 2.0),
+        ));
 
         if open_settings {
             game.input.settings.draw_menu();

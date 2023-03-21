@@ -142,6 +142,46 @@ impl<'a> Board<'a> {
             })
     }
 
+    pub fn move_left(&mut self) {
+        if !self.conflict(&self.active_piece.dots, vec2(-1.0, 0.0), true) {
+            for dot in self.active_piece.dots.iter_mut() {
+                dot.x -= 1.0;
+            }
+        }
+    }
+
+    pub fn move_right(&mut self) {
+        if !self.conflict(&self.active_piece.dots, vec2(1.0, 0.0), true) {
+            for dot in self.active_piece.dots.iter_mut() {
+                dot.x += 1.0;
+            }
+        }
+    }
+
+    pub fn soft_drop(&mut self) {
+        if !self.conflict(&self.active_piece.dots, vec2(0.0, -1.0), true) {
+            for dot in self.active_piece.dots.iter_mut() {
+                dot.y -= 1.0;
+            }
+        }
+    }
+
+    pub fn hard_drop(&mut self) {
+        // the hard drop
+        let mut y_offset = 0.0;
+        for y in (0..HEIGHT as i32).rev() {
+            let y = y as f32 * -1.0;
+            if !self.conflict(&self.active_piece.dots, vec2(0.0, y), true) {
+                y_offset = y;
+                break;
+            }
+        }
+        for dot in self.active_piece.dots.iter_mut() {
+            dot.y += y_offset;
+        }
+        self.set_active_tetromino_position();
+    }
+
     // https://harddrop.com/wiki/SRS
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L249-L278
     pub fn rotate_tetromino(&mut self, clockwise: bool, should_offset: bool) {
@@ -246,7 +286,8 @@ impl<'a> Board<'a> {
             };
 
             if (front_left_corner_filled && front_right_corner_filled)
-                && (bottom_left_corner_filled ^ bottom_right_corner_filled) // XOR operator
+                && (bottom_left_corner_filled ^ bottom_right_corner_filled)
+            // XOR operator
             {
                 if lines_cleared == 0 {
                     return Some(Action::TSpinNoLines);

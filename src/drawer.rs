@@ -178,7 +178,8 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             .for_each(|(i, tetromino)| {
                 tetromino.get_structure().iter().for_each(|position| {
                     let x = bottom_left_corner.x + (WIDTH + 2.0 + position.x) * block_size;
-                    let y = (bottom_left_corner.y - HEIGHT * block_size) + (i as f32 * 3.0 + position.y) * block_size;
+                    let y = (bottom_left_corner.y - HEIGHT * block_size)
+                        + (i as f32 * 3.0 + position.y) * block_size;
                     let (r, g, b) = tetromino.get_color();
                     draw_rectangle(x, y, block_size, block_size, Color::from_rgba(r, g, b, 255));
 
@@ -194,7 +195,9 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         if let Some(piece) = hold_piece {
             piece.tetromino.get_structure().iter().for_each(|position| {
                 let x = bottom_left_corner.x - position.x * block_size + block_size * -3.0;
-                let y = (bottom_left_corner.y - HEIGHT * block_size) + position.y * block_size + block_size;
+                let y = (bottom_left_corner.y - HEIGHT * block_size)
+                    + position.y * block_size
+                    + block_size;
                 let (r, g, b) = piece.tetromino.get_color();
                 draw_rectangle(x, y, block_size, block_size, Color::from_rgba(r, g, b, 255));
 
