@@ -3,13 +3,7 @@ use macroquad::{
     prelude::{is_key_down, is_key_pressed},
 };
 
-use crate::{
-    settings::Settings,
-    tetris::{
-        board::Board,
-        consts::{vec2, HEIGHT},
-    },
-};
+use crate::{settings::Settings, tetris::board::Board};
 
 #[derive(Default)]
 pub struct Input {

@@ -29,11 +29,7 @@ impl<'a> Board<'a> {
         // this first place gets replaced so it doesn't matter what it is
         let active_piece = Piece {
             tetromino: TETROMINO_TYPES[0],
-            dots: TETROMINO_TYPES[0]
-                .get_structure()
-                .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
-                .collect(),
+            dots: Vec::new(),
             rotation_index: 0,
             previous_rotation_index: None,
             previous_offset_kick: None,
@@ -66,6 +62,14 @@ impl<'a> Board<'a> {
         self.set_next_tetromino_as_active_piece();
     }
 
+    fn get_spawn_dots(&self, tetromino: &Tetromino) -> Vec<Vec2> {
+        tetromino
+            .get_structure()
+            .iter()
+            .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
+            .collect()
+    }
+
     pub fn draw(&self) {
         self.drawer.draw_tetrominos(&self.positions);
         self.drawer.draw_current_tetromino(&self.active_piece);
@@ -82,12 +86,7 @@ impl<'a> Board<'a> {
             self.set_next_tetromino_as_active_piece();
         } else {
             let mut hold_piece = self.hold_piece.clone().unwrap();
-            hold_piece.dots = hold_piece
-                .tetromino
-                .get_structure()
-                .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
-                .collect();
+            hold_piece.dots = self.get_spawn_dots(&hold_piece.tetromino);
             hold_piece.rotation_index = 0;
             self.hold_piece = Some(self.active_piece.clone());
             self.active_piece = hold_piece;
@@ -97,11 +96,7 @@ impl<'a> Board<'a> {
     fn set_next_tetromino_as_active_piece(&mut self) {
         let piece = Piece {
             tetromino: self.preview_pieces[0],
-            dots: self.preview_pieces[0]
-                .get_structure()
-                .iter()
-                .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
-                .collect(),
+            dots: self.get_spawn_dots(&self.preview_pieces[0]),
             rotation_index: 0,
             previous_rotation_index: None,
             previous_offset_kick: None,
