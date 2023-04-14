@@ -165,10 +165,10 @@ impl<'a> Board<'a> {
     pub fn hard_drop(&mut self) {
         // the hard drop
         let mut y_offset = 0.0;
-        for y in (0..HEIGHT as i32).rev() {
+        for y in 1..HEIGHT as i32 {
             let y = y as f32 * -1.0;
-            if !self.conflict(&self.active_piece.dots, vec2(0.0, y), true) {
-                y_offset = y;
+            if self.conflict(&self.active_piece.dots, vec2(0.0, y), true) {
+                y_offset = y + 1.0;
                 break;
             }
         }

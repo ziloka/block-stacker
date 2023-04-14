@@ -115,16 +115,16 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         }
     }
 
+    // draw ghost piece, ghost piece appears where the harddrop would be
     fn draw_ghost_piece(&self, board: &Board, active_piece: &Piece) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
 
-        // draw ghost piece, ghost piece appears where the harddrop would be
         let mut y_offset = 0.0;
-        for y in (0..HEIGHT as i32).rev() {
+        for y in 1..HEIGHT as i32 {
             let y = y as f32 * -1.0;
-            if !board.conflict(&active_piece.dots, vec2(0.0, y), true) {
-                y_offset = y;
+            if board.conflict(&active_piece.dots, vec2(0.0, y), true) {
+               y_offset = y + 1.0;
                 break;
             }
         }
