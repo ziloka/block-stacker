@@ -72,6 +72,7 @@ impl<'a> Board<'a> {
 
     pub fn draw(&self) {
         self.drawer.draw_tetrominos(&self.positions);
+        self.drawer.draw_ghost_piece(&self, &self.active_piece);
         self.drawer.draw_current_tetromino(&self.active_piece);
         self.drawer.draw_preview_pieces(&self.preview_pieces);
         self.drawer.draw_hold_piece(&self.hold_piece);

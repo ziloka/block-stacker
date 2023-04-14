@@ -6,7 +6,7 @@ use macroquad::{
     text::draw_text,
 };
 
-use crate::tetris::consts::{vec2, Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH};
+use crate::tetris::{consts::{vec2, Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH}, board::Board};
 
 pub struct Drawer<'a> {
     pub bottom_left_corner: &'a Cell<Vec2>,
@@ -113,6 +113,28 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 );
             }
         }
+    }
+
+    fn draw_ghost_piece(&self, board: &Board, active_piece: &Piece) {
+        let block_size = self.block_size.get();
+        let bottom_left_corner = self.bottom_left_corner.get();
+
+        // draw ghost piece, ghost piece appears where the harddrop would be
+        let mut y_offset = 0.0;
+        for y in (0..HEIGHT as i32).rev() {
+            let y = y as f32 * -1.0;
+            if !board.conflict(&active_piece.dots, vec2(0.0, y), true) {
+                y_offset = y;
+                break;
+            }
+        }
+
+        active_piece.dots.iter().for_each(|position| {
+            let x = bottom_left_corner.x + position.x * block_size;
+            let y = bottom_left_corner.y - (position.y + y_offset) * block_size - block_size;
+            draw_rectangle(x, y, block_size, block_size, WHITE);
+            draw_rectangle_lines(x, y, block_size, block_size, 2.0, BLACK);
+        });
     }
 
     fn draw_tetrominos(
