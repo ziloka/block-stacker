@@ -6,8 +6,8 @@ edition = "2021"
 authors = ["Ziloka <50429450+ziloka@users.noreply.github.com>"]
 
 [dependencies]
-# bevy = { version = "0.8.0", features = ["dynamic"] }
-bevy = { version = "0.9" }
+# bevy = { version = "0.9" }
+bevy = { version = "0.10" }
 rand = { version = "0.8" }
 
 # https://bevy-cheatbook.github.io/platforms/wasm.html

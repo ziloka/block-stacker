@@ -1,5 +1,5 @@
-use bevy::prelude::*;
 use crate::piece::Position;
+use bevy::prelude::*;
 
 // change handling (measured in frames per movement)
 // pub const ARR: f32 = 1.6;
@@ -23,22 +23,22 @@ impl KEYS {
     pub const HARDDROP: KeyCode = KeyCode::Space;
 }
 
-
 #[derive(Bundle, Copy, Clone)]
 pub struct BOARD {
-  pub active_piece: TetriminoType,
+    pub active_piece: TetriminoType,
 }
 impl BOARD {
     pub const HEIGHT: f32 = 20.0; // 20 blocks high
     pub const WIDTH: f32 = 10.0; // 10 blocks wide
     pub const TETRIOMINO_SIDE_LENGTH: f32 = 40.0; // 40 pixels per side (square)
-    pub const TOP_RIGHT_CORNER: Position = Position { // top right corner of the board
-      x: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0,
-      y: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0,
+    pub const TOP_RIGHT_CORNER: Position = Position {
+        // top right corner of the board
+        x: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0,
+        y: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0,
     };
     pub const BOTTOM_LEFT_CORNER: Position = Position {
-      x: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0 * -1.0,
-      y: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0 * -1.0,
+        x: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0 * -1.0,
+        y: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH / 2.0 * -1.0,
     };
 }
 #[derive(Copy, Clone)]
@@ -99,16 +99,16 @@ impl TetriminoType {
                 Delta { x: 2.0, y: 1.0 },
             ],
             TetriminoType::O => [
-              Delta { x: 0.0, y: 1.0 },
-              Delta { x: 1.0, y: 1.0 },
-              Delta { x: 0.0, y: 0.0 },
-              Delta { x: 1.0, y: 0.0 },
+                Delta { x: 0.0, y: 1.0 },
+                Delta { x: 1.0, y: 1.0 },
+                Delta { x: 0.0, y: 0.0 },
+                Delta { x: 1.0, y: 0.0 },
             ],
             TetriminoType::T => [
-              Delta { x: 0.0, y: 1.0 },
-              Delta { x: -1.0, y: 0.0 },
-              Delta { x: 0.0, y: 0.0 },
-              Delta { x: 1.0, y: 0.0 },
+                Delta { x: 0.0, y: 1.0 },
+                Delta { x: -1.0, y: 0.0 },
+                Delta { x: 0.0, y: 0.0 },
+                Delta { x: 1.0, y: 0.0 },
             ],
             TetriminoType::S => [
                 Delta { x: 0.0, y: 1.0 },

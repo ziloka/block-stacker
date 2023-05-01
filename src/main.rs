@@ -3,7 +3,7 @@ use bevy::{
     input::{keyboard::KeyboardInput, ButtonState},
     prelude::*,
     sprite::MaterialMesh2dBundle,
-    window::PresentMode,
+    window::{PresentMode, WindowResolution},
 };
 use rand::seq::SliceRandom;
 
@@ -17,13 +17,16 @@ fn main() {
         // change background color
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins.set(WindowPlugin {
-            window: WindowDescriptor {
+            primary_window: Some(Window {
                 title: "tetris".to_string(),
-                width: BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
-                height: BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
+                resolution: WindowResolution::new(
+                    BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
+                    BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
+                ),
                 present_mode: PresentMode::AutoVsync,
+                resizable: true,
                 ..default()
-            },
+            }),
             ..default()
         }))
         .add_plugin(LogDiagnosticsPlugin::default())
@@ -59,7 +62,7 @@ fn setup(
                     BOARD::TOP_RIGHT_CORNER.y - (1.0 * BOARD::TETRIOMINO_SIDE_LENGTH),
                     1.0,
                 ),
-                visibility: Visibility { is_visible: true },
+                visibility: Visibility::Visible,
                 ..default()
             },
         ))
@@ -76,7 +79,7 @@ fn setup(
                         scale: Vec3::splat(BOARD::TETRIOMINO_SIDE_LENGTH),
                     },
                     material: materials.add(ColorMaterial::from(board.active_piece.get_color())),
-                    visibility: Visibility { is_visible: true },
+                    visibility: Visibility::Visible,
                     ..default()
                 });
             }
@@ -88,7 +91,7 @@ fn setup(
             // https://www.reddit.com/r/bevy/comments/xs792h/help_with_understanding_child_parent_relationships/
             SpatialBundle {
                 transform: Transform::from_xyz(0.0, 0.0, 1.0),
-                visibility: Visibility { is_visible: true },
+                visibility: Visibility::Visible,
                 ..default()
             },
         ))
