@@ -8,7 +8,7 @@ use macroquad::{
     ui::{hash, root_ui, widgets::Window},
 };
 
-// https://tetris.wiki/DAS
+
 pub struct Settings {
     pub handles: Handles,
     pub controls: Controls,
@@ -16,6 +16,7 @@ pub struct Settings {
     subscriber_id: usize,
 }
 
+// https://tetris.wiki/DAS
 // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml?context=3
 // https://www.reddit.com/r/Tetris/comments/13uqby/comment/c77ev43/?context=3
 pub struct Handles {
@@ -50,7 +51,7 @@ enum FocusedOn {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            handles: Handles { das: 8.6, arr: 0.6 },
+            handles: Handles { das: 133.0, arr: 10.0 },
             controls: Controls {
                 left: KeyCode::Left,
                 right: KeyCode::Right,
@@ -78,13 +79,13 @@ impl Settings {
                     ui.slider(
                         hash!(),
                         "DAS (frames per movement)",
-                        0.0..200.0,
+                        0.0..500.0,
                         &mut self.handles.das,
                     );
                     ui.slider(
                         hash!(),
                         "ARR (frames per movement)",
-                        0.0..50.,
+                        0.0..500.,
                         &mut self.handles.arr,
                     );
                 });
