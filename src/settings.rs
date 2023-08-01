@@ -1,5 +1,5 @@
 use macroquad::{
-    miniquad::{graphics::GraphicsContext, EventHandler, KeyMods},
+    miniquad::{EventHandler, KeyMods},
     prelude::{
         get_last_key_pressed,
         utils::{register_input_subscriber, repeat_all_miniquad_input},
@@ -7,7 +7,6 @@ use macroquad::{
     },
     ui::{hash, root_ui, widgets::Window},
 };
-
 
 pub struct Settings {
     pub handles: Handles,
@@ -20,8 +19,8 @@ pub struct Settings {
 // https://www.reddit.com/r/Tetris/comments/frbii6/comment/fphx9ml?context=3
 // https://www.reddit.com/r/Tetris/comments/13uqby/comment/c77ev43/?context=3
 pub struct Handles {
-    pub das: f32, // Delayed Auto Shift in frames per movement
-    pub arr: f32, // Auto Repeat Rate in frames per movement
+    pub das: f32, // Delayed Auto Shift (the time between the initial keypress and the start of its automatic repeat movement) in frames per movement
+    pub arr: f32, // Auto Repeat Rate (the speed at which tetroiminoes move when holding down movement keys) in frames per movement 
 }
 
 pub struct Controls {
@@ -51,7 +50,10 @@ enum FocusedOn {
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            handles: Handles { das: 133.0, arr: 10.0 },
+            handles: Handles {
+                das: 133.0,
+                arr: 10.0,
+            },
             controls: Controls {
                 left: KeyCode::Left,
                 right: KeyCode::Right,
@@ -154,12 +156,11 @@ impl Settings {
 }
 
 impl EventHandler for Settings {
-    fn update(&mut self, _ctx: &mut GraphicsContext) {}
-    fn draw(&mut self, _ctx: &mut GraphicsContext) {}
+    fn update(&mut self) {}
+    fn draw(&mut self) {}
 
     fn char_event(
         &mut self,
-        _ctx: &mut GraphicsContext,
         _character: char,
         _keymods: KeyMods,
         _repeat: bool,

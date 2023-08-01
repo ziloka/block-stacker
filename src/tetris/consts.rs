@@ -87,6 +87,12 @@ pub enum Tetromino {
     Z,
 }
 
+impl Default for Tetromino {
+    fn default() -> Self {
+        Tetromino::I
+    }
+}
+
 impl Tetromino {
     // RGB value of color
     pub fn get_color(&self) -> (u8, u8, u8) {
@@ -233,7 +239,7 @@ impl Tetromino {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct Piece {
     pub tetromino: Tetromino,
     pub dots: Vec<Vec2>,

@@ -38,66 +38,68 @@ impl Action {
         }
     }
 
-    // pub fn add_score(&self, level: &u64, action_score: &u64) -> u64 {
-    //     match *self {
-    //         Action::Single => {
-    //             100 * level
-    //             // 100 × level
-    //         }
-    //         Action::Double => {
-    //             300 * level
-    //             // 300 × level
-    //         }
-    //         Action::Triple => {
-    //             500 * level
-    //             // 500 × level
-    //         }
-    //         Action::Tetris => {
-    //             800 * level
-    //             // 800 × level; difficult
-    //         }
-    //         Action::TSpinMiniNoLines => {
-    //             100 * level
-    //             // 100 × level
-    //         }
-    //         Action::TSpinNoLines => {
-    //             400 * level
-    //             // 400 × level
-    //         }
-    //         Action::TSpinMiniSingle => {
-    //             200 * level
-    //             // 200 × level; difficult
-    //         }
-    //         Action::TSpinSingle => {
-    //             800 * level
-    //             // 800 × level; difficult
-    //         }
-    //         Action::TSpinMiniDouble => {
-    //             400 * level
-    //             // 400 × level; difficult
-    //         }
-    //         Action::TSpinDouble => {
-    //             1200 * level
-    //             // 1200 × level; difficult
-    //         }
-    //         Action::TSpinTriple => {
-    //             1600 * level
-    //             // 1600 × level; difficult
-    //         }
-    //         Action::BackToBackDifficultLineClears => {
-    //             // Action score × 1.5 (excluding soft drop and hard drop)
-    //             action_score * 1.5
-    //         }
-    //         Action::Combo => {
-    //             // 50 × combo count × level
-    //             26
-    //         }
-    //         Action::SoftDrop => {
-    //             // 1 per cell
-    //         }
-    //         Action::HardDrop => {
-    //             // 2 per cell
-    //         }
-    //     }
-    // }
+    pub fn add_score(&self, level: &f64, action_score: &f64) -> f64 {
+        match *self {
+            Action::Single => {
+                100. * level
+                // 100 × level
+            }
+            Action::Double => {
+                300. * level
+                // 300 × level
+            }
+            Action::Triple => {
+                500. * level
+                // 500 × level
+            }
+            Action::Tetris => {
+                800. * level
+                // 800 × level; difficult
+            }
+            Action::TSpinMiniNoLines => {
+                100. * level
+                // 100 × level
+            }
+            Action::TSpinNoLines => {
+                400. * level
+                // 400 × level
+            }
+            Action::TSpinMiniSingle => {
+                200. * level
+                // 200 × level; difficult
+            }
+            Action::TSpinSingle => {
+                800. * level
+                // 800 × level; difficult
+            }
+            Action::TSpinMiniDouble => {
+                400. * level
+                // 400 × level; difficult
+            }
+            Action::TSpinDouble => {
+                1200. * level
+                // 1200 × level; difficult
+            }
+            Action::TSpinTriple => {
+                1600. * level
+                // 1600 × level; difficult
+            }
+            Action::BackToBackDifficultLineClears => {
+                // Action score × 1.5 (excluding soft drop and hard drop)
+                action_score * 1.5
+            }
+            Action::Combo => {
+                // 50 × combo count × level
+                26.
+            }
+            Action::SoftDrop => {
+                // 1 per cell
+                1.
+            }
+            Action::HardDrop => {
+                // 2 per cell
+                2.
+            }
+        }
+    }
 }

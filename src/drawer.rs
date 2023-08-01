@@ -6,7 +6,10 @@ use macroquad::{
     text::draw_text,
 };
 
-use crate::tetris::{consts::{vec2, Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH}, board::Board};
+use crate::tetris::{
+    board::Board,
+    consts::{vec2, Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH},
+};
 
 pub struct Drawer<'a> {
     pub bottom_left_corner: &'a Cell<Vec2>,
@@ -124,7 +127,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         for y in 1..HEIGHT as i32 {
             let y = y as f32 * -1.0;
             if board.conflict(&active_piece.dots, vec2(0.0, y), true) {
-               y_offset = y + 1.0;
+                y_offset = y + 1.0;
                 break;
             }
         }

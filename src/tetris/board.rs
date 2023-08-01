@@ -2,7 +2,7 @@ use std::ops::{Add, Sub};
 
 use super::{
     action::Action,
-    consts::{vec2, Piece, State, Tetromino, Vec2, HEIGHT, TETROMINO_TYPES, WIDTH},
+    consts::{vec2, Piece, State, Tetromino, Vec2, HEIGHT, WIDTH},
     drawer::Drawer,
     generator::Generator,
 };
@@ -16,6 +16,7 @@ pub struct Board<'a> {
     pub game_state: State,
     pub active_piece: Piece,
     pub hold_piece: Option<Piece>,
+    pub score: u64,
     generator: Generator,
     drawer: &'a dyn Drawer,
     preview_pieces: [Tetromino; 7],
@@ -27,19 +28,14 @@ pub struct Board<'a> {
 impl<'a> Board<'a> {
     pub fn new(drawer: &'a dyn Drawer, seed: usize) -> Self {
         // this first place gets replaced so it doesn't matter what it is
-        let active_piece = Piece {
-            tetromino: TETROMINO_TYPES[0],
-            dots: Vec::new(),
-            rotation_index: 0,
-            previous_rotation_index: None,
-            previous_offset_kick: None,
-        };
+        let active_piece: Piece = Default::default();
         let mut generator = Generator::new(seed);
         let tetrominos = generator.get_new_sequence_of_tetrominos();
         let mut board = Self {
             game_state: State::Playing,
             active_piece,
             hold_piece: None,
+            score: 0,
             generator,
             drawer,
             preview_pieces: tetrominos,
@@ -180,19 +176,19 @@ impl<'a> Board<'a> {
 
     // https://harddrop.com/wiki/SRS
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L249-L278
-    pub fn rotate_tetromino(&mut self, clockwise: bool, should_offset: bool) {
+    pub fn rotate_tetromino_90(&mut self, clockwise: bool, should_offset: bool) {
         let old_rotation_index = self.active_piece.rotation_index;
         self.active_piece.previous_rotation_index = Some(old_rotation_index);
         self.active_piece.rotation_index += if clockwise { 1 } else { -1 };
         self.active_piece.rotation_index = self.mod_helper(self.active_piece.rotation_index, 4);
         let origin = self.active_piece.dots[0];
+        let rot_matrix = if clockwise {
+            [vec2(0.0, -1.0), vec2(1.0, 0.0)]
+        } else {
+            [vec2(0.0, 1.0), vec2(-1.0, 0.0)]
+        };
         for pos in &mut self.active_piece.dots {
             let relative_pos = pos.sub(origin);
-            let rot_matrix = if clockwise {
-                [vec2(0.0, -1.0), vec2(1.0, 0.0)]
-            } else {
-                [vec2(0.0, 1.0), vec2(-1.0, 0.0)]
-            };
             *pos = vec2(
                 (rot_matrix[0].x * relative_pos.x) + (rot_matrix[1].x * relative_pos.y),
                 (rot_matrix[0].y * relative_pos.x) + (rot_matrix[1].y * relative_pos.y),
@@ -203,8 +199,34 @@ impl<'a> Board<'a> {
         if should_offset
             && !self.offset_tetromino(old_rotation_index, self.active_piece.rotation_index)
         {
-            self.rotate_tetromino(!clockwise, false);
+            self.rotate_tetromino_90(!clockwise, false);
         }
+    }
+
+    pub fn rotate_tetromino_180(&mut self, should_offset: bool) {
+        let old_rotation_index = self.active_piece.rotation_index;
+        self.active_piece.previous_rotation_index = Some(old_rotation_index);
+        self.active_piece.rotation_index += 2;
+        self.active_piece.rotation_index = self.mod_helper(self.active_piece.rotation_index, 4);
+        let origin = self.active_piece.dots[0];
+        let rot_matrix = [vec2(0.0, -1.0), vec2(1.0, 0.0)];
+        for _ in 0..2 {
+            for pos in &mut self.active_piece.dots {
+                let relative_pos = pos.sub(origin);
+                *pos = vec2(
+                    (rot_matrix[0].x * relative_pos.x) + (rot_matrix[1].x * relative_pos.y),
+                    (rot_matrix[0].y * relative_pos.x) + (rot_matrix[1].y * relative_pos.y),
+                )
+                .add(origin);
+            }
+        }
+        if should_offset
+            && !self.offset_tetromino(old_rotation_index, self.active_piece.rotation_index)
+        {
+            self.rotate_tetromino_180(false);
+        }
+
+        // self.rotate_tetromino(clockwise, true)
     }
 
     // determine the rotation index of the tetromino
