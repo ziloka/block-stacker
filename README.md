@@ -5,6 +5,11 @@ Goal: Open source modern tetris client
 
 The coordinate system is in the [center of the screen](https://bevy-cheatbook.github.io/features/coords.html?highlight=coordinate#2d-and-3d-scenes-and-cameras)
 
+# Contributing
+[common-changelog](https://common-changelog.org/)
+[semver cheatsheet](https://devhints.io/semver)
+[]()
+
 # Inspiration taken from
 
 https://github.com/bevyengine/bevy/blob/latest/examples/games/breakout.rs

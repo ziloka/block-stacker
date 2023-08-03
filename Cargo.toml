@@ -1,12 +1,13 @@
 [package]
 name = "tetris"
-version = "0.1.0"
+version = "0.0.2"
 # https://github.com/bevyengine/bevy/issues/3205#issuecomment-980637677
 edition = "2021"
 authors = ["Ziloka <50429450+ziloka@users.noreply.github.com>"]
 
 [dependencies]
 bevy = "0.11"
+lazy_static = "1.4.0"
 scrap = "0.5"
 rand = "0.8"
 

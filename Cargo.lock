@@ -2985,9 +2985,10 @@ dependencies = [
 
 [[package]]
 name = "tetris"
-version = "0.1.0"
+version = "0.0.2"
 dependencies = [
  "bevy",
+ "lazy_static",
  "rand",
  "scrap",
 ]
