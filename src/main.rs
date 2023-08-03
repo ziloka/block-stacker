@@ -1,14 +1,20 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+// https://github.com/bevyengine/bevy/blob/latest/examples/window/screenshot.rs
+
 use bevy::{
     diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin},
     input::{keyboard::KeyboardInput, ButtonState},
     prelude::*,
     sprite::MaterialMesh2dBundle,
     window::{PresentMode, WindowResolution},
+    utils::tracing::Level,
+    log::LogPlugin
 };
 use rand::seq::SliceRandom;
 
 mod consts;
-use consts::{ActivePiece, BOARD, KEYS, TETRIMINO_TYPES};
+use consts::{ActivePiece, BOARD, KEYS, TETRIMINO_TYPES, TetriminoType};
 
 mod piece;
 
@@ -16,23 +22,29 @@ fn main() {
     App::new()
         // change background color
         .insert_resource(ClearColor(Color::BLACK))
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
-            primary_window: Some(Window {
-                title: "tetris".to_string(),
-                resolution: WindowResolution::new(
-                    BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
-                    BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
-                ),
-                present_mode: PresentMode::AutoVsync,
-                resizable: true,
-                ..default()
-            }),
-            ..default()
-        }))
-        .add_plugin(LogDiagnosticsPlugin::default())
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_startup_system(setup)
-        .add_system(selected_tetrimino_movement_system)
+        .add_plugins(
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        title: "tetris".to_string(),
+                        resolution: WindowResolution::new(
+                            BOARD::WIDTH * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
+                            BOARD::HEIGHT * BOARD::TETRIOMINO_SIDE_LENGTH * 1.25,
+                        ),
+                        present_mode: PresentMode::AutoVsync,
+                        resizable: true,
+                        ..default()
+                    }),
+                    ..default()
+                })
+                .set(LogPlugin {
+                    level: Level::INFO,
+                    filter: "wgpu=error,bevy_render=info,bevy_ecs=trace".to_string(),
+                }),
+        )
+        // .add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin::default()))
+        .add_systems(Startup, setup)
+        .add_systems(Update, selected_tetrimino_movement_system)
         // .add_system(tetrimino_gravity)
         .run();
 }
@@ -46,9 +58,8 @@ fn setup(
 
     // https://stackoverflow.com/questions/48490049/how-do-i-choose-a-random-value-from-an-enum
     let starting_piece = TETRIMINO_TYPES.choose(&mut rand::thread_rng()).unwrap();
-    let board = BOARD {
-        active_piece: starting_piece.clone(),
-    };
+    
+    let board = spawn_board(&mut commands, &mut meshes, &mut materials, starting_piece);
 
     // spawn the current piece available to move around
     commands
@@ -85,6 +96,19 @@ fn setup(
             }
         });
 
+    
+}
+
+fn spawn_board(
+    commands: &mut Commands,
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+    starting_piece: &TetriminoType
+) -> BOARD {
+    let board = BOARD {
+        active_piece: starting_piece.clone(),
+    };
+
     commands
         .spawn((
             board,
@@ -120,8 +144,9 @@ fn setup(
                 }
             }
         });
-}
 
+        board
+}
 // fn tetrimino_gravity(mut commands: Commands, query: Query<&ActivePiece>) {}
 
 // https://bevy-cheatbook.github.io/input/keyboard.html
