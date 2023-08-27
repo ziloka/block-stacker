@@ -80,8 +80,7 @@ impl<'a> Board<'a> {
     pub fn hold_tetromino(&mut self) {
         match &mut self.hold_piece {
             Some(hold_piece) => {
-                *hold_piece = self.active_piece.clone();
-                self.active_piece = hold_piece.clone();
+                std::mem::swap(hold_piece, &mut self.active_piece);
             },
             None => {
                 self.hold_piece = Some(self.active_piece.clone());
