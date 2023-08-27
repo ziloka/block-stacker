@@ -78,15 +78,15 @@ impl<'a> Board<'a> {
     }
 
     pub fn hold_tetromino(&mut self) {
-        if self.hold_piece.is_none() {
-            self.hold_piece = Some(self.active_piece.clone());
-            self.set_next_tetromino_as_active_piece();
-        } else {
-            let mut hold_piece = self.hold_piece.clone().unwrap();
-            hold_piece.dots = self.get_spawn_dots(&hold_piece.tetromino);
-            hold_piece.rotation_index = 0;
-            self.hold_piece = Some(self.active_piece.clone());
-            self.active_piece = hold_piece;
+        match &mut self.hold_piece {
+            Some(hold_piece) => {
+                *hold_piece = self.active_piece.clone();
+                self.active_piece = hold_piece.clone();
+            },
+            None => {
+                self.hold_piece = Some(self.active_piece.clone());
+                self.set_next_tetromino_as_active_piece();
+            }
         }
     }
 
