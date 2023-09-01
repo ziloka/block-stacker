@@ -8,6 +8,12 @@ cd target/wasm32-unknown-unknown/release
 echo "<html lang=\"en\">
 <head>
     <meta charset=\"utf-8\">
+    
+    <!-- Force browser to redownload file https://github.com/orgs/community/discussions/19713#discussioncomment-3051290 -->
+    <meta http-equiv='cache-control' content='no-cache'> 
+    <meta http-equiv='expires' content='0'> 
+    <meta http-equiv='pragma' content='no-cache'>
+
     <title>Tetris</title>
     <style>
         html,
