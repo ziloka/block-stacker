@@ -32,6 +32,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 Tetromino::I => (-2, 2),
                 _ => (-1, 1),
             };
+            // draw black rectangle thing behind tetromino
             for i in min..=max {
                 for j in min..=max {
                     let x = bottom_left_corner.x + (origin.x + i as f32) * block_size;
@@ -216,11 +217,14 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
     fn draw_hold_piece(&self, hold_piece: &Option<Piece>) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
+        let debug = self.debug.get();
 
         if let Some(piece) = hold_piece {
-            piece.tetromino.get_structure().iter().for_each(|position| {
-                let x = bottom_left_corner.x - position.x * block_size + block_size * -3.0;
-                let y = (bottom_left_corner.y - HEIGHT * block_size)
+            let dots = piece.tetromino.get_structure();
+            let origin = dots[0];
+            dots.iter().for_each(|position| {
+                let x = bottom_left_corner.x - (origin.x - position.x * block_size) + block_size * -3.0;
+                let y = (bottom_left_corner.y - origin.y - HEIGHT * block_size)
                     + position.y * block_size
                     + block_size;
                 let (r, g, b) = piece.tetromino.get_color();
@@ -228,6 +232,18 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
 
                 draw_rectangle_lines(x, y, block_size, block_size, 2.0, BLACK);
             });
+
+            if debug {
+                // draw origin dot on hold piece location
+                draw_circle_lines(
+                    bottom_left_corner.x - origin.x * block_size + block_size * -3.0 + (block_size / 2.0),
+                    (bottom_left_corner.y - origin.y - HEIGHT * block_size) - (block_size / 2.0 - block_size * 2.0),
+                    block_size / 2.0,
+                    2.0,
+                    WHITE
+                );
+            }
+
         }
     }
 

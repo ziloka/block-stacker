@@ -1,4 +1,4 @@
-FROM rust:1.66.1-bullseye
+FROM rust:1.72.0-bullseye
 
 ENV DEBIAN_FRONTEND noninteractive
 
