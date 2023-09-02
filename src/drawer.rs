@@ -26,13 +26,13 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         let origin = active_piece.dots[0];
 
         if debug {
-            // this is just for debugging purposes (ensure pieces are in the true SRS rotations)
+            // for debugging purposes (ensure pieces are in the true SRS rotations)
             // https://harddrop.com/wiki/File:SRS-true-rotations.png
             let (min, max) = match active_piece.tetromino {
                 Tetromino::I => (-2, 2),
                 _ => (-1, 1),
             };
-            // draw black rectangle thing behind tetromino
+            // draw black rectangle behind tetromino
             for i in min..=max {
                 for j in min..=max {
                     let x = bottom_left_corner.x + (origin.x + i as f32) * block_size;
@@ -61,6 +61,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 WHITE,
             );
 
+            // debugging for detecting tspins
             if matches!(active_piece.tetromino, Tetromino::T) {
                 let fl = vec2(origin.x - 1.0, origin.y + 1.0) * block_size;
                 let fr = vec2(origin.x + 1.0, origin.y + 1.0) * block_size;
@@ -68,48 +69,47 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 let br = vec2(origin.x - 1.0, origin.y - 1.0) * block_size;
 
                 let (
-                    front_left_corner_filled,
-                    front_right_corner_filled,
-                    bottom_left_corner_filled,
-                    bottom_right_corner_filled,
+                    front_left_corner,
+                    front_right_corner,
+                    bottom_left_corner,
+                    bottom_right_corner,
                 ) = match active_piece.rotation_index {
                     0 => (fl, fr, bl, br),
                     1 => (fr, br, fl, bl),
                     2 => (br, bl, fr, fl),
                     _ => {
-                        // make the assumption its rotation index 3
                         assert!(active_piece.rotation_index == 3);
                         (bl, fl, br, fr)
                     }
                 };
 
                 draw_rectangle_lines(
-                    bottom_left_corner.x + front_left_corner_filled.x,
-                    bottom_left_corner.y - front_left_corner_filled.y - block_size,
+                    bottom_left_corner.x + front_left_corner.x,
+                    bottom_left_corner.y - front_left_corner.y - block_size,
                     block_size,
                     block_size,
                     5.0,
                     RED,
                 );
                 draw_rectangle_lines(
-                    bottom_left_corner.x + front_right_corner_filled.x,
-                    bottom_left_corner.y - front_right_corner_filled.y - block_size,
+                    bottom_left_corner.x + front_right_corner.x,
+                    bottom_left_corner.y - front_right_corner.y - block_size,
                     block_size,
                     block_size,
                     5.0,
                     ORANGE,
                 );
                 draw_rectangle_lines(
-                    bottom_left_corner.x + bottom_left_corner_filled.x,
-                    bottom_left_corner.y - bottom_left_corner_filled.y - block_size,
+                    bottom_left_corner.x + bottom_left_corner.x,
+                    bottom_left_corner.y - bottom_left_corner.y - block_size,
                     block_size,
                     block_size,
                     5.0,
                     GREEN,
                 );
                 draw_rectangle_lines(
-                    bottom_left_corner.x + bottom_right_corner_filled.x,
-                    bottom_left_corner.y - bottom_right_corner_filled.y - block_size,
+                    bottom_left_corner.x + bottom_right_corner.x,
+                    bottom_left_corner.y - bottom_right_corner.y - block_size,
                     block_size,
                     block_size,
                     5.0,
@@ -243,7 +243,6 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                     WHITE
                 );
             }
-
         }
     }
 

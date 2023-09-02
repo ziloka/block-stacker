@@ -320,8 +320,7 @@ impl<'a> Board<'a> {
             {
                 // check if i was suppose to upgrade TSpinMini to regular Tspin
                 // T has to use the fifth, or the final, kick, a Mini T-Spin gets bumped to a T-Spin even if the corners were filled on the back rather than front
-                if self.active_piece.previous_offset_kick.is_some()
-                    && self.active_piece.previous_offset_kick.unwrap() == 4
+                if self.active_piece.previous_offset_kick.is_some_and(|num| num == 4)
                 {
                     if lines_cleared == 0 {
                         return Some(Action::TSpinNoLines);
