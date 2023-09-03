@@ -33,11 +33,25 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 _ => (-1, 1),
             };
             // draw black rectangle behind tetromino
+            // let x = bottom_left_corner.x + (origin.x + min) * block_size;
+            // let y = bottom_left_corner.y - (origin.y + max) * block_size - block_size;
+            // let w = block_size * 3.0f32;
+            // let h = block_size * 3.0f32;
+            // println!("x: {}, y: {}, w: {}, h: {}", x, y, w, h);
+            // draw_rectangle(x, y, w, h, BLACK);
+
+            // println!("block size: {}", block_size);
+            // println!("min x: {}, min y: {}", bottom_left_corner.x + (origin.x + min) * block_size, bottom_left_corner.y - (origin.y + min) * block_size - block_size);
+            // println!("max x: {}, max y: {}", bottom_left_corner.x + (origin.x + max) * block_size, bottom_left_corner.y - (origin.y + max) * block_size - block_size);
+            // println!("w: {}, h: {}\n", w, h);
             for i in min..=max {
                 for j in min..=max {
                     let x = bottom_left_corner.x + (origin.x + i as f32) * block_size;
                     let y = bottom_left_corner.y - (origin.y + j as f32) * block_size - block_size;
                     draw_rectangle(x, y, block_size, block_size, BLACK);
+                    // if i == min && j == min || i == max && j == max {
+                    //     println!("x: {}, y: {}", x, y);
+                    // }
                 }
             }
         }
@@ -69,10 +83,10 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 let br = vec2(origin.x - 1.0, origin.y - 1.0) * block_size;
 
                 let (
-                    front_left_corner,
-                    front_right_corner,
-                    bottom_left_corner,
-                    bottom_right_corner,
+                    front_left,
+                    front_right,
+                    bottom_left,
+                    bottom_right,
                 ) = match active_piece.rotation_index {
                     0 => (fl, fr, bl, br),
                     1 => (fr, br, fl, bl),
@@ -84,32 +98,32 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 };
 
                 draw_rectangle_lines(
-                    bottom_left_corner.x + front_left_corner.x,
-                    bottom_left_corner.y - front_left_corner.y - block_size,
+                    bottom_left_corner.x + front_left.x,
+                    bottom_left_corner.y - front_left.y - block_size,
                     block_size,
                     block_size,
                     5.0,
                     RED,
                 );
                 draw_rectangle_lines(
-                    bottom_left_corner.x + front_right_corner.x,
-                    bottom_left_corner.y - front_right_corner.y - block_size,
+                    bottom_left_corner.x + front_right.x,
+                    bottom_left_corner.y - front_right.y - block_size,
                     block_size,
                     block_size,
                     5.0,
                     ORANGE,
                 );
                 draw_rectangle_lines(
-                    bottom_left_corner.x + bottom_left_corner.x,
-                    bottom_left_corner.y - bottom_left_corner.y - block_size,
+                    bottom_left_corner.x + bottom_left.x,
+                    bottom_left_corner.y - bottom_left.y - block_size,
                     block_size,
                     block_size,
                     5.0,
                     GREEN,
                 );
                 draw_rectangle_lines(
-                    bottom_left_corner.x + bottom_right_corner.x,
-                    bottom_left_corner.y - bottom_right_corner.y - block_size,
+                    bottom_left_corner.x + bottom_right.x,
+                    bottom_left_corner.y - bottom_right.y - block_size,
                     block_size,
                     block_size,
                     5.0,
@@ -174,7 +188,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             // draw the indexs on the side of the board
             for i in 0..(HEIGHT as u32) {
                 draw_text(
-                    &i.to_string(),
+                    i.to_string().as_str(),
                     bottom_left_corner.x - block_size,
                     (bottom_left_corner.y - i as f32 * block_size) - block_size / 2.0,
                     20.0,
@@ -184,7 +198,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
 
             for i in 0..(WIDTH as u32) {
                 draw_text(
-                    &i.to_string(),
+                    i.to_string().as_str(),
                     bottom_left_corner.x + i as f32 * block_size,
                     bottom_left_corner.y + block_size / 2.0,
                     20.0,

@@ -108,9 +108,7 @@ impl<'a> Board<'a> {
     }
 
     fn add_tetromino_preview_piece(&mut self) {
-        for i in 1..self.preview_pieces.len() {
-            self.preview_pieces[i - 1] = self.preview_pieces[i];
-        }
+        self.preview_pieces.rotate_left(1);
         self.preview_pieces[self.preview_pieces.len() - 1] = self.generator.next().unwrap();
     }
 
