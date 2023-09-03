@@ -304,7 +304,6 @@ impl<'a> Board<'a> {
 
             if (front_left_corner_filled && front_right_corner_filled)
                 && (bottom_left_corner_filled ^ bottom_right_corner_filled)
-            // XOR operator
             {
                 if lines_cleared == 0 {
                     return Some(Action::TSpinNoLines);
@@ -318,7 +317,7 @@ impl<'a> Board<'a> {
             } else if (front_left_corner_filled ^ front_right_corner_filled)
                 && (bottom_left_corner_filled && bottom_right_corner_filled)
             {
-                // check if i was suppose to upgrade TSpinMini to regular Tspin
+                // check whether or not upgrade TSpinMini to regular Tspin
                 // T has to use the fifth, or the final, kick, a Mini T-Spin gets bumped to a T-Spin even if the corners were filled on the back rather than front
                 if self.active_piece.previous_offset_kick.is_some_and(|num| num == 4)
                 {

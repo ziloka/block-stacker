@@ -31,7 +31,8 @@ echo "<html lang=\"en\">
     </style>
 </head>
 <body>
-    <canvas id=\"glcanvas\" tabindex='1'></canvas>
+    <!-- Disable context menu https://stackoverflow.com/questions/737022/how-do-i-disable-right-click-on-my-web-page -->
+    <canvas id=\"glcanvas\" tabindex='1' oncontextmenu="return false"></canvas>
     <!-- Minified and statically hosted version of https://github.com/not-fl3/macroquad/blob/master/js/mq_js_bundle.js -->
     <script src=\"https://not-fl3.github.io/miniquad-samples/mq_js_bundle.js\"></script>
     <script>load(\"tetris.wasm\");</script> <!-- Your compiled wasm file -->
