@@ -8,10 +8,3 @@ edition = "2021"
 [dependencies]
 macroquad = "0.4"
 # cold-clear-2 = { git = "https://github.com/MinusKelvin/cold-clear-2" }
-
-[profile.release]
-strip = true 
-opt-level = "z"  # Optimize for size.
-lto = true
-codegen-units = 1
-panic = "abort"

@@ -33,25 +33,11 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 _ => (-1, 1),
             };
             // draw black rectangle behind tetromino
-            // let x = bottom_left_corner.x + (origin.x + min) * block_size;
-            // let y = bottom_left_corner.y - (origin.y + max) * block_size - block_size;
-            // let w = block_size * 3.0f32;
-            // let h = block_size * 3.0f32;
-            // println!("x: {}, y: {}, w: {}, h: {}", x, y, w, h);
-            // draw_rectangle(x, y, w, h, BLACK);
-
-            // println!("block size: {}", block_size);
-            // println!("min x: {}, min y: {}", bottom_left_corner.x + (origin.x + min) * block_size, bottom_left_corner.y - (origin.y + min) * block_size - block_size);
-            // println!("max x: {}, max y: {}", bottom_left_corner.x + (origin.x + max) * block_size, bottom_left_corner.y - (origin.y + max) * block_size - block_size);
-            // println!("w: {}, h: {}\n", w, h);
             for i in min..=max {
                 for j in min..=max {
                     let x = bottom_left_corner.x + (origin.x + i as f32) * block_size;
                     let y = bottom_left_corner.y - (origin.y + j as f32) * block_size - block_size;
                     draw_rectangle(x, y, block_size, block_size, BLACK);
-                    // if i == min && j == min || i == max && j == max {
-                    //     println!("x: {}, y: {}", x, y);
-                    // }
                 }
             }
         }
@@ -82,20 +68,16 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 let bl = vec2(origin.x + 1.0, origin.y - 1.0) * block_size;
                 let br = vec2(origin.x - 1.0, origin.y - 1.0) * block_size;
 
-                let (
-                    front_left,
-                    front_right,
-                    bottom_left,
-                    bottom_right,
-                ) = match active_piece.rotation_index {
-                    0 => (fl, fr, bl, br),
-                    1 => (fr, br, fl, bl),
-                    2 => (br, bl, fr, fl),
-                    _ => {
-                        assert!(active_piece.rotation_index == 3);
-                        (bl, fl, br, fr)
-                    }
-                };
+                let (front_left, front_right, bottom_left, bottom_right) =
+                    match active_piece.rotation_index {
+                        0 => (fl, fr, bl, br),
+                        1 => (fr, br, fl, bl),
+                        2 => (br, bl, fr, fl),
+                        _ => {
+                            assert!(active_piece.rotation_index == 3);
+                            (bl, fl, br, fr)
+                        }
+                    };
 
                 draw_rectangle_lines(
                     bottom_left_corner.x + front_left.x,
@@ -237,7 +219,8 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             let dots = piece.tetromino.get_structure();
             let origin = dots[0];
             dots.iter().for_each(|position| {
-                let x = bottom_left_corner.x - (origin.x - position.x * block_size) + block_size * -3.0;
+                let x =
+                    bottom_left_corner.x - (origin.x - position.x * block_size) + block_size * -3.0;
                 let y = (bottom_left_corner.y - origin.y - HEIGHT * block_size)
                     + position.y * block_size
                     + block_size;
@@ -250,11 +233,14 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             if debug {
                 // draw origin dot on hold piece location
                 draw_circle_lines(
-                    bottom_left_corner.x - origin.x * block_size + block_size * -3.0 + (block_size / 2.0),
-                    (bottom_left_corner.y - origin.y - HEIGHT * block_size) - (block_size / 2.0 - block_size * 2.0),
+                    bottom_left_corner.x - origin.x * block_size
+                        + block_size * -3.0
+                        + (block_size / 2.0),
+                    (bottom_left_corner.y - origin.y - HEIGHT * block_size)
+                        - (block_size / 2.0 - block_size * 2.0),
                     block_size / 2.0,
                     2.0,
-                    WHITE
+                    WHITE,
                 );
             }
         }

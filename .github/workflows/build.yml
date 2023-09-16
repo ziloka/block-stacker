@@ -1,0 +1,104 @@
+# Source: https://github.com/BtbN/FFmpeg-Builds/blob/20172ca00af0bc0e554c203c559a1339da6651d0/.github/workflows/build.yml
+
+name: Build Tetris
+
+on:
+  push:
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushpull_requestpull_request_targetpathspaths-ignore
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
+    paths-ignore:
+      - '**.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - '.vscode/**'
+      - '.devcontainer/**'
+      - 'LICENSE'
+  workflow_dispatch:
+    inputs:
+      doRelease:
+        description: 'Publish new release'
+        type: boolean
+        default: false
+        required: false
+      buildOnly:
+        description: 'Only build tetris'
+        type: boolean
+        default: false
+        required: false
+
+jobs:
+  pre_check:
+    name: Pre Checks
+    if: ${{ github.event.inputs.buildOnly != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repo Check
+        run: |
+          if [[ "$GITHUB_REPOSITORY" != "ziloka/tetris" ]]; then
+            echo "When forking this repository to make your own builds, you have to adjust this check."
+            echo "When doing so make sure to randomize the scheduled cron time above, in order to spread out the various build times as much as possible."
+            echo "This has been put in place due to the enormous amounts of traffic hundreds/thousands of parallel builds can cause on external infrastructure."
+            exit 1
+          fi
+          exit 0
+  build_tetris:
+    name: Build tetris
+    if: ${{ ( github.event.inputs.buildOnly == 'true' && !cancelled() ) || success() }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners#supported-runners-and-hardware-resources
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Build tetris
+        run: |
+          T="$(echo -n ${{ github.token }} | sha256sum | head -c 64)" && echo -e "::add-mask::${T}\n::stop-commands::${T}"
+          ./release.sh
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: tetris
+          path: artifacts/*
+  publish_release:
+    name: Publish release
+    if: ${{ !cancelled() && ( github.event_name == 'schedule' || github.event.inputs.doRelease == 'true' ) && needs.build_tetris.result == 'success' }}
+    needs: build_tetris
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: tetris
+          path: artifacts
+      - name: Create release
+        id: create_release
+        run: |
+          set -xe
+          shopt -s nullglob
+          RELDATE="$(date +'%Y-%m-%d %H:%M')"
+          NAME="Auto-Build $RELDATE"
+          TAGNAME="autobuild-$(date +'%Y-%m-%d-%H-%M')"
+          hub release create $(for a in artifacts/*.{zip,tar.xz}; do echo -a $a; done) -m "$NAME" -t "main" "$TAGNAME"
+          echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
+          echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Update Latest
+        run: |
+          set -xe
+          shopt -s nullglob
+          mkdir latest_artifacts
+          ./util/repack_latest.sh latest_artifacts artifacts/*.{zip,tar.xz}
+          NAME="Latest Auto-Build (${{ steps.create_release.outputs.rel_date }})"
+          TAGNAME="latest"
+          hub release delete "$TAGNAME" || true
+          git push --delete origin "$TAGNAME" || true
+          sleep 15
+          hub release create $(for a in latest_artifacts/*; do echo -a $a; done) -m "$NAME" -t "main" "$TAGNAME"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

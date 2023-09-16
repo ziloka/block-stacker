@@ -12,6 +12,15 @@ Press F3 if you want to see debugging information
 Tetris Guideline spefications are followed as closely as possible
 They are available via [here](https://tetris.fandom.com/wiki/Tetris_Guideline)
 
+# Contributing
+
+During development run 
+```
+cargo install cargo-watch
+cargo watch -x run
+```
+to achieve hot code reloading
+
 # Inspiration taken from
 
 https://github.com/vlang/v/tree/master/examples/tetris

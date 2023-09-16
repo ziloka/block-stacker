@@ -14,8 +14,8 @@ const CLEAN_BOARD_SLATE: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usiz
 
 pub struct Board<'a> {
     pub game_state: State,
-    pub active_piece: Piece,
-    pub hold_piece: Option<Piece>,
+    active_piece: Piece,
+    hold_piece: Option<Piece>,
     pub score: u64,
     generator: Generator,
     drawer: &'a dyn Drawer,
@@ -83,7 +83,7 @@ impl<'a> Board<'a> {
                 hold_piece.rotation_index = 0;
                 hold_piece.dots = Self::get_spawn_dots(&hold_piece.tetromino);
                 std::mem::swap(hold_piece, &mut self.active_piece);
-            },
+            }
             None => {
                 self.hold_piece = Some(self.active_piece.clone());
                 self.set_next_tetromino_as_active_piece();
@@ -99,7 +99,7 @@ impl<'a> Board<'a> {
             previous_rotation_index: None,
             previous_offset_kick: None,
         };
-        if self.conflict(&piece.dots, vec2(0.0, 0.0), false) {
+        if self.conflict(&piece.dots, vec2(0.0, 0.0), true) {
             self.game_state = State::GameOver;
         } else {
             self.active_piece = piece;
@@ -112,7 +112,7 @@ impl<'a> Board<'a> {
         self.preview_pieces[self.preview_pieces.len() - 1] = self.generator.next().unwrap();
     }
 
-    // and x and y position are based off of the top left corner of the piece
+    // and x and y position are based off of the bottom left corner of the piece
     pub fn conflict(
         &self,
         dots: &[Vec2],
@@ -196,7 +196,11 @@ impl<'a> Board<'a> {
         }
 
         if should_offset
-            && !self.offset_tetromino(old_rotation_index, self.active_piece.rotation_index)
+            && !self.wallkick_tetromino(
+                self.active_piece.tetromino.get_offset_data(),
+                old_rotation_index,
+                self.active_piece.rotation_index,
+            )
         {
             self.rotate_tetromino_90(!clockwise, false);
         }
@@ -220,7 +224,11 @@ impl<'a> Board<'a> {
             }
         }
         if should_offset
-            && !self.offset_tetromino(old_rotation_index, self.active_piece.rotation_index)
+            && !self.wallkick_tetromino(
+                self.active_piece.tetromino.get_offset_data(),
+                old_rotation_index,
+                self.active_piece.rotation_index,
+            )
         {
             self.rotate_tetromino_180(false);
         }
@@ -238,14 +246,19 @@ impl<'a> Board<'a> {
     }
 
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340
-    // https://github.com/fiorescarlatto/four-tris/blob/master/Tetris.au3#L3395-L3449
-    fn offset_tetromino(&mut self, old_rotation_index: i8, new_rotation_index: i8) -> bool {
-        let offset_data = self.active_piece.tetromino.get_offset_data();
+    // https://github.com/fiorescarlatto/four-tris/blob/dc08ed253e704a4a68302dfc4392b5e28ad3eccf/Tetris.au3#L3395-L3450
+    fn wallkick_tetromino(
+        &mut self,
+        wallkick_data: Vec<Vec<Vec2>>,
+        old_rotation_index: i8,
+        new_rotation_index: i8,
+    ) -> bool {
         let mut move_possible = false;
 
-        for (i, offset_element) in offset_data.iter().enumerate() {
+        for (i, offset_element) in wallkick_data.iter().enumerate() {
             let offset_value1 = offset_element[old_rotation_index as usize];
             let offset_value2 = offset_element[new_rotation_index as usize];
+            // derive the kick translations by taking the difference between pairs of offset data
             let end_offset = vec2(
                 offset_value1.x - offset_value2.x,
                 offset_value1.y - offset_value2.y,
@@ -319,7 +332,10 @@ impl<'a> Board<'a> {
             {
                 // check whether or not upgrade TSpinMini to regular Tspin
                 // T has to use the fifth, or the final, kick, a Mini T-Spin gets bumped to a T-Spin even if the corners were filled on the back rather than front
-                if self.active_piece.previous_offset_kick.is_some_and(|num| num == 4)
+                if self
+                    .active_piece
+                    .previous_offset_kick
+                    .is_some_and(|num| num == 4)
                 {
                     if lines_cleared == 0 {
                         return Some(Action::TSpinNoLines);
@@ -340,8 +356,7 @@ impl<'a> Board<'a> {
                     return Some(Action::TSpinMiniDouble);
                 }
             }
-        }
-        if lines_cleared == 1 {
+        } else if lines_cleared == 1 {
             return Some(Action::Single);
         } else if lines_cleared == 2 {
             return Some(Action::Double);

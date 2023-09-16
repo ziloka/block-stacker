@@ -81,9 +81,9 @@ dependencies = [
 
 [[package]]
 name = "flate2"
-version = "1.0.26"
+version = "1.0.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3b9429470923de8e8cbd4d2dc513535400b4b3fef0319fb5c4e1f520a7bef743"
+checksum = "c6c98ee8095e9d1dcbf2fcc6d95acccb90d1c81db1e44725c6a984b1dbdfb010"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
@@ -116,9 +116,9 @@ dependencies = [
 
 [[package]]
 name = "image"
-version = "0.24.6"
+version = "0.24.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "527909aa81e20ac3a44803521443a765550f09b5130c2c2fa1ea59c2f8f50a3a"
+checksum = "6f3dfdbdd72063086ff443e297b61695500514b1e41095b6fb9a5ab48a70a711"
 dependencies = [
  "bytemuck",
  "byteorder",
@@ -240,9 +240,9 @@ checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
 
 [[package]]
 name = "png"
-version = "0.17.9"
+version = "0.17.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "59871cc5b6cce7eaccca5a802b4173377a1c2ba90654246789a8fa2334426d11"
+checksum = "dd75bf2d8dd3702b9707cdbc56a5b9ef42cec752eb8b3bafc01234558442aa64"
 dependencies = [
  "bitflags",
  "crc32fast",

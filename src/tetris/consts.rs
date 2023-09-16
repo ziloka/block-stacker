@@ -187,84 +187,179 @@ impl Tetromino {
         }
     }
 
-    // https://tetris.wiki/Super_Rotation_System
+    // https://tetris.wiki/Super_Rotation_System - READ THE "How Guidline SRS *Really* Works" section
+    // https://www.youtube.com/watch?v=yIpk5TJ_uaI
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L36-L92
+    // https://github.com/fiorescarlatto/four-tris/blob/dc08ed253e704a4a68302dfc4392b5e28ad3eccf/Tetris.au3#L3395-L3450
     // offset data for the Tetromino wallkicks
-    pub fn get_offset_data(&self) -> Vec<[Vec2; 4]> {
+    pub fn get_offset_data(&self) -> Vec<Vec<Vec2>> {
         match *self {
-            Tetromino::I => [
-                [
-                    vec2(0.0, 0.0),  // spawn state (O)
-                    vec2(-1.0, 0.0), // state (R) resulting from a clockwise rotation ("right") from spawn
-                    vec2(-1.0, 1.0), // state (2) resulting from 2 successive rotations in either direction from spawn.
-                    vec2(0.0, 1.0), // state (L) resulting from a counter-clockwise ("left") rotation from spawn
+            Tetromino::I => vec![
+                vec![
+                    vec2(0.0, 0.0), // 0: Offset #1
+                    vec2(-1.0, 0.0), // R: Offset #1
+                    vec2(-1.0, 1.0), // 2: Offset #1
+                    vec2(0.0, 1.0), // L: Offset #1
                 ],
-                [
-                    vec2(-1.0, 0.0),
-                    vec2(0.0, 0.0),
-                    vec2(1.0, 1.0),
-                    vec2(0.0, 1.0),
+                vec![
+                    vec2(-1.0, 0.0), // 0: Offset #2
+                    vec2(0.0, 0.0), // R: Offset #2
+                    vec2(1.0, 1.0), // 2: Offset #2
+                    vec2(0.0, 1.0), // L: Offset #2
                 ],
-                [
-                    vec2(2.0, 0.0),
-                    vec2(0.0, 0.0),
-                    vec2(-2.0, 1.0),
-                    vec2(0.0, 1.0),
+                vec![
+                    vec2(2.0, 0.0), // 0: Offset #3
+                    vec2(0.0, 0.0), // R: Offset #3
+                    vec2(-2.0, 1.0), // 2: Offset #3
+                    vec2(0.0, 1.0), // L: Offset #3
                 ],
-                [
-                    vec2(-1.0, 0.0),
-                    vec2(0.0, 1.0),
-                    vec2(1.0, 0.0),
-                    vec2(0.0, -1.0),
+                vec![
+                    vec2(-1.0, 0.0), // 0: Offset #4
+                    vec2(0.0, 1.0), // R: Offset #4
+                    vec2(1.0, 0.0), // 2: Offset #4
+                    vec2(0.0, -1.0), // L: Offset #4
                 ],
-                [
-                    vec2(2.0, 0.0),
-                    vec2(0.0, -2.0),
-                    vec2(-2.0, 0.0),
-                    vec2(0.0, 2.0),
+                vec![
+                    vec2(2.0, 0.0), // 0: Offset #5
+                    vec2(0.0, -2.0), // R: Offset #5
+                    vec2(-2.0, 0.0), // 2: Offset #5
+                    vec2(0.0, 2.0), // L: Offset #5
                 ],
-            ]
-            .to_vec(),
-            Tetromino::O => [[
+            ],
+            Tetromino::O => vec![vec![
                 vec2(0.0, 0.0),
                 vec2(0.0, -1.0),
                 vec2(-1.0, -1.0),
                 vec2(-1.0, 0.0),
-            ]]
-            .to_vec(),
-            _ => [
-                [
+            ]],
+            _ => vec![
+                vec![
                     vec2(0.0, 0.0),
                     vec2(0.0, 0.0),
                     vec2(0.0, 0.0),
                     vec2(0.0, 0.0),
                 ],
-                [
+                vec![
                     vec2(0.0, 0.0),
                     vec2(1.0, 0.0),
                     vec2(0.0, 0.0),
                     vec2(-1.0, 0.0),
                 ],
-                [
+                vec![
                     vec2(0.0, 0.0),
                     vec2(1.0, -1.0),
                     vec2(0.0, 0.0),
                     vec2(-1.0, -1.0),
                 ],
-                [
+                vec![
                     vec2(0.0, 0.0),
                     vec2(0.0, 2.0),
                     vec2(0.0, 0.0),
                     vec2(0.0, 2.0),
                 ],
-                [
+                vec![
                     vec2(0.0, 0.0),
                     vec2(1.0, 2.0),
                     vec2(0.0, 0.0),
                     vec2(-1.0, 2.0),
                 ],
-            ]
-            .to_vec(),
+            ],
+        }
+    }
+
+    // 180 wall kicks
+    // https://tetris.fandom.com/wiki/SRS#180%C2%B0_rotation
+    // nullpomino data: https://github.com/nullpomino/nullpomino/blob/ca361b926cb2f52ce302c7d901b9ca693e830f9f/nullpomino-core/src/main/java/mu/nu/nullpo/game/subsystem/wallkick/StandardWallkick.java#L112-L125
+    // nullpomino usage: https://github.com/nullpomino/nullpomino/blob/ca361b926cb2f52ce302c7d901b9ca693e830f9f/nullpomino-core/src/main/java/mu/nu/nullpo/game/subsystem/wallkick/BaseStandardWallkick.java#L33
+    // tetrio data: https://cdn.discordapp.com/attachments/674421736162197515/721130601054339072/180kicks.png
+    // https://harddrop.com/wiki/List_of_twists#180.C2.B0_Twists
+    // https://harddrop.com/wiki/Rotate
+    pub fn get_180_offset_data(&self) -> Vec<Vec<Vec2>> {
+        match *self {
+            Tetromino::I => vec![
+                vec![
+                    vec2(1.0, 0.0),
+                    vec2(2.0, 0.0),
+                    vec2(1.0, 1.0),
+                    vec2(2.0, 1.0),
+                    vec2(-1.0, 0.0),
+                    vec2(-2.0, 0.0),
+                    vec2(-1.0, 1.0),
+                    vec2(-2.0, 1.0),
+                    vec2(0.0, -1.0),
+                    vec2(3.0, 0.0),
+                    vec2(-3.0, 0.0),
+                ],
+                vec![
+                    vec2(0.0, 1.0),
+                    vec2(0.0, 2.0),
+                    vec2(-1.0, 1.0),
+                    vec2(-1.0, 2.0),
+                    vec2(0.0, -1.0),
+                    vec2(0.0, -2.0),
+                    vec2(-1.0, -1.0),
+                    vec2(-1.0, -2.0),
+                    vec2(1.0, 0.0),
+                    vec2(0.0, 3.0),
+                    vec2(0.0, -3.0),
+                ],
+                vec![
+                    vec2(1.0, 0.0),
+                    vec2(-2.0, 0.0),
+                    vec2(-1.0, -1.0),
+                    vec2(-2.0, -1.0),
+                    vec2(1.0, 0.0),
+                    vec2(2.0, 0.0),
+                    vec2(1.0, -1.0),
+                    vec2(2.0, -1.0),
+                    vec2(0.0, 1.0),
+                    vec2(-3.0, 0.0),
+                    vec2(3.0, 0.0),
+                ],
+                vec![
+                    vec2(0.0, 1.0),
+                    vec2(0.0, 2.0),
+                    vec2(1.0, 1.0),
+                    vec2(1.0, 2.0),
+                    vec2(0.0, -1.0),
+                    vec2(0.0, -2.0),
+                    vec2(1.0, -1.0),
+                    vec2(1.0, -2.0),
+                    vec2(-1.0, 0.0),
+                    vec2(0.0, 3.0),
+                    vec2(0.0, -3.0),
+                ],
+            ],
+            _ => vec![
+                vec![
+                    vec2(-1.0, 0.0),
+                    vec2(-2.0, 0.0),
+                    vec2(1.0, 0.0),
+                    vec2(2.0, 0.0),
+                    vec2(0.0, 1.0),
+                ],
+                vec![
+                    vec2(0.0, 1.0),
+                    vec2(0.0, 2.0),
+                    vec2(0.0, -1.0),
+                    vec2(0.0, -2.0),
+                    vec2(-1.0, 0.0),
+                ],
+                vec![
+                    vec2(1.0, 0.0),
+                    vec2(2.0, 0.0),
+                    vec2(-1.0, 0.0),
+                    vec2(-2.0, 0.0),
+                    vec2(0.0, -1.0),
+                ],
+                vec![
+                    vec2(0.0, 1.0),
+                    vec2(0.0, 2.0),
+                    vec2(0.0, -1.0),
+                    vec2(0.0, -2.0),
+                    vec2(1.0, 0.0),
+                ],
+            ],
         }
     }
 }

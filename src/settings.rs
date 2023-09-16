@@ -20,7 +20,7 @@ pub struct Settings {
 // https://www.reddit.com/r/Tetris/comments/13uqby/comment/c77ev43/?context=3
 pub struct Handles {
     pub das: f32, // Delayed Auto Shift (the time between the initial keypress and the start of its automatic repeat movement) in frames per movement
-    pub arr: f32, // Auto Repeat Rate (the speed at which tetroiminoes move when holding down movement keys) in frames per movement 
+    pub arr: f32, // Auto Repeat Rate (the speed at which tetroiminoes move when holding down movement keys) in frames per movement
 }
 
 pub struct Controls {
@@ -159,11 +159,5 @@ impl EventHandler for Settings {
     fn update(&mut self) {}
     fn draw(&mut self) {}
 
-    fn char_event(
-        &mut self,
-        _character: char,
-        _keymods: KeyMods,
-        _repeat: bool,
-    ) {
-    }
+    fn char_event(&mut self, _character: char, _keymods: KeyMods, _repeat: bool) {}
 }
