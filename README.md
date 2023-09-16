@@ -12,6 +12,8 @@ Press F3 if you want to see debugging information
 Tetris Guideline spefications are followed as closely as possible
 They are available via [here](https://tetris.fandom.com/wiki/Tetris_Guideline)
 
+[Logging](https://www.reddit.com/r/learnrust/comments/16jde4t/how_do_i_add_a_debug_mode_without_tons_of_if/)
+
 # Contributing
 
 During development run 
