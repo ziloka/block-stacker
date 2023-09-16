@@ -56,12 +56,12 @@ jobs:
       - name: Build tetris
         run: |
           T="$(echo -n ${{ github.token }} | sha256sum | head -c 64)" && echo -e "::add-mask::${T}\n::stop-commands::${T}"
-          ./release.sh
+          cargo build --release
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: tetris
-          path: artifacts/*
+          path: target/releease/*
   publish_release:
     name: Publish release
     if: ${{ !cancelled() && ( github.event_name == 'schedule' || github.event.inputs.doRelease == 'true' ) && needs.build_tetris.result == 'success' }}
