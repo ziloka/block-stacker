@@ -1,5 +1,5 @@
 # Implement
-- Infinite Undo
+- ~~Infinite Undo~~
 - Replay
 - 180 rotations wallkicks
 - Custom block pieces

@@ -1,9 +1,9 @@
-use std::cell::Cell;
+use std::{cell::Cell, time::Instant};
 
 use macroquad::{
     prelude::{draw_rectangle, Color, BLACK, GREEN, ORANGE, RED, VIOLET, WHITE},
     shapes::{draw_circle_lines, draw_rectangle_lines},
-    text::draw_text,
+    text::draw_text, time::get_fps,
 };
 
 use crate::tetris::{
@@ -12,6 +12,7 @@ use crate::tetris::{
 };
 
 pub struct Drawer<'a> {
+    pub start: Instant,
     pub bottom_left_corner: &'a Cell<Vec2>,
     pub block_size: &'a Cell<f32>,
     pub debug: &'a Cell<bool>,
@@ -26,6 +27,8 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         let origin = active_piece.dots[0];
 
         if debug {
+            self.draw_debug_info();
+
             // for debugging purposes (ensure pieces are in the true SRS rotations)
             // https://harddrop.com/wiki/File:SRS-true-rotations.png
             let (min, max) = match active_piece.tetromino {
@@ -256,6 +259,26 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             bottom_left_corner.y - (HEIGHT / 2.0) * block_size,
             20.0,
             WHITE,
+        );
+    }
+}
+
+
+impl<'a> Drawer<'a> {
+    pub fn draw_debug_info(&self) {
+        draw_text(
+            format!("fps: {}", get_fps()).as_str(),
+            10.0,
+            20.0,
+            20.0,
+            WHITE,
+        );
+        draw_text(
+            format!("It has been {} minutes since program started", self.start.elapsed().as_secs() / 60).as_str(),
+            10.,
+            40.,
+            20.,
+            WHITE
         );
     }
 }

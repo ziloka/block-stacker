@@ -51,9 +51,7 @@ impl<'a> Input<'a> {
             }
             if is_key_down(self.settings.controls.soft_drop) && !board.conflict(&board.active_piece.dots, vec2(0.0, -1.0), true) {
                 board.soft_drop();
-                // self.history.add_state(board.clone());
             }
-
             self.arr = 0.;
         }
 

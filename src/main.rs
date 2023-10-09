@@ -1,12 +1,10 @@
-use std::cell::Cell;
+use std::{cell::Cell, time::Instant};
 
 use macroquad::{
     main,
     prelude::{
         is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK, WHITE,
     },
-    text::draw_text,
-    time::get_fps,
     window::{clear_background, next_frame, screen_height, screen_width},
 };
 
@@ -32,6 +30,7 @@ async fn main() {
     let block_size = Cell::new(30.0);
     let debug = Cell::new(false);
     let drawer = Drawer {
+        start: Instant::now(),
         bottom_left_corner: &bottom_left_corner,
         block_size: &block_size,
         debug: &debug,
@@ -64,13 +63,6 @@ async fn main() {
             }
         }
         handle_keyboard_input(&mut game.board, &debug, &mut open_settings);
-        draw_text(
-            format!("fps: {}", get_fps()).as_str(),
-            10.0,
-            20.0,
-            20.0,
-            WHITE,
-        );
         next_frame().await;
     }
 }
