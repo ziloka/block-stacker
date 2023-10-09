@@ -1,6 +1,7 @@
 use std::ops::Range;
 
 // implement pcg xsh rr (Xorshift High/Retry)
+#[derive(Clone)]
 pub struct Random {
     state: u64,
     inc: u64,

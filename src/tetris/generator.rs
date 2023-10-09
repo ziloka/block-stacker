@@ -4,6 +4,7 @@ use super::{
 };
 
 // https://tetris.fandom.com/wiki/Random_Generator
+#[derive(Clone)]
 pub struct Generator {
     random: Random,
     bag: [Tetromino; 7],

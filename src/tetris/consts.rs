@@ -187,7 +187,7 @@ impl Tetromino {
         }
     }
 
-    // https://tetris.wiki/Super_Rotation_System - READ THE "How Guidline SRS *Really* Works" section
+    // https://tetris.wiki/Super_Rotation_System - READ THE "How Guideline SRS *Really* Works" section
     // https://www.youtube.com/watch?v=yIpk5TJ_uaI
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PiecesController.cs#L36-L92
     // https://github.com/fiorescarlatto/four-tris/blob/dc08ed253e704a4a68302dfc4392b5e28ad3eccf/Tetris.au3#L3395-L3450
@@ -373,6 +373,7 @@ pub struct Piece {
     pub previous_offset_kick: Option<usize>, // there are only 5 kicks
 }
 
+#[derive(Clone)]
 pub enum State {
     Playing,
     GameOver,

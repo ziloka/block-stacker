@@ -33,6 +33,8 @@ pub struct Controls {
     pub rotate_180: KeyCode,
     pub hold: KeyCode,
     pub restart: KeyCode,
+    pub undo: Vec<KeyCode>,
+    pub redo: Vec<KeyCode>
 }
 
 enum FocusedOn {
@@ -45,6 +47,8 @@ enum FocusedOn {
     Rotate180,
     Hold,
     Restart,
+    Undo,
+    Redo
 }
 
 impl Default for Settings {
@@ -60,10 +64,12 @@ impl Default for Settings {
                 soft_drop: KeyCode::Down,
                 hard_drop: KeyCode::Space,
                 rotate_clockwise: KeyCode::Up,
-                rotate_counterclockwise: KeyCode::Z,
+                rotate_counterclockwise: KeyCode::X,
                 rotate_180: KeyCode::A,
                 hold: KeyCode::C,
                 restart: KeyCode::R,
+                undo: vec![KeyCode::F4],
+                redo: vec![KeyCode::LeftControl, KeyCode::R],
             },
             focused_on: None,
             subscriber_id: register_input_subscriber(),
@@ -129,24 +135,59 @@ impl Settings {
                     if ui.button(None, format!("Restart: {:?}", self.controls.restart)) {
                         self.focused_on = Some(FocusedOn::Restart);
                     }
+                    if ui.button(None, format!("Undo: {:?}", self.controls.undo.iter().map(|s| format!("{:?}", s)).collect::<Vec<String>>().join(" + "))) {
+                        self.focused_on = Some(FocusedOn::Undo);
+                    }
+                    if ui.button(None, format!("Redo: {:?}", self.controls.redo.iter().map(|s| format!("{:?}", s)).collect::<Vec<String>>().join(" + "))) {
+                        self.focused_on = Some(FocusedOn::Redo);
+                    }
                     if let Some(focused_on) = &self.focused_on {
                         if let Some(keycode) = get_last_key_pressed() {
                             match focused_on {
-                                FocusedOn::Left => self.controls.left = keycode,
-                                FocusedOn::Right => self.controls.right = keycode,
-                                FocusedOn::SoftDrop => self.controls.soft_drop = keycode,
-                                FocusedOn::HardDrop => self.controls.hard_drop = keycode,
+                                FocusedOn::Left => {
+                                    self.controls.left = keycode;
+                                    self.focused_on = None;
+                                },
+                                FocusedOn::Right => {
+                                    self.controls.right = keycode;
+                                    self.focused_on = None;
+                                },
+                                FocusedOn::SoftDrop => {
+                                    self.controls.soft_drop = keycode;
+                                    self.focused_on = None;
+                                },
+                                FocusedOn::HardDrop => {
+                                    self.controls.hard_drop = keycode;
+                                    self.focused_on = None;
+                                },
                                 FocusedOn::RotateClockwise => {
-                                    self.controls.rotate_clockwise = keycode
+                                    self.controls.rotate_clockwise = keycode;
+                                    self.focused_on = None;
                                 }
                                 FocusedOn::RotateCounterclockwise => {
-                                    self.controls.rotate_counterclockwise = keycode
+                                    self.controls.rotate_counterclockwise = keycode;
+                                    self.focused_on = None;
                                 }
-                                FocusedOn::Rotate180 => self.controls.rotate_180 = keycode,
-                                FocusedOn::Hold => self.controls.hold = keycode,
-                                FocusedOn::Restart => self.controls.restart = keycode,
+                                FocusedOn::Rotate180 => {
+                                    self.controls.rotate_180 = keycode;
+                                    self.focused_on = None;
+                                },
+                                FocusedOn::Hold => {
+                                    self.controls.hold = keycode;
+                                    self.focused_on = None;
+                                },
+                                FocusedOn::Restart => {
+                                    self.controls.restart = keycode;
+                                    self.focused_on = None
+                                },
+                                FocusedOn::Undo => {
+                                    self.controls.undo.push(keycode);
+                                },
+                                FocusedOn::Redo => {
+                                    self.controls.redo.push(keycode);
+                                }
                             }
-                            self.focused_on = None;
+                            
                         }
                     }
                 });

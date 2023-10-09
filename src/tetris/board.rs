@@ -12,6 +12,7 @@ const ROW_INIT: [Option<(u8, u8, u8)>; WIDTH as usize] = [CELL_INIT; WIDTH as us
 const CLEAN_BOARD_SLATE: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize] =
     [ROW_INIT; HEIGHT as usize];
 
+#[derive(Clone)]
 pub struct Board<'a> {
     pub game_state: State,
     active_piece: Piece,

@@ -18,7 +18,6 @@ on:
       doRelease:
         description: 'Publish new release'
         type: boolean
-        default: false
         required: false
       buildOnly:
         description: 'Only build tetris'
@@ -61,10 +60,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: tetris
-          path: target/releease/*
+          path: target/release/tetris.*
   publish_release:
     name: Publish release
-    if: ${{ !cancelled() && ( github.event_name == 'schedule' || github.event.inputs.doRelease == 'true' ) && needs.build_tetris.result == 'success' }}
+    if: ${{ !cancelled() && needs.build_tetris.result == 'success' }}
     needs: build_tetris
     runs-on: ubuntu-latest
     steps:
@@ -83,22 +82,8 @@ jobs:
           RELDATE="$(date +'%Y-%m-%d %H:%M')"
           NAME="Auto-Build $RELDATE"
           TAGNAME="autobuild-$(date +'%Y-%m-%d-%H-%M')"
-          hub release create $(for a in artifacts/*.{zip,tar.xz}; do echo -a $a; done) -m "$NAME" -t "main" "$TAGNAME"
+          hub release create $(for a in target/release/*.{}; do echo -a $a; done) -m "$NAME" -t "main" "$TAGNAME"
           echo "tag_name=${TAGNAME}" >> $GITHUB_OUTPUT
           echo "rel_date=${RELDATE}" >> $GITHUB_OUTPUT
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-      - name: Update Latest
-        run: |
-          set -xe
-          shopt -s nullglob
-          mkdir latest_artifacts
-          ./util/repack_latest.sh latest_artifacts artifacts/*.{zip,tar.xz}
-          NAME="Latest Auto-Build (${{ steps.create_release.outputs.rel_date }})"
-          TAGNAME="latest"
-          hub release delete "$TAGNAME" || true
-          git push --delete origin "$TAGNAME" || true
-          sleep 15
-          hub release create $(for a in latest_artifacts/*; do echo -a $a; done) -m "$NAME" -t "main" "$TAGNAME"
         env:
           GITHUB_TOKEN: ${{ github.token }}
