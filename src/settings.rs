@@ -69,7 +69,7 @@ impl Default for Settings {
                 hold: KeyCode::C,
                 restart: KeyCode::R,
                 undo: vec![KeyCode::F4],
-                redo: vec![KeyCode::LeftControl, KeyCode::R],
+                redo: vec![KeyCode::F5],
             },
             focused_on: None,
             subscriber_id: register_input_subscriber(),

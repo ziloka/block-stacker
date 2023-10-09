@@ -15,7 +15,7 @@ const CLEAN_BOARD_SLATE: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usiz
 #[derive(Clone)]
 pub struct Board<'a> {
     pub game_state: State,
-    active_piece: Piece,
+    pub active_piece: Piece,
     hold_piece: Option<Piece>,
     pub score: u64,
     generator: Generator,
@@ -135,26 +135,20 @@ impl<'a> Board<'a> {
     }
 
     pub fn move_left(&mut self) {
-        if !self.conflict(&self.active_piece.dots, vec2(-1.0, 0.0), true) {
-            for dot in self.active_piece.dots.iter_mut() {
-                dot.x -= 1.0;
-            }
+        for dot in self.active_piece.dots.iter_mut() {
+            dot.x -= 1.0;
         }
     }
 
     pub fn move_right(&mut self) {
-        if !self.conflict(&self.active_piece.dots, vec2(1.0, 0.0), true) {
-            for dot in self.active_piece.dots.iter_mut() {
-                dot.x += 1.0;
-            }
+        for dot in self.active_piece.dots.iter_mut() {
+            dot.x += 1.0;
         }
     }
 
     pub fn soft_drop(&mut self) {
-        if !self.conflict(&self.active_piece.dots, vec2(0.0, -1.0), true) {
-            for dot in self.active_piece.dots.iter_mut() {
-                dot.y -= 1.0;
-            }
+        for dot in self.active_piece.dots.iter_mut() {
+            dot.y -= 1.0;
         }
     }
 
@@ -176,7 +170,7 @@ impl<'a> Board<'a> {
 
     // https://harddrop.com/wiki/SRS
     // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L249-L278
-    pub fn rotate_tetromino_90(&mut self, clockwise: bool, should_offset: bool) {
+    pub fn rotate_tetromino_90(&mut self, clockwise: bool, should_offset: bool) -> bool {
         let old_rotation_index = self.active_piece.rotation_index;
         self.active_piece.previous_rotation_index = Some(old_rotation_index);
         self.active_piece.rotation_index += if clockwise { 1 } else { -1 };
@@ -204,10 +198,12 @@ impl<'a> Board<'a> {
             )
         {
             self.rotate_tetromino_90(!clockwise, false);
+            return true;
         }
+        return false;
     }
 
-    pub fn rotate_tetromino_180(&mut self, should_offset: bool) {
+    pub fn rotate_tetromino_180(&mut self, should_offset: bool) -> bool {
         let old_rotation_index = self.active_piece.rotation_index;
         self.active_piece.previous_rotation_index = Some(old_rotation_index);
         self.active_piece.rotation_index += 2;
@@ -232,7 +228,9 @@ impl<'a> Board<'a> {
             )
         {
             self.rotate_tetromino_180(false);
+            return true;
         }
+        return false;
 
         // self.rotate_tetromino(clockwise, true)
     }
