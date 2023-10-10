@@ -190,9 +190,11 @@ impl<'a> Board<'a> {
 
         if should_offset
             && !self.wallkick_tetromino(
-                self.active_piece.tetromino.get_offset_data(),
-                old_rotation_index,
-                self.active_piece.rotation_index,
+                self.active_piece.tetromino.get_offset_data().get(Tetromino::find_offset_row_90(
+                    old_rotation_index,
+                    self.active_piece.rotation_index,
+                ))
+                .unwrap()
             )
         {
             self.rotate_tetromino_90(!clockwise, false);
@@ -220,9 +222,11 @@ impl<'a> Board<'a> {
         }
         if should_offset
             && !self.wallkick_tetromino(
-                self.active_piece.tetromino.get_offset_data(),
-                old_rotation_index,
-                self.active_piece.rotation_index,
+                self.active_piece.tetromino.get_offset_data().get(Tetromino::find_offset_row_180(
+                    old_rotation_index,
+                    self.active_piece.rotation_index,
+                ))
+                .unwrap()
             )
         {
             self.rotate_tetromino_180(false);
@@ -244,19 +248,11 @@ impl<'a> Board<'a> {
 
     fn wallkick_tetromino(
         &mut self,
-        wallkick_data: Vec<Vec<Vec2>>,
-        old_rotation_index: i8,
-        new_rotation_index: i8,
+        wallkick_data: &Vec<Vec2>
     ) -> bool {
         let mut move_possible = false;
 
-        for offset_element in wallkick_data
-            .get(Tetromino::find_offset_row(
-                old_rotation_index,
-                new_rotation_index,
-            ))
-            .unwrap()
-        {
+        for offset_element in wallkick_data{
             if !self.conflict(&self.active_piece.dots, *offset_element, true) {
                 // self.active_piece.previous_offset_kick = Some(i);
                 for dot in self.active_piece.dots.iter_mut() {

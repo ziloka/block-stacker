@@ -3,7 +3,7 @@ use std::{cell::Cell, time::Instant};
 use macroquad::{
     main,
     prelude::{
-        is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK, WHITE,
+        is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK,
     },
     window::{clear_background, next_frame, screen_height, screen_width},
 };

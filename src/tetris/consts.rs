@@ -184,8 +184,9 @@ impl Tetromino {
         }
     }
 
-    // figure out what index to recieve from the offset table
-    pub fn find_offset_row(first: i8, second: i8) -> usize {
+    // figure out what index to recieve from the offset table 
+    // for 90 degree turns
+    pub fn find_offset_row_90(first: i8, second: i8) -> usize {
         if (first, second) == (0, 1) {
             // 0->R
             return 0;
@@ -348,6 +349,25 @@ impl Tetromino {
                     vec2(1., -2.),
                 ], // 0->L
             ],
+        }
+    }
+
+    pub fn find_offset_row_180(first: i8, second: i8) -> usize {
+        if (first, second) == (0, 2) {
+            // 0->L (0>>2)
+            return 0;
+        } else if (first, second) == (1, 3) {
+            // L->0 (1>>3)
+            return 1;
+        } else if (first, second) == (2, 0) {
+            // R->3 (2>>0)
+            return 2;
+        } else if (first, second) == (3, 1) {
+            // 3->R (3>>1)
+            return 3;
+        } else {
+            println!("first: {}, second: {}", first, second);
+            unimplemented!();
         }
     }
 
