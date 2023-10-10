@@ -80,7 +80,11 @@ fn handle_keyboard_input(board: &mut Box<Board>, debug: &Cell<bool>, open_settin
     }
 }
 
-fn modify_board_bricks(bottom_left_corner: &Cell<Vec2>, board: &mut Box<Board>, block_size: &Cell<f32>) {
+fn modify_board_bricks(
+    bottom_left_corner: &Cell<Vec2>,
+    board: &mut Box<Board>,
+    block_size: &Cell<f32>,
+) {
     let block_size = block_size.get();
     let bottom_left_corner = bottom_left_corner.get();
     let (x, y) = mouse_position();

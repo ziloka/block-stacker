@@ -3,7 +3,8 @@ use std::{cell::Cell, time::Instant};
 use macroquad::{
     prelude::{draw_rectangle, Color, BLACK, GREEN, ORANGE, RED, VIOLET, WHITE},
     shapes::{draw_circle_lines, draw_rectangle_lines},
-    text::draw_text, time::get_fps,
+    text::draw_text,
+    time::get_fps,
 };
 
 use crate::tetris::{
@@ -263,7 +264,6 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
     }
 }
 
-
 impl<'a> Drawer<'a> {
     pub fn draw_debug_info(&self) {
         draw_text(
@@ -274,11 +274,15 @@ impl<'a> Drawer<'a> {
             WHITE,
         );
         draw_text(
-            format!("It has been {} minutes since program started", self.start.elapsed().as_secs() / 60).as_str(),
+            format!(
+                "It has been {} minutes since program started",
+                self.start.elapsed().as_secs() / 60
+            )
+            .as_str(),
             10.,
             40.,
             20.,
-            WHITE
+            WHITE,
         );
     }
 }

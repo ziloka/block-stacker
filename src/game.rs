@@ -1,9 +1,9 @@
-use std::boxed::Box;
 use crate::{
     input::Input,
     tetris::{board::Board, drawer::Drawer},
 };
 use macroquad::miniquad::date::now;
+use std::boxed::Box;
 
 pub struct Game<'a> {
     pub board: Box<Board<'a>>,

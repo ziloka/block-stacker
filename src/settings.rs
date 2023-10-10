@@ -34,7 +34,7 @@ pub struct Controls {
     pub hold: KeyCode,
     pub restart: KeyCode,
     pub undo: Vec<KeyCode>,
-    pub redo: Vec<KeyCode>
+    pub redo: Vec<KeyCode>,
 }
 
 enum FocusedOn {
@@ -48,7 +48,7 @@ enum FocusedOn {
     Hold,
     Restart,
     Undo,
-    Redo
+    Redo,
 }
 
 impl Default for Settings {
@@ -135,10 +135,32 @@ impl Settings {
                     if ui.button(None, format!("Restart: {:?}", self.controls.restart)) {
                         self.focused_on = Some(FocusedOn::Restart);
                     }
-                    if ui.button(None, format!("Undo: {:?}", self.controls.undo.iter().map(|s| format!("{:?}", s)).collect::<Vec<String>>().join(" + "))) {
+                    if ui.button(
+                        None,
+                        format!(
+                            "Undo: {:?}",
+                            self.controls
+                                .undo
+                                .iter()
+                                .map(|s| format!("{:?}", s))
+                                .collect::<Vec<String>>()
+                                .join(" + ")
+                        ),
+                    ) {
                         self.focused_on = Some(FocusedOn::Undo);
                     }
-                    if ui.button(None, format!("Redo: {:?}", self.controls.redo.iter().map(|s| format!("{:?}", s)).collect::<Vec<String>>().join(" + "))) {
+                    if ui.button(
+                        None,
+                        format!(
+                            "Redo: {:?}",
+                            self.controls
+                                .redo
+                                .iter()
+                                .map(|s| format!("{:?}", s))
+                                .collect::<Vec<String>>()
+                                .join(" + ")
+                        ),
+                    ) {
                         self.focused_on = Some(FocusedOn::Redo);
                     }
                     if let Some(focused_on) = &self.focused_on {
@@ -147,19 +169,19 @@ impl Settings {
                                 FocusedOn::Left => {
                                     self.controls.left = keycode;
                                     self.focused_on = None;
-                                },
+                                }
                                 FocusedOn::Right => {
                                     self.controls.right = keycode;
                                     self.focused_on = None;
-                                },
+                                }
                                 FocusedOn::SoftDrop => {
                                     self.controls.soft_drop = keycode;
                                     self.focused_on = None;
-                                },
+                                }
                                 FocusedOn::HardDrop => {
                                     self.controls.hard_drop = keycode;
                                     self.focused_on = None;
-                                },
+                                }
                                 FocusedOn::RotateClockwise => {
                                     self.controls.rotate_clockwise = keycode;
                                     self.focused_on = None;
@@ -171,23 +193,22 @@ impl Settings {
                                 FocusedOn::Rotate180 => {
                                     self.controls.rotate_180 = keycode;
                                     self.focused_on = None;
-                                },
+                                }
                                 FocusedOn::Hold => {
                                     self.controls.hold = keycode;
                                     self.focused_on = None;
-                                },
+                                }
                                 FocusedOn::Restart => {
                                     self.controls.restart = keycode;
                                     self.focused_on = None
-                                },
+                                }
                                 FocusedOn::Undo => {
                                     self.controls.undo.push(keycode);
-                                },
+                                }
                                 FocusedOn::Redo => {
                                     self.controls.redo.push(keycode);
                                 }
                             }
-                            
                         }
                     }
                 });
