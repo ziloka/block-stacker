@@ -184,7 +184,7 @@ impl Tetromino {
         }
     }
 
-    // figure out what index to recieve from the offset table 
+    // figure out what index to recieve from the offset table
     // for 90 degree turns
     pub fn find_offset_row_90(first: i8, second: i8) -> usize {
         if (first, second) == (0, 1) {
