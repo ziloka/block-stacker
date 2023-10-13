@@ -1,4 +1,4 @@
-use std::{cell::Cell, time::Instant};
+use std::cell::Cell;
 
 use macroquad::{
     prelude::{draw_rectangle, Color, BLACK, GREEN, ORANGE, RED, VIOLET, WHITE},
@@ -12,7 +12,7 @@ use crate::tetris::{
 };
 
 pub struct Drawer<'a> {
-    pub start: Instant,
+    pub start: f64,
     pub bottom_left_corner: &'a Cell<Vec2>,
     pub block_size: &'a Cell<f32>,
     pub debug: &'a Cell<bool>,
@@ -274,7 +274,7 @@ impl<'a> Drawer<'a> {
             WHITE,
         );
         draw_text(
-            format!("It has been {} minutes since program started", self.start.elapsed().as_secs() / 60).as_str(),
+            format!("It has been {} minutes since program started", self.start / 60.0).as_str(),
             10.,
             40.,
             20.,

@@ -1,9 +1,9 @@
-use std::{cell::Cell, time::Instant};
+use std::cell::Cell;
 
 use macroquad::{
     main,
     prelude::{
-        is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK, WHITE,
+        is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK, WHITE, get_time
     },
     window::{clear_background, next_frame, screen_height, screen_width},
 };
@@ -30,7 +30,7 @@ async fn main() {
     let block_size = Cell::new(30.0);
     let debug = Cell::new(false);
     let drawer = Drawer {
-        start: Instant::now(),
+        start: get_time(),
         bottom_left_corner: &bottom_left_corner,
         block_size: &block_size,
         debug: &debug,

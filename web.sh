@@ -49,7 +49,8 @@ headers.Strict-Transport-Security = \"max-age=0; includeSubDomains; preload\"" >
 # Recommended way
 if [ "$1" == "online" ]
 then
-    cargo install --git https://github.com/static-web-server/static-web-server
-    echo "Running application on http://localhost:8080"
-    static-web-server --config-file config.toml --log-level "trace" --port 8080 --root .
+    caddy file-server --listen :8080
+    # cargo install --git https://github.com/static-web-server/static-web-server
+    # echo "Running application on http://localhost:8080"
+    # static-web-server --config-file config.toml --log-level "trace" --port 8080 --root .
 fi
