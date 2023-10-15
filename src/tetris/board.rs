@@ -168,8 +168,6 @@ impl<'a> Board<'a> {
         self.set_active_tetromino_position();
     }
 
-    // https://harddrop.com/wiki/SRS
-    // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L249-L278
     pub fn rotate_tetromino_90(&mut self, clockwise: bool, should_offset: bool) -> bool {
         let old_rotation_index = self.active_piece.rotation_index;
         self.active_piece.previous_rotation_index = Some(old_rotation_index);
@@ -192,9 +190,14 @@ impl<'a> Board<'a> {
 
         if should_offset
             && !self.wallkick_tetromino(
-                self.active_piece.tetromino.get_offset_data(),
-                old_rotation_index,
-                self.active_piece.rotation_index,
+                self.active_piece
+                    .tetromino
+                    .get_offset_data()
+                    .get(Tetromino::find_offset_row_90(
+                        old_rotation_index,
+                        self.active_piece.rotation_index,
+                    ))
+                    .unwrap(),
             )
         {
             self.rotate_tetromino_90(!clockwise, false);
@@ -222,9 +225,14 @@ impl<'a> Board<'a> {
         }
         if should_offset
             && !self.wallkick_tetromino(
-                self.active_piece.tetromino.get_offset_data(),
-                old_rotation_index,
-                self.active_piece.rotation_index,
+                self.active_piece
+                    .tetromino
+                    .get_offset_data()
+                    .get(Tetromino::find_offset_row_180(
+                        old_rotation_index,
+                        self.active_piece.rotation_index,
+                    ))
+                    .unwrap(),
             )
         {
             self.rotate_tetromino_180(false);
@@ -238,36 +246,19 @@ impl<'a> Board<'a> {
     // determine the rotation index of the tetromino
     // returning 0 - O means it is in its spawn position
     // returning 1 - R means it is in a clockwise rotation ("right") from spawn
-    // returning 2 - L means it is in a counter-clockwise rotation ("left") from spawn
-    // returning 3 - 2 means it is in a 180 degree rotation from spawn
+    // returning 3 - L means it is in a counter-clockwise rotation ("left") from spawn
+    // returning 2 - 2 means it is in a 180 degree rotation from spawn
     fn mod_helper(&self, x: i8, m: i8) -> i8 {
         (x % m + m) % m
     }
 
-    // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340
-    // https://github.com/fiorescarlatto/four-tris/blob/dc08ed253e704a4a68302dfc4392b5e28ad3eccf/Tetris.au3#L3395-L3450
-    fn wallkick_tetromino(
-        &mut self,
-        wallkick_data: Vec<Vec<Vec2>>,
-        old_rotation_index: i8,
-        new_rotation_index: i8,
-    ) -> bool {
+    fn wallkick_tetromino(&mut self, wallkick_data: &Vec<Vec2>) -> bool {
         let mut move_possible = false;
-
-        for (i, offset_element) in wallkick_data.iter().enumerate() {
-            let offset_value1 = offset_element[old_rotation_index as usize];
-            let offset_value2 = offset_element[new_rotation_index as usize];
-            // derive the kick translations by taking the difference between pairs of offset data
-            let end_offset = vec2(
-                offset_value1.x - offset_value2.x,
-                offset_value1.y - offset_value2.y,
-            );
-
-            if !self.conflict(&self.active_piece.dots, end_offset, true) {
-                self.active_piece.previous_offset_kick = Some(i);
-                // https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L226-L247
+        for offset_element in wallkick_data {
+            if !self.conflict(&self.active_piece.dots, *offset_element, true) {
+                // self.active_piece.previous_offset_kick = Some(i);
                 for dot in self.active_piece.dots.iter_mut() {
-                    *dot = dot.add(end_offset);
+                    *dot = dot.add(*offset_element);
                 }
                 move_possible = true;
                 break;
