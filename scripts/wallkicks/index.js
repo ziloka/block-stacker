@@ -13,30 +13,35 @@ const HEIGHT = 7;
 const WIDTH = 5;
 
 // 35 elements in total
-const matrix = Array.from({length: HEIGHT}, ()=> (Array.from({length: WIDTH}, () => 0)));
-console.log(`matrix has ${matrix.length} rows`);
-console.log(`matrix has ${matrix[0].length} columns`);
+const board = Array.from({length: HEIGHT}, ()=> (Array.from({length: WIDTH}, () => "N")));
+const active_piece_initial = [];
+const active_piece_destination = [];
 $("div img").each((i, e) => {
     const name = $(e).attr("alt");
     const row = Math.floor(i / WIDTH);
     const column = i % WIDTH;
-    // console.log(`${i} (${row}, ${column})`);
-    switch (name) {
-        case "LTet.png": // active tetromino
-            matrix[row][column] = 1;
-            break;
-        case "GTet.png": // garbage block
-            matrix[row][column] = 2;
-            break;
-        case "-Tet.png": // where dest tetromino goes
-            matrix[row][column] = 3;
-            break;
-        case "Tet.png": // empty block
-            break;
-        default:
-            console.log(`missing case for: ${name}`);
-            break;
+    if (/(L|J|T|S|Z|I)Tet\.png/.test(name)) { // initial tetromino position
+        active_piece_initial.push(` vec2(${row}., ${column}.)`)
+        // active_piece_initial[row][column] = "G";
+    } else {
+        switch (name) {
+            case "GTet.png": // garbage block
+                board[row][column] = "G";
+                break;
+            case "-Tet.png": // dest tetromino position
+                active_piece_destination.push(` vec2(${row}., ${column}.)`)
+                break;
+            case "Tet.png": // empty block
+                break;
+            default:
+                console.log(`missing case for: ${name}`);
+                break;
+        }
     }
 });
 
-console.log(matrix);
+const format = (arr) => JSON.stringify(arr).replace(/"/g, '').replace(/\[/g, "vec![");
+
+console.log(`board: ${format(board)}`);
+console.log(`initial: ${format(active_piece_initial)}`);
+console.log(`dest: ${format(active_piece_destination)}`);

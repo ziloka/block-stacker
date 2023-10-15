@@ -2,32 +2,44 @@ use std::ops::{Add, Sub};
 
 use super::{
     action::Action,
-    consts::{vec2, Piece, State, Tetromino, Vec2, HEIGHT, WIDTH},
-    drawer::Drawer,
+    consts::{vec2, Piece, State, Tetromino, Vec2},
     generator::Generator,
 };
 
-const CELL_INIT: Option<(u8, u8, u8)> = None;
-const ROW_INIT: [Option<(u8, u8, u8)>; WIDTH as usize] = [CELL_INIT; WIDTH as usize];
-const CLEAN_BOARD_SLATE: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize] =
-    [ROW_INIT; HEIGHT as usize];
-
 #[derive(Clone)]
-pub struct Board<'a> {
+pub struct Board {
     pub game_state: State,
     pub active_piece: Piece,
-    hold_piece: Option<Piece>,
+    pub hold_piece: Option<Piece>,
     pub score: u64,
     generator: Generator,
-    drawer: &'a dyn Drawer,
-    preview_pieces: [Tetromino; 7],
+    pub preview_pieces: [Tetromino; 7],
     // (0, 0) represents the bottom left corner, (WIDTH, HEIGHT) represents the top right corner
-    positions: [[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
-    last_action: Option<Action>,
+    pub positions: Vec<Vec<Option<(u8, u8, u8)>>>,
+    pub last_action: Option<Action>,
 }
 
-impl<'a> Board<'a> {
-    pub fn new(drawer: &'a dyn Drawer, seed: usize) -> Self {
+impl Board {
+    pub fn import(positions: Vec<Vec<Option<(u8, u8, u8)>>>, seed: usize) -> Self {
+        let active_piece: Piece = Default::default();
+        let mut generator = Generator::new(seed);
+        let tetrominos = generator.get_new_sequence_of_tetrominos();
+        let mut board = Self {
+            game_state: State::Playing,
+            active_piece,
+            hold_piece: None,
+            score: 0,
+            generator,
+            preview_pieces: tetrominos,
+            // https://stackoverflow.com/a/53930630
+            positions: positions,
+            last_action: None,
+        };
+        board.set_next_tetromino_as_active_piece();
+        board
+    }
+
+    pub fn new(seed: usize) -> Self {
         // this first place gets replaced so it doesn't matter what it is
         let active_piece: Piece = Default::default();
         let mut generator = Generator::new(seed);
@@ -38,10 +50,9 @@ impl<'a> Board<'a> {
             hold_piece: None,
             score: 0,
             generator,
-            drawer,
             preview_pieces: tetrominos,
             // https://stackoverflow.com/a/53930630
-            positions: CLEAN_BOARD_SLATE,
+            positions: vec![vec![None; 10]; 20],
             last_action: None,
         };
         board.set_next_tetromino_as_active_piece();
@@ -55,34 +66,23 @@ impl<'a> Board<'a> {
         self.hold_piece = None;
         self.generator = generator;
         self.preview_pieces = tetrominos;
-        self.positions = CLEAN_BOARD_SLATE;
+        self.positions = vec![vec![None; self.positions[0].len()]; self.positions.len()];
         self.set_next_tetromino_as_active_piece();
     }
 
-    fn get_spawn_dots(tetromino: &Tetromino) -> Vec<Vec2> {
+    fn get_spawn_dots(&self, tetromino: &Tetromino) -> Vec<Vec2> {
         tetromino
             .get_structure()
             .iter()
-            .map(|pos| vec2(pos.x + WIDTH / 2.0, HEIGHT - 2.0 - pos.y))
+            .map(|pos| vec2(pos.x + self.positions[0].len() as f32 / 2.0, self.positions.len() as f32 - 2.0 - pos.y))
             .collect()
-    }
-
-    pub fn draw(&self) {
-        self.drawer.draw_tetrominos(&self.positions);
-        self.drawer.draw_ghost_piece(&self, &self.active_piece);
-        self.drawer.draw_current_tetromino(&self.active_piece);
-        self.drawer.draw_preview_pieces(&self.preview_pieces);
-        self.drawer.draw_hold_piece(&self.hold_piece);
-        if let Some(action) = &self.last_action {
-            self.drawer.draw_action_text(action.to_string());
-        }
     }
 
     pub fn hold_tetromino(&mut self) {
         match &mut self.hold_piece {
             Some(hold_piece) => {
                 hold_piece.rotation_index = 0;
-                hold_piece.dots = Self::get_spawn_dots(&hold_piece.tetromino);
+                hold_piece.dots = self.get_spawn_dots(&hold_piece.tetromino);
                 std::mem::swap(hold_piece, &mut self.active_piece);
             }
             None => {
@@ -95,7 +95,7 @@ impl<'a> Board<'a> {
     fn set_next_tetromino_as_active_piece(&mut self) {
         let piece = Piece {
             tetromino: self.preview_pieces[0],
-            dots: Self::get_spawn_dots(&self.preview_pieces[0]),
+            dots: self.get_spawn_dots(&self.preview_pieces[0]),
             rotation_index: 0,
             previous_rotation_index: None,
             previous_offset_kick: None,
@@ -126,7 +126,7 @@ impl<'a> Board<'a> {
                 let Vec2 { x: column, y: row } = relative;
                 (
                     relative.x < 0.0 // for the left side
-                 || relative.x >= WIDTH // for the right side
+                 || relative.x >= self.positions[0].len() as f32 // for the right side
                  || relative.y < 0.0
                     // for the floor (bottom)
                 ) || dont_allow_overlapping_blocks
@@ -155,7 +155,7 @@ impl<'a> Board<'a> {
     pub fn hard_drop(&mut self) {
         // the hard drop
         let mut y_offset = 0.0;
-        for y in 1..HEIGHT as i32 {
+        for y in 1..self.positions.len() as i32 {
             let y = y as f32 * -1.0;
             if self.conflict(&self.active_piece.dots, vec2(0.0, y), true) {
                 y_offset = y + 1.0;
@@ -370,8 +370,8 @@ impl<'a> Board<'a> {
         }
 
         let mut index = 0.0;
-        while index <= HEIGHT - 1.0 {
-            let row = self.positions[index as usize];
+        while index <= self.positions.len() as f32 - 1.0 {
+            let row = &self.positions[index as usize];
             if row.iter().all(|x| x.is_some()) {
                 self.clear_line(index as usize);
             } else {
@@ -381,8 +381,8 @@ impl<'a> Board<'a> {
     }
 
     fn clear_line(&mut self, row_index: usize) {
-        for y in row_index..HEIGHT as usize - 1 {
-            self.positions[y] = self.positions[y + 1];
+        for y in row_index..self.positions.len() as usize - 1 {
+            self.positions[y] = self.positions[y + 1].clone();
         }
     }
 

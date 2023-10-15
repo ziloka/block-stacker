@@ -9,7 +9,7 @@ use macroquad::{
 
 use crate::tetris::{
     board::Board,
-    consts::{vec2, Piece, Tetromino, Vec2, GRAY, HEIGHT, WIDTH},
+    consts::{vec2, Piece, Tetromino, Vec2, GRAY},
 };
 
 pub struct Drawer<'a> {
@@ -19,8 +19,8 @@ pub struct Drawer<'a> {
     pub debug: &'a Cell<bool>,
 }
 
-impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
-    fn draw_current_tetromino(&self, active_piece: &Piece) {
+impl<'a> Drawer<'a> {
+    pub fn draw_current_tetromino(&self, active_piece: &Piece) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
         let debug = self.debug.get();
@@ -120,20 +120,20 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
     }
 
     // draw ghost piece, ghost piece appears where the harddrop would be
-    fn draw_ghost_piece(&self, board: &Board, active_piece: &Piece) {
+    pub fn draw_ghost_piece(&self, board: &Board) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
 
         let mut y_offset = 0.0;
-        for y in 1..HEIGHT as i32 {
+        for y in 1..board.positions.len() as i32 {
             let y = y as f32 * -1.0;
-            if board.conflict(&active_piece.dots, vec2(0.0, y), true) {
+            if board.conflict(&board.active_piece.dots, vec2(0.0, y), true) {
                 y_offset = y + 1.0;
                 break;
             }
         }
 
-        active_piece.dots.iter().for_each(|position| {
+        board.active_piece.dots.iter().for_each(|position| {
             let x = bottom_left_corner.x + position.x * block_size;
             let y = bottom_left_corner.y - (position.y + y_offset) * block_size - block_size;
             draw_rectangle(x, y, block_size, block_size, WHITE);
@@ -141,9 +141,9 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         });
     }
 
-    fn draw_tetrominos(
+    pub fn draw_tetrominos(
         &self,
-        positions: &[[Option<(u8, u8, u8)>; WIDTH as usize]; HEIGHT as usize],
+        positions: &Vec<Vec<Option<(u8, u8, u8)>>>,
     ) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
@@ -151,9 +151,9 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
 
         draw_rectangle(
             bottom_left_corner.x,
-            bottom_left_corner.y - HEIGHT * block_size,
-            WIDTH * block_size,
-            HEIGHT * block_size,
+            bottom_left_corner.y - positions.len() as f32 * block_size,
+            positions[0].len() as f32 * block_size,
+            positions.len() as f32 * block_size,
             Color::from_rgba(GRAY.0, GRAY.1, GRAY.2, 255),
         );
 
@@ -172,7 +172,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
 
         if debug {
             // draw the indexs on the side of the board
-            for i in 0..(HEIGHT as u32) {
+            for i in 0..(positions.len() as u32) {
                 draw_text(
                     i.to_string().as_str(),
                     bottom_left_corner.x - block_size,
@@ -182,7 +182,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                 );
             }
 
-            for i in 0..(WIDTH as u32) {
+            for i in 0..(positions.len() as u32) {
                 draw_text(
                     i.to_string().as_str(),
                     bottom_left_corner.x + i as f32 * block_size,
@@ -194,17 +194,18 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         }
     }
 
-    fn draw_preview_pieces(&self, preview_pieces: &[Tetromino; 7]) {
+    pub fn draw_preview_pieces(&self, board: &Board) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
+        let preview_pieces = board.preview_pieces;
 
         preview_pieces[0..5]
             .iter()
             .enumerate()
             .for_each(|(i, tetromino)| {
                 tetromino.get_structure().iter().for_each(|position| {
-                    let x = bottom_left_corner.x + (WIDTH + 2.0 + position.x) * block_size;
-                    let y = (bottom_left_corner.y - HEIGHT * block_size)
+                    let x = bottom_left_corner.x + (board.positions[0].len() as f32 + 2.0 + position.x) * block_size;
+                    let y = (bottom_left_corner.y - board.positions.len() as f32 * block_size)
                         + (i as f32 * 3.0 + position.y) * block_size;
                     let (r, g, b) = tetromino.get_color();
                     draw_rectangle(x, y, block_size, block_size, Color::from_rgba(r, g, b, 255));
@@ -214,10 +215,11 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             });
     }
 
-    fn draw_hold_piece(&self, hold_piece: &Option<Piece>) {
+    pub fn draw_hold_piece(&self, board: &Board) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
         let debug = self.debug.get();
+        let hold_piece = &board.hold_piece;
 
         if let Some(piece) = hold_piece {
             let dots = piece.tetromino.get_structure();
@@ -225,7 +227,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
             dots.iter().for_each(|position| {
                 let x =
                     bottom_left_corner.x - (origin.x - position.x * block_size) + block_size * -3.0;
-                let y = (bottom_left_corner.y - origin.y - HEIGHT * block_size)
+                let y = (bottom_left_corner.y - origin.y - board.positions.len() as f32 * block_size)
                     + position.y * block_size
                     + block_size;
                 let (r, g, b) = piece.tetromino.get_color();
@@ -240,7 +242,7 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
                     bottom_left_corner.x - origin.x * block_size
                         + block_size * -3.0
                         + (block_size / 2.0),
-                    (bottom_left_corner.y - origin.y - HEIGHT * block_size)
+                    (bottom_left_corner.y - origin.y - board.positions.len() as f32 * block_size)
                         - (block_size / 2.0 - block_size * 2.0),
                     block_size / 2.0,
                     2.0,
@@ -250,21 +252,19 @@ impl<'a> crate::tetris::drawer::Drawer for Drawer<'a> {
         }
     }
 
-    fn draw_action_text(&self, text: &str) {
+    pub fn draw_action_text(&self, board: &Board, text: &str) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
 
         draw_text(
             text,
             bottom_left_corner.x - 5.0 * block_size,
-            bottom_left_corner.y - (HEIGHT / 2.0) * block_size,
+            bottom_left_corner.y - (board.positions.len() as f32 / 2.0) * block_size,
             20.0,
             WHITE,
         );
     }
-}
 
-impl<'a> Drawer<'a> {
     pub fn draw_debug_info(&self) {
         draw_text(
             format!("fps: {}", get_fps()).as_str(),

@@ -1,19 +1,16 @@
-use crate::{
-    input::Input,
-    tetris::{board::Board, drawer::Drawer},
-};
+use crate::{input::Input, tetris::board::Board};
 use macroquad::miniquad::date::now;
 use std::boxed::Box;
 
-pub struct Game<'a> {
-    pub board: Box<Board<'a>>,
-    pub input: Input<'a>,
+pub struct Game {
+    pub board: Box<Board>,
+    pub input: Input,
 }
 
-impl<'a> Game<'a> {
-    pub fn new(drawer: &'a dyn Drawer) -> Self {
+impl Game {
+    pub fn new() -> Self {
         Self {
-            board: Box::new(Board::new(drawer, now() as usize)),
+            board: Box::new(Board::new(now() as usize)),
             input: Input::default(),
         }
     }

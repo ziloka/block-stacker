@@ -92,8 +92,6 @@ impl Div<f32> for Vec2 {
 
 pub const GRAY: (u8, u8, u8) = (128, 128, 128);
 pub const CUSTOM_GARBAGE: (u8, u8, u8) = (105, 105, 105);
-pub const HEIGHT: f32 = 20.0;
-pub const WIDTH: f32 = 10.0;
 
 pub const TETROMINO_TYPES: [Tetromino; 7] = [
     Tetromino::I,

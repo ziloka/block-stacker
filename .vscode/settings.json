@@ -3,5 +3,8 @@
         "**/target": true
     },
     "lldb.verboseLogging": true,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "deno.enable": true,
+    "deno.lint": true,
+    "deno.unstable": false
 }

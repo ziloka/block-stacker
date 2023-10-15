@@ -10,17 +10,17 @@ use crate::{
 };
 
 #[derive(Default)]
-pub struct Input<'a> {
+pub struct Input {
     pub settings: Settings,
     das: f64, // the frames that have passed since the last movement
     arr: f64, // the frames that have passed since the last movement
     last_checked: f64,
-    history: History<'a>,
+    history: History,
 }
 
-impl<'a> Input<'a> {
+impl Input {
     // handles movement for every frame
-    pub fn handle(&mut self, board: &mut Box<Board<'a>>) {
+    pub fn handle(&mut self, board: &mut Box<Board>) {
         let held_down = is_key_down(self.settings.controls.left)
             || is_key_down(self.settings.controls.right)
             || is_key_down(self.settings.controls.soft_drop);
