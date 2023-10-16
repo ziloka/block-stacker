@@ -27,7 +27,7 @@ jobs:
         run: |
           ./web.sh
           mkdir -p static
-          mv target/wasm32-unknown-unknown/release/{index.html,tetris.wasm} static
+          mv target/wasm32-unknown-unknown/release/{index.html,client.wasm} static
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
