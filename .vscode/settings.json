@@ -3,6 +3,7 @@
         "**/target": true
     },
     "lldb.verboseLogging": true,
+    "editor.accessibilitySupport": "off",
     "editor.formatOnSave": true,
     "deno.enable": true,
     "deno.lint": true,

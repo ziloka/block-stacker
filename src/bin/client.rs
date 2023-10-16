@@ -1,9 +1,9 @@
-use std::{cell::Cell, time::Instant};
+use std::cell::Cell;
 
 use macroquad::{
     main,
     prelude::{is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK},
-    window::{clear_background, next_frame, screen_height, screen_width},
+    window::{clear_background, next_frame, screen_height, screen_width}, time::get_time,
 };
 
 use tetris::{
@@ -11,7 +11,7 @@ use tetris::{
     game::Game,
     tetris::{
         board::Board,
-        consts::{vec2, State, Vec2, CUSTOM_GARBAGE, HEIGHT, WIDTH},
+        consts::{vec2, State, Vec2, CUSTOM_GARBAGE},
     },
 };
 
@@ -21,7 +21,7 @@ async fn main() {
     let block_size = Cell::new(30.0);
     let debug = Cell::new(false);
     let drawer = Drawer {
-        start: Instant::now(),
+        start: get_time(),
         bottom_left_corner: &bottom_left_corner,
         block_size: &block_size,
         debug: &debug,
@@ -31,11 +31,11 @@ async fn main() {
 
     loop {
         let block_size_temp =
-            (screen_height() / (HEIGHT * 1.25)).min(screen_width() / (WIDTH * 1.25));
+            (screen_height() / (game.board.positions.len() as f32 * 1.25)).min(screen_width() / (game.board.positions[0].len() as f32 * 1.25));
         block_size.set(block_size_temp);
         bottom_left_corner.set(vec2(
             block_size_temp * 6.0,
-            block_size_temp * (HEIGHT + 2.0),
+            block_size_temp * (game.board.positions.len() as f32 + 2.0),
         ));
 
         if open_settings {
@@ -49,10 +49,10 @@ async fn main() {
                     drawer.draw_tetrominos(&game.board.positions);
                     drawer.draw_ghost_piece(&game.board);
                     drawer.draw_current_tetromino(&game.board.active_piece);
-                    drawer.draw_preview_pieces(&game.board.preview_pieces);
-                    drawer.draw_hold_piece(&game.board.hold_piece);
+                    drawer.draw_preview_pieces(&game.board);
+                    drawer.draw_hold_piece(&game.board);
                     if let Some(action) = &game.board.last_action {
-                        drawer.draw_action_text(action.to_string());
+                        drawer.draw_action_text(&game.board, action.to_string());
                     }
                 }
                 State::GameOver => {

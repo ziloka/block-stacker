@@ -70,11 +70,11 @@ impl Board {
         self.set_next_tetromino_as_active_piece();
     }
 
-    fn get_spawn_dots(&self, tetromino: &Tetromino) -> Vec<Vec2> {
+    fn get_spawn_dots(tetromino: &Tetromino, board_height: f32, board_width: f32) -> Vec<Vec2> {
         tetromino
             .get_structure()
             .iter()
-            .map(|pos| vec2(pos.x + self.positions[0].len() as f32 / 2.0, self.positions.len() as f32 - 2.0 - pos.y))
+            .map(|pos| vec2(pos.x + board_width as f32 / 2.0, board_height - 2.0 - pos.y))
             .collect()
     }
 
@@ -82,7 +82,7 @@ impl Board {
         match &mut self.hold_piece {
             Some(hold_piece) => {
                 hold_piece.rotation_index = 0;
-                hold_piece.dots = self.get_spawn_dots(&hold_piece.tetromino);
+                hold_piece.dots = Self::get_spawn_dots(&hold_piece.tetromino, self.positions.len() as f32, self.positions[0].len() as f32);
                 std::mem::swap(hold_piece, &mut self.active_piece);
             }
             None => {
@@ -95,7 +95,7 @@ impl Board {
     fn set_next_tetromino_as_active_piece(&mut self) {
         let piece = Piece {
             tetromino: self.preview_pieces[0],
-            dots: self.get_spawn_dots(&self.preview_pieces[0]),
+            dots: Self::get_spawn_dots(&self.preview_pieces[0], self.positions.len() as f32, self.positions[0].len() as f32),
             rotation_index: 0,
             previous_rotation_index: None,
             previous_offset_kick: None,
