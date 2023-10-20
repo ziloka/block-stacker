@@ -4,7 +4,7 @@ use macroquad::{
     prelude::{draw_rectangle, Color, BLACK, GREEN, ORANGE, RED, VIOLET, WHITE},
     shapes::{draw_circle_lines, draw_rectangle_lines},
     text::draw_text,
-    time::get_fps,
+    time::{get_fps, get_time},
 };
 
 use crate::tetris::{
@@ -13,7 +13,6 @@ use crate::tetris::{
 };
 
 pub struct Drawer<'a> {
-    pub start: f64,
     pub bottom_left_corner: &'a Cell<Vec2>,
     pub block_size: &'a Cell<f32>,
     pub debug: &'a Cell<bool>,
@@ -141,10 +140,7 @@ impl<'a> Drawer<'a> {
         });
     }
 
-    pub fn draw_tetrominos(
-        &self,
-        positions: &Vec<Vec<Option<(u8, u8, u8)>>>,
-    ) {
+    pub fn draw_tetrominos(&self, positions: &Vec<Vec<Option<(u8, u8, u8)>>>) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
         let debug = self.debug.get();
@@ -182,7 +178,7 @@ impl<'a> Drawer<'a> {
                 );
             }
 
-            for i in 0..(positions.len() as u32) {
+            for i in 0..(positions[0].len() as u32) {
                 draw_text(
                     i.to_string().as_str(),
                     bottom_left_corner.x + i as f32 * block_size,
@@ -204,7 +200,8 @@ impl<'a> Drawer<'a> {
             .enumerate()
             .for_each(|(i, tetromino)| {
                 tetromino.get_structure().iter().for_each(|position| {
-                    let x = bottom_left_corner.x + (board.positions[0].len() as f32 + 2.0 + position.x) * block_size;
+                    let x = bottom_left_corner.x
+                        + (board.positions[0].len() as f32 + 2.0 + position.x) * block_size;
                     let y = (bottom_left_corner.y - board.positions.len() as f32 * block_size)
                         + (i as f32 * 3.0 + position.y) * block_size;
                     let (r, g, b) = tetromino.get_color();
@@ -227,9 +224,10 @@ impl<'a> Drawer<'a> {
             dots.iter().for_each(|position| {
                 let x =
                     bottom_left_corner.x - (origin.x - position.x * block_size) + block_size * -3.0;
-                let y = (bottom_left_corner.y - origin.y - board.positions.len() as f32 * block_size)
-                    + position.y * block_size
-                    + block_size;
+                let y =
+                    (bottom_left_corner.y - origin.y - board.positions.len() as f32 * block_size)
+                        + position.y * block_size
+                        + block_size;
                 let (r, g, b) = piece.tetromino.get_color();
                 draw_rectangle(x, y, block_size, block_size, Color::from_rgba(r, g, b, 255));
 
@@ -274,7 +272,11 @@ impl<'a> Drawer<'a> {
             WHITE,
         );
         draw_text(
-            format!("It has been {} minutes since program started", self.start / 60.0).as_str(),
+            format!(
+                "It has been {:.2} minutes since program started",
+                get_time() / 60.0
+            )
+            .as_str(),
             10.,
             40.,
             20.,

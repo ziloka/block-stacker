@@ -1,4 +1,9 @@
-use std::ops::{Add, Sub};
+use std::{
+    fmt::{Display, Formatter},
+    ops::{Add, Sub},
+};
+
+use crate::tetris::board;
 
 use super::{
     action::Action,
@@ -17,6 +22,23 @@ pub struct Board {
     // (0, 0) represents the bottom left corner, (WIDTH, HEIGHT) represents the top right corner
     pub positions: Vec<Vec<Option<(u8, u8, u8)>>>,
     pub last_action: Option<Action>,
+}
+
+impl Display for Board {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut board_string = String::new();
+        for row in self.positions.iter() {
+            for element in row.iter().rev() {
+                if let Some(_) = element {
+                    board_string.insert_str(0, "x");
+                } else {
+                    board_string.insert_str(0, " ");
+                }
+            }
+            board_string.insert_str(0, "\n");
+        }
+        write!(f, "{}", board_string)
+    }
 }
 
 impl Board {
@@ -82,7 +104,11 @@ impl Board {
         match &mut self.hold_piece {
             Some(hold_piece) => {
                 hold_piece.rotation_index = 0;
-                hold_piece.dots = Self::get_spawn_dots(&hold_piece.tetromino, self.positions.len() as f32, self.positions[0].len() as f32);
+                hold_piece.dots = Self::get_spawn_dots(
+                    &hold_piece.tetromino,
+                    self.positions.len() as f32,
+                    self.positions[0].len() as f32,
+                );
                 std::mem::swap(hold_piece, &mut self.active_piece);
             }
             None => {
@@ -95,7 +121,11 @@ impl Board {
     fn set_next_tetromino_as_active_piece(&mut self) {
         let piece = Piece {
             tetromino: self.preview_pieces[0],
-            dots: Self::get_spawn_dots(&self.preview_pieces[0], self.positions.len() as f32, self.positions[0].len() as f32),
+            dots: Self::get_spawn_dots(
+                &self.preview_pieces[0],
+                self.positions.len() as f32,
+                self.positions[0].len() as f32,
+            ),
             rotation_index: 0,
             previous_rotation_index: None,
             previous_offset_kick: None,

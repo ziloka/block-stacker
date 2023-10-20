@@ -3,7 +3,7 @@ use std::cell::Cell;
 use macroquad::{
     main,
     prelude::{is_key_pressed, is_mouse_button_down, mouse_position, KeyCode, MouseButton, BLACK},
-    window::{clear_background, next_frame, screen_height, screen_width}, time::get_time,
+    window::{clear_background, next_frame, screen_height, screen_width},
 };
 
 use tetris::{
@@ -15,13 +15,15 @@ use tetris::{
     },
 };
 
+const G: Option<(u8, u8, u8)> = Some((105, 105, 105));
+const N: Option<(u8, u8, u8)> = None;
+
 #[main("Tetris")]
 async fn main() {
     let bottom_left_corner = Cell::new(vec2(0.0, 0.0));
     let block_size = Cell::new(30.0);
     let debug = Cell::new(false);
     let drawer = Drawer {
-        start: get_time(),
         bottom_left_corner: &bottom_left_corner,
         block_size: &block_size,
         debug: &debug,
@@ -29,9 +31,32 @@ async fn main() {
     let mut open_settings = false;
     let mut game = Game::new();
 
+
+    let mut negative_1x_0y = vec![
+        vec![N, N, N, N, N],
+        vec![N, N, N, N, N],
+        vec![N, N, N, N, N],
+        vec![G, G, N, N, N],
+        vec![G, N, N, N, N],
+        vec![G, N, N, N, N],
+        vec![G, N, N, G, N],
+    ];
+    negative_1x_0y.reverse();
+    game.board = Box::new(Board::import(negative_1x_0y, 0));
+    game.board.active_piece.tetromino = tetris::tetris::consts::Tetromino::L;
+    game.board.active_piece.dots = vec![vec2(2., 2.), vec2(2., 1.), vec2(2., 3.), vec2(1., 3.)];
+    game.board.active_piece.rotation_index = 1;
+    println!("{}", &game.board);
+    game.board.rotate_tetromino_90(true, true);
+    game.board.hard_drop();
+    println!("{}", &game.board);
+    let dest = vec![vec2(4., 1.), vec2(6., 1.), vec2(6., 2.)];
+    dbg!(&game.board.active_piece);
+
+
     loop {
-        let block_size_temp =
-            (screen_height() / (game.board.positions.len() as f32 * 1.25)).min(screen_width() / (game.board.positions[0].len() as f32 * 1.25));
+        let block_size_temp = (screen_height() / (game.board.positions.len() as f32 * 1.25))
+            .min(screen_width() / (game.board.positions[0].len() as f32 * 1.25));
         block_size.set(block_size_temp);
         bottom_left_corner.set(vec2(
             block_size_temp * 6.0,

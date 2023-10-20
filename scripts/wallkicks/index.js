@@ -22,7 +22,6 @@ $("div img").each((i, e) => {
     const column = i % WIDTH;
     if (/(L|J|T|S|Z|I)Tet\.png/.test(name)) { // initial tetromino position
         active_piece_initial.push(` vec2(${row}., ${column}.)`)
-        // active_piece_initial[row][column] = "G";
     } else {
         switch (name) {
             case "GTet.png": // garbage block
