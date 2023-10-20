@@ -31,7 +31,6 @@ async fn main() {
     let mut open_settings = false;
     let mut game = Game::new();
 
-
     let mut negative_1x_0y = vec![
         vec![N, N, N, N, N],
         vec![N, N, N, N, N],
@@ -44,15 +43,25 @@ async fn main() {
     negative_1x_0y.reverse();
     game.board = Box::new(Board::import(negative_1x_0y, 0));
     game.board.active_piece.tetromino = tetris::tetris::consts::Tetromino::L;
-    game.board.active_piece.dots = vec![vec2(2., 2.), vec2(2., 1.), vec2(2., 3.), vec2(1., 3.)];
-    game.board.active_piece.rotation_index = 1;
-    println!("{}", &game.board);
+    game.board.active_piece.dots = vec![vec2(2., 1.), vec2(3., 2.), vec2(1., 1.), vec2(3., 1.)];
+    game.board.active_piece.rotation_index = 0;
+    dbg!(&game.board);
     game.board.rotate_tetromino_90(true, true);
-    game.board.hard_drop();
-    println!("{}", &game.board);
-    let dest = vec![vec2(4., 1.), vec2(6., 1.), vec2(6., 2.)];
-    dbg!(&game.board.active_piece);
+    let dest = vec![vec2(1., 2.), vec2(1., 1.), vec2(1., 0.), vec2(2., 0.)];
+    dbg!(&game.board.active_piece.dots);
 
+    assert!(
+        &game.board.active_piece.dots.iter().all(|item| vec![
+            vec2(1., 2.),
+            vec2(1., 1.),
+            vec2(1., 0.),
+            vec2(2., 0.)
+        ]
+        .contains(item)),
+        "expected = {:?}\nfound = {:?}",
+        vec![vec2(1., 2.), vec2(1., 1.), vec2(1., 0.), vec2(2., 0.)],
+        &game.board.active_piece.dots
+    );
 
     loop {
         let block_size_temp = (screen_height() / (game.board.positions.len() as f32 * 1.25))

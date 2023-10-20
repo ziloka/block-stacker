@@ -18,17 +18,17 @@ const active_piece_initial = [];
 const active_piece_destination = [];
 $("div img").each((i, e) => {
     const name = $(e).attr("alt");
-    const row = Math.floor(i / WIDTH);
-    const column = i % WIDTH;
+    const y = HEIGHT - Math.floor(i / WIDTH) - 1;
+    const x = i % WIDTH;
     if (/(L|J|T|S|Z|I)Tet\.png/.test(name)) { // initial tetromino position
-        active_piece_initial.push(` vec2(${row}., ${column}.)`)
+        active_piece_initial.push(` vec2(${x}., ${y}.)`)
     } else {
         switch (name) {
             case "GTet.png": // garbage block
-                board[row][column] = "G";
+                board[x][y] = "G";
                 break;
             case "-Tet.png": // dest tetromino position
-                active_piece_destination.push(` vec2(${row}., ${column}.)`)
+                active_piece_destination.push(` vec2(${x}., ${y}.)`)
                 break;
             case "Tet.png": // empty block
                 break;
@@ -38,6 +38,7 @@ $("div img").each((i, e) => {
         }
     }
 });
+// board.reverse().map((a) => a.reverse())
 
 const format = (arr) => JSON.stringify(arr).replace(/"/g, '').replace(/\[/g, "vec![");
 

@@ -1,6 +1,7 @@
 use std::{
     fmt::{Display, Formatter},
     ops::{Add, Sub},
+    fmt::Debug
 };
 
 use crate::tetris::board;
@@ -25,6 +26,23 @@ pub struct Board {
 }
 
 impl Display for Board {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let mut board_string = String::new();
+        for row in self.positions.iter() {
+            for element in row.iter().rev() {
+                if let Some(_) = element {
+                    board_string.insert_str(0, "x");
+                } else {
+                    board_string.insert_str(0, " ");
+                }
+            }
+            board_string.insert_str(0, "\n");
+        }
+        write!(f, "{}", board_string)
+    }
+}
+
+impl Debug for Board {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         let mut board_string = String::new();
         for row in self.positions.iter() {
