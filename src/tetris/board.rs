@@ -1,10 +1,8 @@
 use std::{
+    fmt::Debug,
     fmt::{Display, Formatter},
     ops::{Add, Sub},
-    fmt::Debug
 };
-
-use crate::tetris::board;
 
 use super::{
     action::Action,
@@ -149,7 +147,8 @@ impl Board {
             previous_offset_kick: None,
         };
         if self.conflict(&piece.dots, vec2(0.0, 0.0), true) {
-            self.game_state = State::GameOver;
+            // self.game_state = State::GameOver;
+            println!("UNCOMMENT ME RIGHT NOW");
         } else {
             self.active_piece = piece;
             self.add_tetromino_preview_piece();

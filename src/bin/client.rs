@@ -31,37 +31,27 @@ async fn main() {
     let mut open_settings = false;
     let mut game = Game::new();
 
-    let mut negative_1x_0y = vec![
-        vec![N, N, N, N, N],
-        vec![N, N, N, N, N],
-        vec![N, N, N, N, N],
-        vec![G, G, N, N, N],
-        vec![G, N, N, N, N],
-        vec![G, N, N, N, N],
-        vec![G, N, N, G, N],
-    ];
-    negative_1x_0y.reverse();
-    game.board = Box::new(Board::import(negative_1x_0y, 0));
-    game.board.active_piece.tetromino = tetris::tetris::consts::Tetromino::L;
-    game.board.active_piece.dots = vec![vec2(2., 1.), vec2(3., 2.), vec2(1., 1.), vec2(3., 1.)];
-    game.board.active_piece.rotation_index = 0;
-    dbg!(&game.board);
-    game.board.rotate_tetromino_90(true, true);
-    let dest = vec![vec2(1., 2.), vec2(1., 1.), vec2(1., 0.), vec2(2., 0.)];
-    dbg!(&game.board.active_piece.dots);
+    // let mut negative_1x_0y = vec![vec![G,N,N,G,G],vec![G,N,G,G,G],vec![G,N,G,G,G],vec![G,N,N,N,N],vec![G,G,N,N,N],vec![N,N,N,N,N],vec![N,N,N,N,N]];
+    // game.board = Box::new(Board::import(negative_1x_0y, 0));
+    // game.board.active_piece.tetromino = tetris::tetris::consts::Tetromino::L;
+    // game.board.active_piece.dots = vec![ vec2(3., 4.), vec2(1., 3.), vec2(2., 3.), vec2(3., 3.)];
+    // game.board.active_piece.rotation_index = 0;
+    // game.board.rotate_tetromino_90(true, true);
+    // let dest = vec![vec2(1., 2.), vec2(1., 1.), vec2(1., 0.), vec2(2., 0.)];
+    // dbg!(&game.board.active_piece.dots);
 
-    assert!(
-        &game.board.active_piece.dots.iter().all(|item| vec![
-            vec2(1., 2.),
-            vec2(1., 1.),
-            vec2(1., 0.),
-            vec2(2., 0.)
-        ]
-        .contains(item)),
-        "expected = {:?}\nfound = {:?}",
-        vec![vec2(1., 2.), vec2(1., 1.), vec2(1., 0.), vec2(2., 0.)],
-        &game.board.active_piece.dots
-    );
+    // assert!(
+    //     &game.board.active_piece.dots.iter().all(|item| vec![
+    //         vec2(1., 2.),
+    //         vec2(1., 1.),
+    //         vec2(1., 0.),
+    //         vec2(2., 0.)
+    //     ]
+    //     .contains(item)),
+    //     "expected = {:?}\nfound = {:?}",
+    //     vec![vec2(1., 2.), vec2(1., 1.), vec2(1., 0.), vec2(2., 0.)],
+    //     &game.board.active_piece.dots
+    // );
 
     loop {
         let block_size_temp = (screen_height() / (game.board.positions.len() as f32 * 1.25))
@@ -117,20 +107,20 @@ fn modify_board_bricks(
     board: &mut Box<Board>,
     block_size: &Cell<f32>,
 ) {
-    let block_size = block_size.get();
-    let bottom_left_corner = bottom_left_corner.get();
-    let (x, y) = mouse_position();
-    let x = ((x - bottom_left_corner.x) / block_size).floor() as usize;
-    let y = ((bottom_left_corner.y - y) / block_size).floor() as usize;
-    let brick = vec![vec2(0.0, 0.0)];
+    // let block_size = block_size.get();
+    // let bottom_left_corner = bottom_left_corner.get();
+    // let (x, y) = mouse_position();
+    // let x = ((x - bottom_left_corner.x) / block_size).floor() as usize;
+    // let y = ((bottom_left_corner.y - y) / block_size).floor() as usize;
+    // let brick = vec![vec2(0.0, 0.0)];
 
-    if is_mouse_button_down(MouseButton::Left)
-        && !board.conflict(&brick, vec2(x as f32, y as f32), false)
-    {
-        board.add_brick(x, y, CUSTOM_GARBAGE);
-    } else if is_mouse_button_down(MouseButton::Right)
-        && !board.conflict(&brick, vec2(x as f32, y as f32), false)
-    {
-        board.remove_brick(x, y);
-    }
+    // if is_mouse_button_down(MouseButton::Left)
+    //     && !board.conflict(&brick, vec2(x as f32, y as f32), false)
+    // {
+    //     board.add_brick(x, y, CUSTOM_GARBAGE);
+    // } else if is_mouse_button_down(MouseButton::Right)
+    //     && !board.conflict(&brick, vec2(x as f32, y as f32), false)
+    // {
+    //     board.remove_brick(x, y);
+    // }
 }
