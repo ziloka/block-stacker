@@ -5,23 +5,6 @@ use tetris::tetris::{
     consts::{vec2, Tetromino, Vec2},
 };
 
-macro_rules! print_matrix {
-    ($matrix: expr) => {
-        let mut board_string = String::new();
-        for row in $matrix.iter() {
-            for element in row.iter().rev() {
-                if let Some(_) = element {
-                    board_string.insert_str(0, "x");
-                } else {
-                    board_string.insert_str(0, " ");
-                }
-            }
-            board_string.insert_str(0, "\n");
-        }
-        println!("{}", board_string);
-    };
-}
-
 // make sure the first element in the initial_pos is the origin cell
 fn generate(
     matrix: Vec<Vec<Option<(u8, u8, u8)>>>,
@@ -73,8 +56,6 @@ fn tetromino_j_clockwise_wallkicks() {
     );
 
     // R-> 2 (+1, -1)
-    
-
     let positive_1x_0y = vec![
         vec![0, 0, 0, 0, 0],
         vec![0, 0, 0, 0, 0],
