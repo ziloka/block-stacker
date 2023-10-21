@@ -59,7 +59,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: tetris
+          name: tetris-${{ runner.os }}-${{ runner.arch }}
           path: target/release/client.*
   publish_release:
     name: Publish release
@@ -72,8 +72,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: client
-          path: target/release
+          name: tetris-*-*
+          path: artifacts
       - name: Create release
         id: create_release
         run: |
