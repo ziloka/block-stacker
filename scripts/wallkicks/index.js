@@ -6,7 +6,19 @@
 import * as cheerio from "https://esm.sh/cheerio@0.22.0";
 const $ = cheerio.load(await Deno.readTextFile("input.txt"));
 
-function generate_test_case(table, init_rot_indx, dest_rot_index) {
+function get_rot_indx(s) {
+    if (s === "R") {
+        s = 1;
+    } else if (s === "L") {
+        s = 3;
+    }
+    return s
+}
+
+function generate_test_case(table, offset, init_rot_indx, dest_rot_index) {
+    init_rot_indx = get_rot_indx(init_rot_indx);
+    dest_rot_index = get_rot_indx(dest_rot_index);
+    
     const HEIGHT = 7;
     const WIDTH = 5;
 
@@ -53,8 +65,8 @@ function generate_test_case(table, init_rot_indx, dest_rot_index) {
 
     const format = (arr) => JSON.stringify(arr).replace(/"/g, '').replace(/\[/g, "vec![");
 
-    console.log(`// ${init_rot_indx}->${dest_rot_index}`);
-    console.log(`generate(${format(board)}, TETROMINO_TYPE, ${format(active_piece_initial)}, ${init_rot_indx}, ${format(active_piece_destination)})\n`);
+    console.log(`// ${init_rot_indx}->${dest_rot_index} ${offset}`);
+    console.log(`generate(${format(board)}, TETROMINO_TYPE, ${format(active_piece_initial)}, ${init_rot_indx}, ${format(active_piece_destination)});\n`);
     // console.trace();
 }
 
@@ -64,16 +76,16 @@ function generate_test_case(table, init_rot_indx, dest_rot_index) {
 // document.querySelector("table[style=\"text-align:center;\"]").querySelector("tr[align=\"center\"]").querySelectorAll("td[width=\"74\"]:nth-child(n+7)");
 $("table[style=\"text-align:center;\"]").each((i, tetrominoTests) => {
     // if ([1, 3].includes(i)) return;
-    console.log(`Tetromino test#${i}`);
+    // console.log(`Tetromino test#${i}`);
     $(tetrominoTests).find("tr[align=\"center\"]").each((j, row) => {
-        console.log(`On row #${j}`);
+        // console.log(`On row #${j}`);
 
         const [init_rot_indx, dest_rot_indx] = $(row).find("th").text().trim().split("⇒");
         // this finds the last two elements in each row, except for the I table(s)
         $(row).find("td:nth-child(n+7)").each((_, table) => {
             if ($(table).children().length == 0) return;
-            const offset = $(table).text();
-            generate_test_case(table, init_rot_indx, dest_rot_indx);
+            generate_test_case(table, $(table).text().trim(), init_rot_indx, dest_rot_indx);
         });
     });
+    console.log("\n");
 });
