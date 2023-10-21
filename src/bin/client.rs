@@ -85,20 +85,20 @@ fn modify_board_bricks(
     board: &mut Box<Board>,
     block_size: &Cell<f32>,
 ) {
-    // let block_size = block_size.get();
-    // let bottom_left_corner = bottom_left_corner.get();
-    // let (x, y) = mouse_position();
-    // let x = ((x - bottom_left_corner.x) / block_size).floor() as usize;
-    // let y = ((bottom_left_corner.y - y) / block_size).floor() as usize;
-    // let brick = vec![vec2(0.0, 0.0)];
+    let block_size = block_size.get();
+    let bottom_left_corner = bottom_left_corner.get();
+    let (x, y) = mouse_position();
+    let x = ((x - bottom_left_corner.x) / block_size).floor() as usize;
+    let y = ((bottom_left_corner.y - y) / block_size).floor() as usize;
+    let brick = vec![vec2(0.0, 0.0)];
 
-    // if is_mouse_button_down(MouseButton::Left)
-    //     && !board.conflict(&brick, vec2(x as f32, y as f32), false)
-    // {
-    //     board.add_brick(x, y, CUSTOM_GARBAGE);
-    // } else if is_mouse_button_down(MouseButton::Right)
-    //     && !board.conflict(&brick, vec2(x as f32, y as f32), false)
-    // {
-    //     board.remove_brick(x, y);
-    // }
+    if is_mouse_button_down(MouseButton::Left)
+        && !board.conflict(&brick, vec2(x as f32, y as f32), false)
+    {
+        board.add_brick(x, y, CUSTOM_GARBAGE);
+    } else if is_mouse_button_down(MouseButton::Right)
+        && !board.conflict(&brick, vec2(x as f32, y as f32), false)
+    {
+        board.remove_brick(x, y);
+    }
 }
