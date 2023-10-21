@@ -43,7 +43,7 @@ const G: Option<(u8, u8, u8)> = Some((0, 0, 0));
 const N: Option<(u8, u8, u8)> = None;
 
 #[test]
-fn tetromino_J_90_clockwise_wallkicks() {
+fn tetromino_j_90_clockwise_wallkicks() {
     // 0->R (-1, 0)
     generate(
         vec![
@@ -148,7 +148,7 @@ fn tetromino_J_90_clockwise_wallkicks() {
 }
 
 #[test]
-fn tetromino_L_90_clockwise_wallkicks() {
+fn tetromino_l_90_clockwise_wallkicks() {
     // 0->1 (-1, 0)
     generate(
         vec![
@@ -195,7 +195,7 @@ fn tetromino_L_90_clockwise_wallkicks() {
             vec![N, N, N, N, N],
         ],
         Tetromino::L,
-        vec![ vec2(1., 2.), vec2(1., 3.), vec2(2., 3.), vec2(1., 1.)],
+        vec![vec2(1., 2.), vec2(1., 3.), vec2(2., 3.), vec2(1., 1.)],
         1,
         vec![vec2(2., 1.), vec2(3., 1.), vec2(3., 0.), vec2(1., 1.)],
     );
@@ -270,7 +270,7 @@ fn tetromino_L_90_clockwise_wallkicks() {
 }
 
 #[test]
-fn tetromino_T_90_clockwise_wallkicks() {
+fn tetromino_t_90_clockwise_wallkicks() {
     // 0->1 (-1,-2)
     generate(
         vec![
@@ -409,7 +409,7 @@ fn tetromino_T_90_clockwise_wallkicks() {
 }
 
 #[test]
-fn tetromino_S_90_clockwise_wallkicks() {
+fn tetromino_s_90_clockwise_wallkicks() {
     // 0->1 (-1,-2)
     generate(
         vec![
@@ -492,7 +492,7 @@ fn tetromino_S_90_clockwise_wallkicks() {
         Tetromino::S,
         vec![vec2(2., 3.), vec2(3., 3.), vec2(1., 2.), vec2(2., 2.)],
         2,
-        vec![vec2(1., 1.), vec2(2., 1.), vec2(2., 0.), vec2(1., 2.),],
+        vec![vec2(1., 1.), vec2(2., 1.), vec2(2., 0.), vec2(1., 2.)],
     );
 
     // 3->0 (-1, 0)
@@ -514,7 +514,7 @@ fn tetromino_S_90_clockwise_wallkicks() {
 }
 
 #[test]
-fn tetromino_Z_90_clockwise_wallkicks() {
+fn tetromino_z_90_clockwise_wallkicks() {
     // 0->1 ( 0,-2)
     generate(
         vec![
@@ -619,4 +619,4 @@ fn tetromino_Z_90_clockwise_wallkicks() {
 }
 
 #[test]
-fn tetromino_I_90_clockwise_wallkicks() {}
+fn tetromino_i_90_clockwise_wallkicks() {}

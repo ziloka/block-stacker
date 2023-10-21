@@ -60,7 +60,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: tetris
-          path: target/release/tetris.*
+          path: target/release/client.*
   publish_release:
     name: Publish release
     if: ${{ !cancelled() && needs.build_tetris.result == 'success' }}
@@ -72,8 +72,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v3
         with:
-          name: tetris
-          path: artifacts
+          name: client
+          path: target/release
       - name: Create release
         id: create_release
         run: |

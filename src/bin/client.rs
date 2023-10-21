@@ -15,9 +15,6 @@ use tetris::{
     },
 };
 
-const G: Option<(u8, u8, u8)> = Some((105, 105, 105));
-const N: Option<(u8, u8, u8)> = None;
-
 #[main("Tetris")]
 async fn main() {
     let bottom_left_corner = Cell::new(vec2(0.0, 0.0));

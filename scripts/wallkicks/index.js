@@ -74,10 +74,10 @@ function generate_test_case(table, offset, init_rot_indx, dest_rot_index) {
 // document.querySelector("table[style=\"text-align:center;\"]").querySelector("tr[align=\"center\"]").querySelectorAll(":nth-last-child(n+2 of td[width=\"74\"])");
 // document.querySelector("table[style=\"text-align:center;\"]").querySelectorAll("tr[align=\"center\"] td:nth-child(n+7)"); 
 // document.querySelector("table[style=\"text-align:center;\"]").querySelector("tr[align=\"center\"]").querySelectorAll("td[width=\"74\"]:nth-child(n+7)");
-$("table[style=\"text-align:center;\"]").each((i, tetrominoTests) => {
+$("table[style=\"text-align:center;\"]").each((_, tetrominoTests) => {
     // if ([1, 3].includes(i)) return;
     // console.log(`Tetromino test#${i}`);
-    $(tetrominoTests).find("tr[align=\"center\"]").each((j, row) => {
+    $(tetrominoTests).find("tr[align=\"center\"]").each((_, row) => {
         // console.log(`On row #${j}`);
 
         const [init_rot_indx, dest_rot_indx] = $(row).find("th").text().trim().split("⇒");
