@@ -147,8 +147,7 @@ impl Board {
             previous_offset_kick: None,
         };
         if self.conflict(&piece.dots, vec2(0.0, 0.0), true) {
-            // self.game_state = State::GameOver;
-            println!("UNCOMMENT ME RIGHT NOW");
+            self.game_state = State::GameOver;
         } else {
             self.active_piece = piece;
             self.add_tetromino_preview_piece();
@@ -430,6 +429,7 @@ impl Board {
     fn clear_line(&mut self, row_index: usize) {
         for y in row_index..self.positions.len() as usize - 1 {
             self.positions[y] = self.positions[y + 1].clone();
+            self.positions[y + 1] = vec![None; self.positions[0].len()];
         }
     }
 
