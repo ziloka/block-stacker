@@ -43,7 +43,7 @@ const G: Option<(u8, u8, u8)> = Some((0, 0, 0));
 const N: Option<(u8, u8, u8)> = None;
 
 #[test]
-fn tetromino_j_clockwise_wallkicks() {
+fn tetromino_J_90_clockwise_wallkicks() {
     // 0->R (-1, 0)
     generate(
         vec![
@@ -148,10 +148,475 @@ fn tetromino_j_clockwise_wallkicks() {
 }
 
 #[test]
-fn tetromino_T_left_to_right_wallkicks() {}
+fn tetromino_L_90_clockwise_wallkicks() {
+    // 0->1 (-1, 0)
+    generate(
+        vec![
+            vec![G, N, G, N, G],
+            vec![G, N, N, N, N],
+            vec![G, N, N, N, N],
+            vec![G, G, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::L,
+        vec![vec2(2., 1.), vec2(1., 2.), vec2(1., 1.), vec2(3., 1.)],
+        0,
+        vec![vec2(2., 2.), vec2(1., 0.), vec2(1., 1.), vec2(1., 2.)],
+    );
+
+    // 0->1 ( 0,-2)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, G, N, G, G],
+            vec![G, G, N, N, G],
+            vec![N, N, N, N, G],
+            vec![N, N, N, G, G],
+            vec![N, N, G, G, G],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::L,
+        vec![vec2(2., 3.), vec2(1., 4.), vec2(1., 3.), vec2(3., 3.)],
+        0,
+        vec![vec2(2., 2.), vec2(3., 2.), vec2(2., 1.), vec2(2., 0.)],
+    );
+
+    // 1->2 (+1,-1)
+    generate(
+        vec![
+            vec![N, G, G, N, G],
+            vec![N, N, N, N, G],
+            vec![N, N, G, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::L,
+        vec![ vec2(1., 2.), vec2(1., 3.), vec2(2., 3.), vec2(1., 1.)],
+        1,
+        vec![vec2(2., 1.), vec2(3., 1.), vec2(3., 0.), vec2(1., 1.)],
+    );
+
+    // 1->2 (+1, 0)
+    generate(
+        vec![
+            vec![N, N, G, N, G],
+            vec![N, N, N, N, G],
+            vec![N, N, N, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::L,
+        vec![vec2(1., 1.), vec2(1., 2.), vec2(2., 2.), vec2(1., 0.)],
+        1,
+        vec![vec2(2., 1.), vec2(3., 1.), vec2(3., 0.), vec2(1., 1.)],
+    );
+
+    // 2->3 (+1,-2)
+    generate(
+        vec![
+            vec![G, G, N, N, G],
+            vec![G, G, G, N, G],
+            vec![G, G, G, N, G],
+            vec![G, N, N, N, G],
+            vec![G, N, G, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::L,
+        vec![vec2(2., 3.), vec2(1., 3.), vec2(3., 3.), vec2(3., 2.)],
+        2,
+        vec![vec2(3., 1.), vec2(2., 0.), vec2(3., 0.), vec2(3., 2.)],
+    );
+
+    // 3->0 (-1,-1)
+    generate(
+        vec![
+            vec![G, N, N, N, N],
+            vec![G, N, G, N, N],
+            vec![G, G, G, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::L,
+        vec![vec2(3., 1.), vec2(3., 2.), vec2(2., 0.), vec2(3., 0.)],
+        3,
+        vec![vec2(1., 1.), vec2(1., 0.), vec2(2., 0.), vec2(3., 0.)],
+    );
+
+    // 3->0 (-1, 0)
+    generate(
+        vec![
+            vec![G, G, N, N, N],
+            vec![G, N, N, N, N],
+            vec![G, N, G, N, N],
+            vec![G, G, G, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::L,
+        vec![vec2(3., 1.), vec2(3., 2.), vec2(2., 0.), vec2(3., 0.)],
+        3,
+        vec![vec2(1., 2.), vec2(1., 1.), vec2(2., 1.), vec2(3., 1.)],
+    );
+}
 
 #[test]
-fn tetromino_S_left_to_right_wallkicks() {}
+fn tetromino_T_90_clockwise_wallkicks() {
+    // 0->1 (-1,-2)
+    generate(
+        vec![
+            vec![G, N, G, G, G],
+            vec![G, N, N, G, G],
+            vec![G, N, G, G, G],
+            vec![G, N, N, N, N],
+            vec![G, G, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(2., 3.), vec2(2., 4.), vec2(1., 3.), vec2(3., 3.)],
+        0,
+        vec![vec2(1., 2.), vec2(1., 1.), vec2(2., 1.), vec2(1., 0.)],
+    );
+
+    // 0->1 (-1, 0)
+    generate(
+        vec![
+            vec![G, N, G, G, G],
+            vec![G, N, N, N, N],
+            vec![G, N, N, N, N],
+            vec![G, G, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(2., 1.), vec2(2., 2.), vec2(1., 1.), vec2(3., 1.)],
+        0,
+        vec![vec2(1., 2.), vec2(1., 0.), vec2(1., 1.), vec2(2., 1.)],
+    );
+
+    // 1->2 ( 0, 0)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, N, N, N, G],
+            vec![G, G, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(2., 1.), vec2(2., 2.), vec2(3., 1.), vec2(2., 0.)],
+        1,
+        vec![vec2(1., 1.), vec2(2., 1.), vec2(2., 0.), vec2(3., 1.)],
+    );
+
+    // 1->2 (+1,-1)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, N, N, N, G],
+            vec![G, N, N, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(1., 2.), vec2(1., 3.), vec2(2., 2.), vec2(1., 1.)],
+        1,
+        vec![vec2(2., 1.), vec2(3., 1.), vec2(2., 0.), vec2(1., 1.)],
+    );
+
+    // 2->3 (+1,-2)
+    generate(
+        vec![
+            vec![G, G, G, N, G],
+            vec![G, G, N, N, G],
+            vec![N, N, N, N, G],
+            vec![N, N, N, N, G],
+            vec![N, N, G, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(2., 3.), vec2(1., 3.), vec2(3., 3.), vec2(2., 2.)],
+        2,
+        vec![vec2(3., 2.), vec2(2., 1.), vec2(3., 1.), vec2(3., 0.)],
+    );
+
+    // 2->3 ( 0,-2)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, N, N, G, G],
+            vec![N, N, N, G, G],
+            vec![N, N, N, N, G],
+            vec![N, N, G, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(2., 3.), vec2(1., 3.), vec2(3., 3.), vec2(2., 2.)],
+        2,
+        vec![vec2(1., 1.), vec2(2., 1.), vec2(2., 0.), vec2(2., 2.)],
+    );
+
+    // 3->0 (-1,-1)
+    generate(
+        vec![
+            vec![G, N, N, N, G],
+            vec![G, G, N, N, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(3., 1.), vec2(3., 2.), vec2(2., 1.), vec2(3., 0.)],
+        3,
+        vec![vec2(1., 0.), vec2(2., 0.), vec2(2., 1.), vec2(3., 0.)],
+    );
+
+    // 3->0 (-1, 0)
+    generate(
+        vec![
+            vec![G, G, G, N, G],
+            vec![G, N, N, N, G],
+            vec![G, G, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::T,
+        vec![vec2(3., 1.), vec2(3., 2.), vec2(2., 1.), vec2(3., 0.)],
+        3,
+        vec![vec2(2., 2.), vec2(1., 1.), vec2(3., 1.), vec2(2., 1.)],
+    );
+}
 
 #[test]
-fn tetromino_I_left_to_right_wallkicks() {}
+fn tetromino_S_90_clockwise_wallkicks() {
+    // 0->1 (-1,-2)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, N, N, G, G],
+            vec![G, N, G, G, G],
+            vec![G, N, N, N, N],
+            vec![G, N, N, N, N],
+            vec![G, G, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::S,
+        vec![vec2(2., 3.), vec2(2., 4.), vec2(3., 4.), vec2(1., 3.)],
+        0,
+        vec![vec2(1., 2.), vec2(1., 1.), vec2(2., 1.), vec2(2., 0.)],
+    );
+
+    // 0->1 (0,-2)
+    generate(
+        vec![
+            vec![G, G, G, N, G],
+            vec![G, G, N, N, G],
+            vec![G, G, N, G, G],
+            vec![G, N, N, N, N],
+            vec![G, G, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::S,
+        vec![vec2(2., 3.), vec2(2., 4.), vec2(3., 4.), vec2(1., 3.)],
+        0,
+        vec![vec2(2., 2.), vec2(2., 1.), vec2(3., 1.), vec2(3., 0.)],
+    );
+
+    // 1->2 (+1,-1)
+    generate(
+        vec![
+            vec![G, N, N, G, G],
+            vec![G, G, N, N, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::S,
+        vec![vec2(1., 2.), vec2(1., 3.), vec2(2., 2.), vec2(2., 1.)],
+        1,
+        vec![vec2(3., 1.), vec2(1., 0.), vec2(2., 0.), vec2(2., 1.)],
+    );
+
+    // 1->2 (+1, 0)
+    generate(
+        vec![
+            vec![G, N, N, G, G],
+            vec![N, N, N, N, G],
+            vec![N, N, N, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::S,
+        vec![vec2(1., 1.), vec2(1., 2.), vec2(2., 1.), vec2(2., 0.)],
+        1,
+        vec![vec2(3., 1.), vec2(1., 0.), vec2(2., 1.), vec2(2., 0.)],
+    );
+
+    // 2->3 ( 0,-2)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, N, N, G, G],
+            vec![G, N, N, G, G],
+            vec![G, G, N, N, G],
+            vec![N, N, N, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::S,
+        vec![vec2(2., 3.), vec2(3., 3.), vec2(1., 2.), vec2(2., 2.)],
+        2,
+        vec![vec2(1., 1.), vec2(2., 1.), vec2(2., 0.), vec2(1., 2.),],
+    );
+
+    // 3->0 (-1, 0)
+    generate(
+        vec![
+            vec![G, G, G, N, G],
+            vec![G, N, N, N, G],
+            vec![G, G, N, N, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::S,
+        vec![vec2(3., 1.), vec2(2., 2.), vec2(2., 1.), vec2(3., 0.)],
+        3,
+        vec![vec2(3., 2.), vec2(1., 1.), vec2(2., 2.), vec2(2., 1.)],
+    );
+}
+
+#[test]
+fn tetromino_Z_90_clockwise_wallkicks() {
+    // 0->1 ( 0,-2)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, G, N, N, G],
+            vec![G, G, G, N, G],
+            vec![N, G, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::Z,
+        vec![vec2(2., 3.), vec2(1., 4.), vec2(2., 4.), vec2(3., 3.)],
+        0,
+        vec![vec2(3., 2.), vec2(2., 1.), vec2(3., 1.), vec2(2., 0.)],
+    );
+
+    // 0->1 ( 0, 0)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![N, N, N, N, G],
+            vec![N, N, N, N, G],
+            vec![N, N, N, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::Z,
+        vec![vec2(2., 1.), vec2(1., 2.), vec2(2., 2.), vec2(3., 1.)],
+        0,
+        vec![vec2(3., 2.), vec2(2., 0.), vec2(2., 1.), vec2(3., 1.)],
+    );
+
+    // 1->2 (+1,-1)
+    generate(
+        vec![
+            vec![G, G, N, N, G],
+            vec![G, N, N, G, G],
+            vec![G, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::Z,
+        vec![vec2(1., 2.), vec2(2., 3.), vec2(2., 2.), vec2(1., 1.)],
+        1,
+        vec![vec2(2., 1.), vec2(2., 0.), vec2(3., 0.), vec2(1., 1.)],
+    );
+
+    // 1->2 (+1, 0)
+    generate(
+        vec![
+            vec![G, N, N, N, G],
+            vec![G, N, N, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::Z,
+        vec![vec2(1., 1.), vec2(2., 2.), vec2(2., 1.), vec2(1., 0.)],
+        1,
+        vec![vec2(2., 0.), vec2(3., 0.), vec2(1., 1.), vec2(2., 1.)],
+    );
+
+    // 2->3 (+1,-2)
+    generate(
+        vec![
+            vec![G, G, N, G, G],
+            vec![G, G, N, N, G],
+            vec![G, G, N, N, G],
+            vec![G, N, N, G, G],
+            vec![G, N, N, G, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::Z,
+        vec![vec2(2., 3.), vec2(1., 3.), vec2(2., 2.), vec2(3., 2.)],
+        2,
+        vec![vec2(2., 1.), vec2(3., 1.), vec2(2., 0.), vec2(3., 2.)],
+    );
+
+    // 3->0 ( 0, 0)
+    generate(
+        vec![
+            vec![G, N, G, G, G],
+            vec![G, N, N, N, G],
+            vec![G, N, N, G, G],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+            vec![N, N, N, N, N],
+        ],
+        Tetromino::Z,
+        vec![vec2(2., 1.), vec2(2., 2.), vec2(1., 1.), vec2(1., 0.)],
+        3,
+        vec![vec2(1., 2.), vec2(3., 1.), vec2(2., 2.), vec2(2., 1.)],
+    );
+}
+
+#[test]
+fn tetromino_I_90_clockwise_wallkicks() {}
