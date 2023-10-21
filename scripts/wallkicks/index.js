@@ -6,21 +6,6 @@
 import * as cheerio from "https://esm.sh/cheerio@0.22.0";
 const $ = cheerio.load(await Deno.readTextFile("input.txt"));
 
-// {
-//     const $ = cheerio.load(`<body>
-// <table>
-// <tr><td>This is first row.</td></tr>
-// <tr><td>This is second row.</td></tr>
-// <tr><td>This is third row.</td></tr>
-// <tr><td>This is fourth row.</td></tr>
-// </table>
-// </body>`);
-//     $("tr:nth-last-child(2n)").toArray().map((e) => $(e).find("tr td").each((_, e) => {
-//         console.log($(e).text());
-//     }));
-// }
-
-
 function generate_test_case(table, init_rot_indx, dest_rot_index) {
     const HEIGHT = 7;
     const WIDTH = 5;
@@ -70,15 +55,24 @@ function generate_test_case(table, init_rot_indx, dest_rot_index) {
 
     console.log(`// ${init_rot_indx}->${dest_rot_index}`);
     console.log(`generate(${format(board)}, TETROMINO_TYPE, ${format(active_piece_initial)}, ${init_rot_indx}, ${format(active_piece_destination)})\n`);
+    // console.trace();
 }
 
 // document.querySelector("table[style=\"text-align:center;\"]").querySelector("tr[align=\"center\"]").querySelector("th").textContent 
-// document.querySelector("table[style=\"text-align:center;\"]").querySelector("tr[align=\"center\"]").querySelectorAll(":nth-last-child(-n+2 of td[width=\"74\"])");
+// document.querySelector("table[style=\"text-align:center;\"]").querySelector("tr[align=\"center\"]").querySelectorAll(":nth-last-child(n+2 of td[width=\"74\"])");
+// document.querySelector("table[style=\"text-align:center;\"]").querySelectorAll("tr[align=\"center\"] td:nth-child(n+7)"); 
+// document.querySelector("table[style=\"text-align:center;\"]").querySelector("tr[align=\"center\"]").querySelectorAll("td[width=\"74\"]:nth-child(n+7)");
 $("table[style=\"text-align:center;\"]").each((i, tetrominoTests) => {
-    if ([1, 3].includes(i)) return;
-    $(tetrominoTests).find("tr[align=\"center\"]").each((_, row) => {
+    // if ([1, 3].includes(i)) return;
+    console.log(`Tetromino test#${i}`);
+    $(tetrominoTests).find("tr[align=\"center\"]").each((j, row) => {
+        console.log(`On row #${j}`);
+
         const [init_rot_indx, dest_rot_indx] = $(row).find("th").text().trim().split("⇒");
-        $(row).find("td[width=\"74\"]:nth-last-child(-n+2)").each((_, table) => {
+        // this finds the last two elements in each row, except for the I table(s)
+        $(row).find("td:nth-child(n+7)").each((_, table) => {
+            if ($(table).children().length == 0) return;
+            const offset = $(table).text();
             generate_test_case(table, init_rot_indx, dest_rot_indx);
         });
     });
