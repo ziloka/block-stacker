@@ -1,4 +1,4 @@
-use crate::{input::Input, tetris::board::Board};
+use crate::{core::board::Board, input::Input};
 use macroquad::miniquad::date::now;
 use std::boxed::Box;
 

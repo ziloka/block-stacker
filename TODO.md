@@ -1,4 +1,7 @@
 # Implement
+
+Counter rotating I piece crashes program
+
 - Add Replay
 - 180 rotations wallkicks
 - Custom block pieces

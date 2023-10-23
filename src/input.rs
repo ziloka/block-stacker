@@ -4,9 +4,9 @@ use macroquad::{
 };
 
 use crate::{
-    history::History,
+    core::{board::Board, consts::vec2},
+    extensions::history::History,
     settings::Settings,
-    tetris::{board::Board, consts::vec2},
 };
 
 #[derive(Default)]

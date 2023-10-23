@@ -23,6 +23,15 @@ cargo watch -x run
 ```
 to achieve hot code reloading
 
+Use [Act](https://github.com/nektos/act)
+To test github actions
+```sh
+docker build --no-cache --tag ziloka/tetris:act-20.04 .
+# docker scout quickview
+act --platform ubuntu=latest=ziloka/tetris:act-20.04 --pull=false --artifact-server-path tmp/artifacts
+# act --platform ubuntu-latest=ghcr.io/catthehacker/ubuntu:rust-22.04 --artifact-server-path tmp/artifacts
+```
+
 # Inspiration taken from
 
 https://github.com/vlang/v/tree/master/examples/tetris

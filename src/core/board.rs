@@ -249,6 +249,7 @@ impl Board {
             self.rotate_tetromino_90(!clockwise, false);
             return true;
         }
+
         return false;
     }
 

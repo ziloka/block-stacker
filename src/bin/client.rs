@@ -7,12 +7,12 @@ use macroquad::{
 };
 
 use tetris::{
-    drawer::Drawer,
-    game::Game,
-    tetris::{
+    core::{
         board::Board,
         consts::{vec2, State, Vec2, CUSTOM_GARBAGE},
     },
+    drawer::Drawer,
+    game::Game,
 };
 
 #[main("Tetris")]
@@ -51,7 +51,7 @@ async fn main() {
                     drawer.draw_preview_pieces(&game.board);
                     drawer.draw_hold_piece(&game.board);
                     if let Some(action) = &game.board.last_action {
-                        drawer.draw_action_text(&game.board, action.to_string());
+                        drawer.draw_action_text(&game.board, action.as_str());
                     }
                 }
                 State::GameOver => {

@@ -25,6 +25,7 @@ jobs:
 
       - name: Install and Build 🔧
         run: |
+          chmod +x web.sh
           ./web.sh
           mkdir -p static
           mv target/wasm32-unknown-unknown/release/{index.html,client.wasm} static
