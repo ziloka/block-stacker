@@ -104,8 +104,9 @@ pub const TETROMINO_TYPES: [Tetromino; 7] = [
 ];
 
 // https://en.wikipedia.org/wiki/Tetromino
-#[derive(Clone, Copy, Debug)]
+#[derive(Default, Clone, Copy, Debug)]
 pub enum Tetromino {
+    #[default]
     I,
     J,
     L,
@@ -115,11 +116,11 @@ pub enum Tetromino {
     Z,
 }
 
-impl Default for Tetromino {
-    fn default() -> Self {
-        Tetromino::I
-    }
-}
+// impl Default for Tetromino {
+//     fn default() -> Self {
+//         Tetromino::I
+//     }
+// }
 
 impl Tetromino {
     // RGB value of color
@@ -187,28 +188,28 @@ impl Tetromino {
     pub fn find_offset_row_90(first: i8, second: i8) -> usize {
         if (first, second) == (0, 1) {
             // 0->R
-            return 0;
+            0
         } else if (first, second) == (1, 0) {
             // R->0
-            return 1;
+            1
         } else if (first, second) == (1, 2) {
             // R->2
-            return 2;
+            2
         } else if (first, second) == (2, 1) {
             // 2->R
-            return 3;
+            3
         } else if (first, second) == (2, 3) {
             // 2->L
-            return 4;
+            4
         } else if (first, second) == (3, 2) {
             // L->2
-            return 5;
+            5
         } else if (first, second) == (3, 0) {
             // L->0
-            return 6;
+            6
         } else if (first, second) == (0, 3) {
             // 0->L
-            return 7;
+            7
         } else {
             println!("first: {}, second: {}", first, second);
             unimplemented!();
@@ -353,16 +354,16 @@ impl Tetromino {
     pub fn find_offset_row_180(first: i8, second: i8) -> usize {
         if (first, second) == (0, 2) {
             // 0->L (0>>2)
-            return 0;
+            0
         } else if (first, second) == (1, 3) {
             // L->0 (1>>3)
-            return 1;
+            1
         } else if (first, second) == (2, 0) {
             // R->3 (2>>0)
-            return 2;
+            2
         } else if (first, second) == (3, 1) {
             // 3->R (3>>1)
-            return 3;
+            3
         } else {
             println!("first: {}, second: {}", first, second);
             unimplemented!();

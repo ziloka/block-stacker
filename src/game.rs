@@ -7,8 +7,8 @@ pub struct Game {
     pub input: Input,
 }
 
-impl Game {
-    pub fn new() -> Self {
+impl Default for Game {
+    fn default() -> Self {
         Self {
             board: Box::new(Board::new(now() as usize)),
             input: Input::default(),
