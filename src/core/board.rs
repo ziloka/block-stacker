@@ -112,7 +112,7 @@ impl Board {
         tetromino
             .get_structure()
             .iter()
-            .map(|pos| vec2(pos.x + board_width as f32 / 2.0, board_height - 2.0 - pos.y))
+            .map(|pos| vec2((pos.x + board_width as f32 / 2.) - 1., board_height - 2. - pos.y))
             .collect()
     }
 
@@ -233,16 +233,19 @@ impl Board {
             )
             .add(origin);
         }
+        println!("{}, {}", old_rotation_index, self.active_piece.rotation_index);
 
+        let index = Tetromino::find_offset_row_90(
+            old_rotation_index,
+            self.active_piece.rotation_index,
+        );
+        dbg!(index);
         if should_offset
             && !self.wallkick_tetromino(
                 self.active_piece
                     .tetromino
                     .get_offset_data()
-                    .get(Tetromino::find_offset_row_90(
-                        old_rotation_index,
-                        self.active_piece.rotation_index,
-                    ))
+                    .get(index)
                     .unwrap(),
             )
         {
