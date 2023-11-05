@@ -1,7 +1,9 @@
 [Four-tris wallkick tables](https://github.com/fiorescarlatto/four-tris/blob/dc08ed253e704a4a68302dfc4392b5e28ad3eccf/Tetris.au3#L3395-L3450)
 [Four-tris wallkick](https://github.com/fiorescarlatto/four-tris/blob/dc08ed253e704a4a68302dfc4392b5e28ad3eccf/Tetris.au3#L3395-L3450)
 
+[Rotation System Explanation](https://youtu.be/yIpk5TJ_uaI)
 [PieceController.cs Wallkick](https://github.com/JohnnyTurbo/LD43/blob/82de0ac5aa29f6e87d6c5417e0504d6ae7033ef6/Assets/Scripts/PieceController.cs#L297-L340)
+- [Last commit using this rotation implementation](https://github.com/ziloka/tetris/blob/5c5f836c42b0b5196fbf9b681195c9d912e901a9/src/tetris/board.rs#L173-L278)
 
 [Implementing 180 wallkicks is impossible unless you use wallkick table (cannot use offset data)](https://www.reddit.com/r/Tetris/comments/p11rtf/srs_how_can_i_convert_wall_kick_tables_to_offset/)
 

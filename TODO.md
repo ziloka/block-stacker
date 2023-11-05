@@ -1,9 +1,9 @@
 # Implement
-
-Counter rotating I piece crashes program
+~~Counter rotating I piece crashes program~~
+Counter rotating O piece crashes program
 
 when rotating I and O pieces, there must be a offset to center it
-look at [true rotations](https://harddrop.com/w/images/3/3d/SRS-pieces.png) to understand and compare it in game
+look at [true rotations](https://harddrop.com/wiki/SRS) to understand and compare it in game
 
 - Add Replay
 - 180 rotations wallkicks

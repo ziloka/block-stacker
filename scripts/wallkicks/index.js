@@ -4,7 +4,7 @@
 // given HTML table of tetrominos convert it in array representation
 // https://harddrop.com/wiki/SRS#Wall_Kick_Illustration
 import * as cheerio from "https://esm.sh/cheerio@0.22.0";
-const $ = cheerio.load(await Deno.readTextFile("input.txt"));
+const $ = cheerio.load(await Deno.readTextFile("page.html"));
 
 function get_rot_indx(s) {
     if (s === "R") {
@@ -19,8 +19,10 @@ function generate_test_case(table, offset, init_rot_indx, dest_rot_index) {
     init_rot_indx = get_rot_indx(init_rot_indx);
     dest_rot_index = get_rot_indx(dest_rot_index);
     
-    const HEIGHT = 7;
-    const WIDTH = 5;
+    // const HEIGHT = 7;
+    // const WIDTH = 5;
+    const HEIGHT = $(table).find("div").length;
+    const WIDTH = $($(table).find("div")[0]).find("img").length;
 
     // 35 elements in total
     const board = Array.from({length: HEIGHT}, () => (Array.from({length: WIDTH}, () => "N")));
@@ -40,6 +42,7 @@ function generate_test_case(table, offset, init_rot_indx, dest_rot_index) {
 
         // (6, 0), (6, 1) (6, 2), ...
         // (5, 7), (5, 6) (5, 5), ...
+        // ...
         // console.log(`x: ${x}, y: ${y} | column: ${column} row: ${row}`);
         
         if (/(L|J|T|S|Z|I)Tet\.png/.test(name)) { // initial tetromino position

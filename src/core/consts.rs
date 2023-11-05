@@ -215,7 +215,7 @@ impl Tetromino {
         }
     }
 
-    // https://tetris.wiki/Super_Rotation_System - READ THE "How Guideline SRS *Really* Works" section
+    // https://tetris.wiki/Super_Rotation_System
     // determine the rotation index of the tetromino
     // first number is the number representation, the second is how tetris.wiki refers to the tetromino states
     // returning 0 - 0 means it is in its spawn position
@@ -283,12 +283,23 @@ impl Tetromino {
                     vec2(2., -1.),
                 ], // 0->L
             ],
-            Tetromino::O => vec![vec![
-                vec2(0.0, 0.0),
-                vec2(0.0, -1.0),
-                vec2(-1.0, -1.0),
-                vec2(-1.0, 0.0),
-            ]],
+            Tetromino::O => vec![vec![  // 0->R (0->1)
+                vec2(0., 1.),
+            ], vec![ // R->0
+                vec2(0., -1.),
+            ], vec![ // R->2 (1->2)
+                vec2(1., 0.),
+            ], vec![ // 2->R
+                vec2(-1., 0.),
+            ], vec![ // 2->L (2->3)
+                vec2(0., -1.),
+            ], vec![ // L->2
+                vec2(0., 1.),
+            ], vec![ // L->0 (3->0)
+                vec2(-1., 0.),
+            ], vec![ // 0->L
+                vec2(1., 0.),
+            ],],
             _ => vec![
                 vec![
                     vec2(0., 0.),

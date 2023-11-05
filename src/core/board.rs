@@ -174,6 +174,7 @@ impl Board {
                     relative.x < 0.0 // for the left side
                  || relative.x >= self.positions[0].len() as f32 // for the right side
                  || relative.y < 0.0
+                 || relative.y >= self.positions.len() as f32
                     // for the floor (bottom)
                 ) || dont_allow_overlapping_blocks
                     && self.positions[row as usize][column as usize].is_some()
@@ -233,13 +234,12 @@ impl Board {
             )
             .add(origin);
         }
-        println!("{}, {}", old_rotation_index, self.active_piece.rotation_index);
 
         let index = Tetromino::find_offset_row_90(
             old_rotation_index,
             self.active_piece.rotation_index,
         );
-        dbg!(index);
+
         if should_offset
             && !self.wallkick_tetromino(
                 self.active_piece
