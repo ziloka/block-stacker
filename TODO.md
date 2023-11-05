@@ -2,7 +2,7 @@
 ~~Counter rotating I piece crashes program~~
 Counter rotating O piece crashes program
 
-when rotating I and O pieces, there must be a offset to center it
+when rotating the I piece, there must be a offset to center it
 look at [true rotations](https://harddrop.com/wiki/SRS) to understand and compare it in game
 
 - Add Replay
