@@ -10,6 +10,8 @@ use super::{
     generator::Generator,
 };
 
+pub type POSITIONS = Vec<Vec<Option<(u8, u8, u8)>>>;
+
 #[derive(Clone)]
 pub struct Board {
     pub game_state: State,
@@ -19,7 +21,7 @@ pub struct Board {
     generator: Generator,
     pub preview_pieces: [Tetromino; 7],
     // (0, 0) represents the bottom left corner, (WIDTH, HEIGHT) represents the top right corner
-    pub positions: Vec<Vec<Option<(u8, u8, u8)>>>,
+    pub positions: POSITIONS,
     pub last_action: Option<Action>,
 }
 
@@ -28,13 +30,13 @@ impl Display for Board {
         let mut board_string = String::new();
         for row in self.positions.iter() {
             for element in row.iter().rev() {
-                if let Some(_) = element {
-                    board_string.insert_str(0, "x");
+                if element.is_some() {
+                    board_string.insert(0, 'x');
                 } else {
-                    board_string.insert_str(0, " ");
+                    board_string.insert(0, ' ');
                 }
             }
-            board_string.insert_str(0, "\n");
+            board_string.insert(0, '\n');
         }
         write!(f, "{}", board_string)
     }
@@ -45,13 +47,13 @@ impl Debug for Board {
         let mut board_string = String::new();
         for row in self.positions.iter() {
             for element in row.iter().rev() {
-                if let Some(_) = element {
-                    board_string.insert_str(0, "x");
+                if element.is_some() {
+                    board_string.insert(0, 'x');
                 } else {
-                    board_string.insert_str(0, " ");
+                    board_string.insert(0, ' ');
                 }
             }
-            board_string.insert_str(0, "\n");
+            board_string.insert(0, '\n');
         }
         write!(f, "{}", board_string)
     }
@@ -70,7 +72,7 @@ impl Board {
             generator,
             preview_pieces: tetrominos,
             // https://stackoverflow.com/a/53930630
-            positions: positions,
+            positions,
             last_action: None,
         };
         board.set_next_tetromino_as_active_piece();
@@ -252,8 +254,7 @@ impl Board {
             self.rotate_tetromino_90(!clockwise, false);
             return true;
         }
-
-        return false;
+        false
     }
 
     pub fn rotate_tetromino_180(&mut self, should_offset: bool) -> bool {
@@ -288,7 +289,7 @@ impl Board {
             self.rotate_tetromino_180(false);
             return true;
         }
-        return false;
+        false
 
         // self.rotate_tetromino(clockwise, true)
     }
@@ -431,7 +432,7 @@ impl Board {
     }
 
     fn clear_line(&mut self, row_index: usize) {
-        for y in row_index..self.positions.len() as usize - 1 {
+        for y in row_index..self.positions.len() - 1 {
             self.positions[y] = self.positions[y + 1].clone();
             self.positions[y + 1] = vec![None; self.positions[0].len()];
         }

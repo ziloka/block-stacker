@@ -8,7 +8,7 @@ use macroquad::{
 };
 
 use crate::core::{
-    board::Board,
+    board::{Board, POSITIONS},
     consts::{vec2, Piece, Tetromino, Vec2, GRAY},
 };
 
@@ -140,7 +140,7 @@ impl<'a> Drawer<'a> {
         });
     }
 
-    pub fn draw_tetrominos(&self, positions: &Vec<Vec<Option<(u8, u8, u8)>>>) {
+    pub fn draw_tetrominos(&self, positions: &POSITIONS) {
         let block_size = self.block_size.get();
         let bottom_left_corner = self.bottom_left_corner.get();
         let debug = self.debug.get();

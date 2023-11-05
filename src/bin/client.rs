@@ -26,7 +26,7 @@ async fn main() {
         debug: &debug,
     };
     let mut open_settings = false;
-    let mut game = Game::new();
+    let mut game = Game::default();
 
     loop {
         let block_size_temp = (screen_height() / (game.board.positions.len() as f32 * 1.25))

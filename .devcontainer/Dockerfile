@@ -1,4 +1,4 @@
-FROM rust:1.72.0-bullseye
+FROM mcr.microsoft.com/vscode/devcontainers/rust:buster
 
 ENV DEBIAN_FRONTEND noninteractive
 
