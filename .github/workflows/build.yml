@@ -1,4 +1,4 @@
-# Source: https://github.com/BtbN/FFmpeg-Builds/blob/20172ca00af0bc0e554c203c559a1339da6651d0/.github/workflows/build.yml
+# Source: https://github.com/BtbN/FFmpeg-Builds/blob/7b6432add41f4f8a47592f1e1de73ca182e4cc5c/.github/workflows/build.yml
 
 name: Build Tetris
 
@@ -43,7 +43,7 @@ jobs:
   build_tetris:
     name: Build tetris
     if: ${{ ( github.event.inputs.buildOnly == 'true' && !cancelled() ) || success() }}
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
