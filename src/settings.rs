@@ -33,8 +33,8 @@ pub struct Controls {
     pub rotate_180: KeyCode,
     pub hold: KeyCode,
     pub restart: KeyCode,
-    pub undo: Vec<KeyCode>,
-    pub redo: Vec<KeyCode>,
+    pub undo: KeyCode,
+    pub redo: KeyCode,
 }
 
 enum FocusedOn {
@@ -68,8 +68,8 @@ impl Default for Settings {
                 rotate_180: KeyCode::A,
                 hold: KeyCode::C,
                 restart: KeyCode::R,
-                undo: vec![KeyCode::F4],
-                redo: vec![KeyCode::F5],
+                undo: KeyCode::F4,
+                redo: KeyCode::F5,
             },
             focused_on: None,
             subscriber_id: register_input_subscriber(),
@@ -135,32 +135,10 @@ impl Settings {
                     if ui.button(None, format!("Restart: {:?}", self.controls.restart)) {
                         self.focused_on = Some(FocusedOn::Restart);
                     }
-                    if ui.button(
-                        None,
-                        format!(
-                            "Undo: {:?}",
-                            self.controls
-                                .undo
-                                .iter()
-                                .map(|s| format!("{:?}", s))
-                                .collect::<Vec<String>>()
-                                .join(" + ")
-                        ),
-                    ) {
+                    if ui.button(None, format!("Undo: {:?}", self.controls.undo)) {
                         self.focused_on = Some(FocusedOn::Undo);
                     }
-                    if ui.button(
-                        None,
-                        format!(
-                            "Redo: {:?}",
-                            self.controls
-                                .redo
-                                .iter()
-                                .map(|s| format!("{:?}", s))
-                                .collect::<Vec<String>>()
-                                .join(" + ")
-                        ),
-                    ) {
+                    if ui.button(None, format!("Redo: {:?}", self.controls.redo)) {
                         self.focused_on = Some(FocusedOn::Redo);
                     }
                     if let Some(focused_on) = &self.focused_on {
@@ -203,10 +181,10 @@ impl Settings {
                                     self.focused_on = None
                                 }
                                 FocusedOn::Undo => {
-                                    self.controls.undo.push(keycode);
+                                    self.controls.undo = keycode;
                                 }
                                 FocusedOn::Redo => {
-                                    self.controls.redo.push(keycode);
+                                    self.controls.redo = keycode;
                                 }
                             }
                         }

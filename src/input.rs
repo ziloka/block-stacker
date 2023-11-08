@@ -85,24 +85,12 @@ impl Input {
         } else if is_key_pressed(self.settings.controls.restart) {
             board.restart(now() as usize);
             self.history.add_state(board.clone());
-        } else if self
-            .settings
-            .controls
-            .undo
-            .iter()
-            .all(|k| is_key_pressed(*k))
-        {
+        } else if is_key_pressed(self.settings.controls.undo) {
             if let Some(new_board) = self.history.undo() {
                 *board = new_board;
             }
         }
-        if self
-            .settings
-            .controls
-            .redo
-            .iter()
-            .all(|k| is_key_pressed(*k))
-        {
+        if is_key_pressed(self.settings.controls.redo) {
             if let Some(new_board) = self.history.redo() {
                 *board = new_board;
             }
