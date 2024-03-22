@@ -7,7 +7,7 @@ use macroquad::{
     time::{get_fps, get_time},
 };
 
-use crate::core::{
+use crate::core::logic::{
     board::{Board, POSITIONS},
     consts::{vec2, Piece, Tetromino, Vec2, GRAY},
 };

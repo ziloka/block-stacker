@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="Play together against friends and foes worldwide, or claim your spot on the leaderboards. If you wanna stay on top practice your openers and PCs with the practice client.">
+  <meta name="keywords" content="blox, tetris, server, block, stacking, game, online, play, singleplayer, multiplayer, tetris clone, clone, four-wide, 40 lines">
+  <meta name="author" content="AskPlays">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="white">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)"  content="#333">
+  <script defer src="/js/layout.js"></script>
+  <script async src="/js/basic.js"></script>
+  <script async src="/js/dist/script.js"></script>
+  <!-- <script src="/js/script.js"></script> -->
+  <!-- <script src="/js/lz-string.js"></script>
+  <script src="/js/base64-string.js"></script> -->
+  <link rel="preload" href="/res/icons/settings-icon.svg" as="image" type="image/svg+xml">
+  <link rel="preload" href="/Roboto-Regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link href="/style.css" rel="stylesheet">
+  <link href="/css/game.css" rel="stylesheet" />
+  <link href="/favicon.ico" rel="shortcut icon">
+  <link rel="canonical" href="https://blox.askplays.com/" />
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/res/PWA/apple-touch-icon.png">
+  <title>Blox</title>
+  <meta property="og:title" content="Blox">
+  <meta property="og:site_name" content="Blox">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://blox.askplays.com/">
+  <meta property="og:description" content="The offical Blox website - A block stacking game">
+  <meta property="og:image" content="https://blox.askplays.com/res/t-piece.png">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-SY2ERGJLWS"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-SY2ERGJLWS');
+    gtag('config', 'UA-91770481-2');
+    let displayMode = 'browser';
+    const mqStandAlone = '(display-mode: standalone)';
+    if (navigator.standalone || window.matchMedia(mqStandAlone).matches) {
+      displayMode = 'standalone';
+    }
+    gtag('set', {'display_mode': displayMode});
+  </script>
+  <script data-host="https://microanalytics.io" data-dnt="false" src="https://microanalytics.io/js/script.js" id="ZwSg9rf6GA" async defer></script>
+</head>
+<body>  
+  <a tabindex="0" class="skip-main" href="#cv">Skip To Game</a>
+  <div id="header">
+    <div>
+      <a class="top" id="play" tabindex="0">Play</a>
+      <div>
+        <a id="--100" tabindex="0">Multiplayer</a>
+        <a id="singleplayer" tabindex="0">Singleplayer</a>
+        <a id="custom" tabindex="0">Custom</a>
+        <a id="opener-practice" tabindex="0">Opener</a>
+      </div>
+    </div>
+    <div id="other-button">
+      <a class="top" id="other" tabindex="0">Other</a>
+      <div id="other-dropdown">
+      </div>
+    </div>
+    <!--<div>-->
+    <a id="leaderboard-page" tabindex="0" class="collapse">Leaderboards</a>
+    <a href="/map-maker" id="map-maker" class="collapse">Map Maker</a>
+    <a href="/about/" id="about-page" class="collapse">About</a>
+    <a href="https://discord.gg/WjtPy96nK5" target="_blank" id="discord-page" rel="noopener" class="collapse"><img style="height: 19px;" width="24.52" height="19" alt="discord logo" src="/res/Discord-Logo-White.svg"></a>
+    <!--</div>-->
+    <div>
+      <a class="top" id="account-menu" tabindex="0">Login</a>
+      <div style="display: none;" id="profile-dropdown">
+        <a href="/times" id="times-page">Times</a>
+        <a href="/account/" id="account-page">Account</a>
+        <a id="log-out" tabindex="0">Log Out</a>
+      </div>
+    </div>
+  </div>
+  <div id="container">
+    <div id="players" class="sidebar">
+      <div class="title">Players <button id="help-button" tabindex="0">?</button></div>
+      <div id="player-list"></div>
+      <div class="group" id="lobby">
+        <span class="group-header">Lobby</span>
+        <div class="group-body" id="lobby-list">
+          <button onclick="document.querySelector('#lobby-browser').style.display = 'block'; doSend('lobbies', {})" class="button">Lobby Browser</button><br/>
+          <label for="waiting-mode">Waiting Mode</label> <select id="waiting-mode" name="waiting mode">
+            <option value="0">Standard</option>
+            <option value="2">40 Lines</option>
+            <option value="7">Hyper</option>
+            <option value="3">Digger</option>
+            <option value="6">Four Wide</option>
+            <option value="1">PC Mode</option>
+            <option value="4">Survival</option>
+            <option value="5">T.A.Death</option>
+            <option value="8">T-Spin Rush</option>
+            <option value="9">T-Spin Puzzle</option>
+            <option value="10">All-Spin Puzzle</option>
+          </select><br/>
+          <button onclick="document.querySelector('#lobby-settings').style.display = 'block';" class="button">Lobby Settings</button><br/>
+          <div id="isLeader" style="display: none"><button onclick="doSend('multiStart', {});" class="button">Start Game</button><br/></div>
+          <div id="isTeams" style="display: none">
+            <!-- Team <select id="team" name="team">
+            <option value="0">No Team</option>
+            <option value="1">Red Team</option>
+            <option value="2">Blue Team</option>
+            </select><br/> -->
+            Pick a Team
+            <div class="icon-row">
+              <button id="team-red" class="icon-button"><img style="filter: url(#red-wash);" src="/res/icons/group-icon.svg" alt="Red Team" class="svg-icon" width="24" height="24"/></button>
+              <button id="team-blue" class="icon-button"><img style="filter: url(#blue-wash);" src="/res/icons/group-icon.svg" alt="Blue Team" class="svg-icon" width="24" height="24"/></button>
+            </div>
+            Team Scores:<br/>
+            Red Team: <span id="teamScore1">0</span><br/>
+            Blue Team: <span id="teamScore2">0</span><br/>
+          </div>
+        </div>
+      </div>
+      <div class="group" id="stats">
+        <span class="group-header">Stats</span>
+        <div class="group-body" id="stats-list">
+          PPS: <span id="PPS"></span><br/>
+          APM: <span id="APM"></span><br/>
+          lines: <span id="LINES"></span><br/>
+          time: <span id="TIME"></span><br/>
+          KPP: <span id="kpp"></span><br/>
+          pieces: <span id="stats-pieces"></span><br/>
+        </div>
+      </div>
+    </div>
+    <div id="modes" class="sidebar">
+      <div class="title">Modes</div>
+      <div id="mode-list">
+        <button id="default" data-mode="0">Default</button>
+        <button id="40-lines" data-mode="2">40 Lines</button>
+        <button id="digger" data-mode="3">Digger</button>
+        <button id="hyper" data-mode="7">Hyper</button>
+        <button id="four-wide" data-mode="6">Four Wide</button>
+        <button id="pc-mode" data-mode="1">PC Mode</button>
+        <button id="survival" data-mode="4">Survival</button>
+        <button id="tad" data-mode="5">The Almost Death</button>
+        <button id="tsr" data-mode="8">T-Spin Rush</button>
+        <button id="tsp" data-mode="9">T-Spin Puzzle</button>
+        <button id="asp" data-mode="10">All-Spin Puzzle</button>
+      </div>
+      <div class="group" id="single-group">
+        <span class="group-header">Singleplayer s</span>
+        <div class="group-body" id="single-s">
+          <label for="reset-time">Reset Time</label> <input name="reset-time" id="reset-time" type="number" min="0" max="10000" value="0"/><br/>
+        </div>
+      </div>
+      <div class="group" id="custom-group">
+        <span class="group-header">Custom Settings</span>
+        <div class="group-body" id="custom-settings">
+          <span id="mode-span" style="display: none;">
+            <label for="mode-select">Mode</label> <select id="mode-select" name="modes">
+              <option value="0">Default</option>
+              <option value="2">40 Lines</option>
+              <option value="7">Hyper</option>
+              <option value="3">Digger</option>
+              <option value="6">Four Wide</option>
+              <option value="1">PC Mode</option>
+              <option value="4">Survival</option>
+              <option value="5">The Almost Death</option>
+              <option value="8">T-Spin Rush</option>
+              <option value="9">T-Spin Puzzle</option>
+              <option value="10">All-Spin Puzzle</option>
+            </select><br/>
+          </span>
+          <span id="opener-span" style="display: none;">
+            <button id="btn-opener-search" class="button">Choose Opener</button><br/>
+            <label for="opener">Current Opener</label> <a href="https://docs.google.com/document/d/1-N6Q0PAbECbXZRYoa_tMKksksimQy9fqWGkQYwrCLxY/edit" target="_blank" rel="noopener" id="opener-source" title="Link to the Opener Source">(Source<span class="icon"><img src="/res/icons/launch-icon.svg" alt="Open in new tab" width="17" height="17"/></span>)</a><br/>
+            <input disabled id="opener" name="opener"/><br/>
+            <span id="variation-span" style="display: none;"><label for="variation">Variation</label> <select id="variation" name="variations"></select></span>
+            <label class="switch">Set Seed <span><input id="set-seed" type="checkbox"/><span class="slider"></span></span></label>
+            <label class="switch">Random Opener <span><input id="random-opener" type="checkbox"/><span class="slider"></span></span></label>
+            <label class="switch">Random Variation <span><input id="random-variation" type="checkbox"/><span class="slider"></span></span></label>
+            <label class="switch">Reset on finish <span><input id="reset-finish" type="checkbox"/><span class="slider"></span></span></label>
+            <label class="switch">Reset on fault <span><input id="reset-fault" type="checkbox"/><span class="slider"></span></span></label>
+            <label class="switch">PC Practice <span><input id="pc-practice" type="checkbox"/><span class="slider"></span></span></label>
+            <label for="pc-offset">nth PC</label> <input name="pc-offset" id="pc-offset" type="number" value="1" min="1" max="7"/><br/>
+            <div class="icon-row">
+              <button class="icon-button" id="mirror-opener" title="Mirror Opener"><img src="/res/icons/mirror-icon.svg" alt="Mirror Opener" class="svg-icon" width="24" height="24"/></button>
+              <button class="icon-button" id="show-opener" title="Hide Opener"><img src="/res/icons/visibility_off-icon.svg" alt="Hide Opener" class="svg-icon" width="24" height="24"/></button>
+            </div>
+            <a href="https://docs.google.com/document/d/1-N6Q0PAbECbXZRYoa_tMKksksimQy9fqWGkQYwrCLxY/edit" target="_blank" rel="noopener">Opener List<span class="icon"><img src="/res/icons/launch-icon.svg" alt="Open in new tab" width="17" height="17"/></span></a>
+          </span>
+          <label for="SPEED">Speed</label> <input name="speed" id="SPEED" type="number" min="0" max="20" value="1"/><br/>
+          <span class="hidden">Start Speed <input id="START_SPEED" type="number" min="0" max="20" value="1"/><br/></span>
+          <label class="switch">No Gravity <span><input id="nogravity" type="checkbox"/><span class="slider"></span></span></label>
+          <label for="rotation-system">Rotation System</label> <select id="rotation-system" name="rotation system">
+            <option value="SRS">SRS</option>
+            <option value="BRS">BRS</option>
+            <option value="NES">NES</option>
+            <option value="RSRS">RSRS</option>
+          </select><br/>
+          <label class="switch">All Spin <span><input id="all-spin" type="checkbox"/><span class="slider"></span></span></label>
+          <span id="board-span" style="display: none;">
+            <label for="board-width">Board Width</label> <input name="board-width" id="board-width" type="number" min="1" max="1000" value="10"/><br/>
+            <label for="board-height">Board Height</label> <input name="board-height" id="board-height" type="number" min="1" max="1000" value="20"/><br/>
+          </span>
+          <span id="lock-delay-span" style="display: none;">
+            Lock Delay <input id="lock-delay" type="number" value="600" min="1" max="10000"/><br/>
+            Lock Delay Decrease <input id="lock-delay-decrease" type="checkbox" checked/><br/>
+          </span>
+          <span id="hold-span" style="display: none;"><label class="switch">Infinite Hold <span><input id="hold-mode" type="checkbox"/><span class="slider"></span></span></label></span>
+          <span id="ai-span" style="display: none;">AI <button class="expand-effect">></button><br/>
+            <div class="effect-set">AI Type <select id="ai-mode" type="checkbox">
+                <option value="none">None</option>
+                <option value="extremely-easy">Extremely Easy</option>
+                <option value="very-easy">Very Easy</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+                <option value="extreme">Extreme</option>
+                <option value="impossible">Impossible</option>
+                <option value="match">Match</option>
+              </select><br/>
+              AI Opponents <input id="computer-count" type="number" min="1" max="100" value="1" onchange="computerCount = this.value-0;"/><br/>
+              AI Depth <input id="ai-depth" type="range" min="1" max="4" value="2"/><br/>
+              total checks <span id="total-checks">20</span><br/>(keep below 500)<br/>
+              AI Battle <input id="ai-battle" type="checkbox" min="1" max="4" value="2"/><br/>
+            </div>
+          </span>
+        </div>
+      </div>
+      <div class="group" id="pcfinder-group">
+        <span class="group-header">PC Finder</span>
+        <div class="group-body" id="pcfinder-stats">
+          Display:<br/> 
+          <span id="pcfinder-showing">No PC Found</span><br/>
+          Status:<br/>
+          <span id="pcfinder-action"></span><br/>
+          <button class="menu-button" id="pcfinder-find">Find PC</button>
+        </div>
+      </div>
+    </div>
+    <div id="main">
+      <div id="left-canvas">
+        <span id="fps"></span>
+        <!-- <span id="glfps"></span> -->
+        <canvas id="hold-canvas" width="128" height="128"></canvas>
+        <span id="cog" title="Game Settings"><img src="/res/icons/settings-icon.svg" alt="Settings Cog" width="60" height="60"/><span>Settings</span></span>
+        <span id="mobileReconnect" title="Reconnect" class="hidden">Reconnect</span>
+        <div id="attack-group">
+          <div id="attack-fade"></div>
+          <div id="attack"></div>
+        </div>
+        <canvas id="redbar-canvas"></canvas>
+      </div>
+      <div id="cv">
+        <canvas id="back-canvas" width="160" height="320"></canvas>
+        <canvas id="canvas" width="160" height="320"></canvas>
+        <div class="time-bars">
+          <div id="wait-bar"></div>
+          <div id="perma-wait-bar"></div>
+          <div id="game-timer"></div>
+        </div>
+        <div class="center-bars">
+          <div id="title-bar" class="hidden">
+            <span>Blox</span>
+            <span id="subtitle-bar" class="hidden">Click To Start</span>
+          </div>
+          <div id="start-bar" class="hidden">
+            <span>READY</span>
+            <span id="start-disconnected" class="hidden">Disconnected</span>
+          </div>
+          <div id="team-bar" class="hidden">
+            <span>Red Team Wins!</span>
+          </div>
+          <div id="win-bar" class="hidden">
+            <span>You Win!</span>
+          </div>
+          <div id="record-bar" class="hidden">
+            <span>Personal Best</span>
+          </div>
+          <div id="gameover-bar" class="hidden">
+            <span>Game Over</span>
+          </div>
+        </div>
+      </div>
+      <div id="right-canvas">
+        <span id="ping"></span>
+        <span id="mobile-chat" title="Chat"><img src="/res/icons/chat-icon.svg" alt="go to chat" width="48" height="48"><span id="chat-notification"></span></span>
+        <canvas id="queue-canvas" width="128" height="128"></canvas>
+        <span id="score"></span>
+      </div>
+    </div>
+    <div id="mobile-buttons">
+      <span id="input-restart"><img src="/res/icons/play_arrow-icon.svg" alt="start game"></span>
+      <span id="input-none"></span>
+      <span id="input-180"><img src="/res/icons/loop-icon.svg" alt="start game"></span>
+      <span id="input-hold"><img src="/res/icons/swap_horiz-icon.svg" alt="hold piece"></span>
+      <span id="input-hard"><img src="/res/icons/file_download-icon.svg" alt="hard drop"></span>
+      <span id="input-left"><img src="/res/icons/arrow_back_ios-icon.svg" alt="left"></span>
+      <span id="input-right"><img src="/res/icons/arrow_forward_ios-icon.svg" alt="right"></span>
+      <span id="input-soft"><img src="/res/icons/south-icon.svg" alt="soft drop"></span>
+      <span id="input-ccw"><img src="/res/icons/rotate_left-icon.svg" alt="rotate counter clockwise"></span>
+      <span id="input-cw"><img src="/res/icons/rotate_right-icon.svg" alt="rotate clockwise"></span>
+    </div>
+    <div id="chat">
+      <h1>Chat 
+        <button id="chat-type" tabindex="0">(global)</button>
+        <button id="close-chat" onclick="document.getElementById('chat').style.display = 'none';">X</button>
+      </h1>
+      <div id="chat-box"></div>
+      <input id="chat-input" type="text" placeholder="type here" autocomplete="off">
+      <span id="emote-button" tabindex="0"><img src="/res/icons/insert_emoticon-icon.svg" alt="emote menu" width="24" height="24"></span>
+      <div id="emote-menu">
+        <div class="title">Emotes<button class="close" id="emote-close" onclick="document.getElementById('lobby-settings').style.display = 'none';">X</button></div>
+        <div id="emotes">
+        </div>
+      </div>
+    </div>
+    <div id="aside">
+      <div id="canvi"></div>
+      <div id="iframe-container">
+        <iframe id="opener-iframe" name="opener source"></iframe>
+      </div>
+      <div id="lobby-windows">
+        <div id="lobby-browser">
+          <button class="close" id="close-lobby-browser" onclick="document.getElementById('lobby-browser').style.display = 'none';">X</button>
+          <span class="group-header">Lobby Browser</span>
+          <div id="lobbies-list">
+          </div>
+          <button id="lobby-create" class="button" onclick="doSend('createLobby', prompt('Lobby Name'))">Create Lobby</button>
+          <button id="lobby-refresh" class="button" onclick="doSend('lobbies', {});">Refresh</button>
+        </div>
+        <div id="lobby-settings">
+          <button class="close" id="close-lobby-settings" onclick="document.getElementById('lobby-settings').style.display = 'none';">X</button>
+          <span class="group-header">Lobby Settings</span>
+          <div id="lobby-group" class="input-columns">
+            <span>Lobby Name</span><input data-key="name" id="lobby-name" type="text" value="lobby"/>
+            <span>Password</span><input data-key="password" id="lobby-password" type="text" value=""/>
+            <span>Player Limit</span><input data-key="playerLimit" id="player-limit" type="number" value="0"/>
+            <span>Start Speed</span><input data-key="startSpeed" id="lobby-startSpeed" type="number" min="0" max="20000" value="1"/>
+            <span>Speed Increase</span><input data-key="speedIncrease" id="lobby-speedIncrease" type="number" min="0" max="20" value="1"/>
+            <!-- <span>Speed Limit (PPS)</span><input data-key="speedLimit" id="lobby-speedLimit" type="number" min="0" max="20" value="1"/>  -->
+            <span>Rotation System</span><select data-key="rotationSystem" id="lobby-rotationSystem" name="rotation system">
+              <option value="SRS">SRS</option>
+              <option value="BRS">BRS</option>
+              <option value="NES">NES</option>
+              <!--<option value="TGM">TGM</option>
+              <option value="CRS">CRS</option>-->
+            </select>
+            <span>Mode</span><select data-key="mode" id="lobby-mode" name="mode">
+              <option value="0">Standard</option>
+              <!--<option value="2">40 Lines</option>-->
+              <option value="1">PC Mode</option>
+              <option value="3">Digger</option>
+              <option value="4">Survival</option>
+              <option value="5">T.A.Death</option>
+              <option value="6">Four Wide</option>
+              <option value="7">Hyper</option>
+            </select>
+            <span>Teams</span><input data-key="teams" id="lobby-teams" type="checkbox"/>
+            <span>Attack Table</span><input data-key="attackTable" id="lobby-attackTable" class="table" type="text" value="0,1,2,4,2,4,6,10"/>
+            <span>Combo Table</span><input data-key="comboTable" id="lobby-comboTable"  class="table" type="text" value="0,0,1,1,1,2,2,3,3,4,4,4,5"/>
+            <span>Infinite Hold</span><input data-key="infiniteHold" id="lobby-infiniteHold" type="checkbox"/>
+            <span>Garbage Delay</span><input data-key="garbageDelay" id="lobby-garbageDelay" type="number" min="0" max="60000" value="333"/>
+            <span>Messiness (%)</span><input data-key="messiness" id="lobby-messiness" type="number" min="0" max="100" value="0"/>
+            <span>No Four Wide</span><input data-key="noFourWide" id="lobby-noFourWide" type="checkbox"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="settings-wrapper" class="popup-wrapper hidden">
+    <div id="settings">
+      <div class="title">Settings</div>
+      <div class="scroll">
+        <div class="tabheader">
+          <span id="mobile-controls" class="hidden"><button class="expand-button">Mobile Controls</button></span>
+          <span id="gamepad-controls" class="hidden"><button class="expand-button">Gamepad Controls</button></span>
+          <button class="expand-button toggled">Controls</button>
+          <button class="expand-button">Skinning</button>
+          <button class="expand-button">Visuals</button>
+          <button class="expand-button">Special Effects</button>
+          <button class="expand-button">Sound</button>
+          <button class="expand-button">Advanced</button>
+          <!--<button id="close-settings" onclick="document.getElementById('settings').style.display = 'none'; settingsMenu = false;">X</button>-->
+        </div>
+        <div class="tabcontent">
+          <div class="expand-content">
+            <span class="group-header">Mobile Controls</span>
+            Move Buttons <input type="checkbox" id="mobile-move"><br/>
+            <s>Scale Buttons</s> <input type="checkbox" disabled id="mobile-scale"><br/>
+            More Space <input type="checkbox" class="setting" id="more-space" data-key="moreSpace" value="true"><br/>
+            <button id="mobile-reset">Reset Mobile Controls</button><br/>
+          </div>
+          <div class="expand-content">
+            <span class="group-header">Gamepad Controls</span>
+            Dead Zone <input type="number" class="setting" id="deadzone" data-key="deadzone" min="0" max="100" value="50"><br/>
+            Disable Input <input type="checkbox" class="setting" id="disable-gamepad" data-key="disableGamepad" value="true"><br/>
+            <table class="controls-table">
+              <tr><th>Action</th><th>Button Number</th></tr>
+              <tr><td>Rotate CCW</td><td class="button-bind">6</button></td></tr>
+              <tr><td>Rotate CW</td><td class="button-bind">7</button></td></tr>
+              <tr><td>Rotate 180</td><td class="button-bind">2</button></td></tr>
+              <tr><td>Hold</td><td class="button-bind">1</button></td></tr>
+              <tr><td>Retry</td><td class="button-bind">3</button></td></tr>
+              <tr><td>Left</td><td class="button-bind">14</button></td></tr>
+              <tr><td>Right</td><td class="button-bind">15</button></td></tr>
+              <tr><td>Soft Drop</td><td class="button-bind">13</button></td></tr>
+              <tr><td>Hard Drop</td><td class="button-bind">0</button></td></tr>
+              <tr><td>Start Lobby</td><td class="button-bind">11</button></td></tr>
+              <tr><td>Mirror Opener</td><td class="button-bind">4</button></td></tr>
+              <tr><td>Toggle Opener</td><td class="button-bind">5</button></td></tr>
+              <!--<tr><td>Open Chat</td><td class="button-bind">-1</button></td></tr>
+              <tr><td>Cycle Variation</td><td class="button-bind">-1</button></td></tr>
+              <tr><td>PC Finder</td><td class="button-bind">-1</button></td></tr>
+              <tr><td>Toggle Focus Mode</td><td class="button-bind">-1</button></td></tr>
+              <tr><td>Undo Piece</td><td class="button-bind">-1</button></td></tr>
+              <tr><td>PC Finder (2 higher)</td><td class="button-bind">-1</button></td></tr>-->
+            </table>
+          </div>
+          <div class="expand-content" id="settings-controls">
+            <span class="group-header">Tuning</span>
+            DAS <input id="DAS" type="number" min="1" max="1000" value="150"/> ms<br/>
+            ARR <input id="ARR" type="number" min="0" max="1000" value="100"/> ms<br/>
+            Soft Drop <input id="SOFT_DROP" type="number" min="0" max="10" value="16"/> ms<br/>
+            Soft Drop DAS <input id="SOFT_DROP_DAS" type="number" min="0" max="1000" value="150"/> ms<br/>
+            Prevent Accidental Hard Drop <input id="double-hard-drop" class="setting" type="checkbox" data-key="doubleHardDrop" checked/><br/>
+            <br/>
+            <span class="group-header">Keyboard Controls</span>
+            <table class="controls-table">
+              <tr><th>Action</th><th>Key Id</th></tr>
+              <tr><td>Rotate CCW</td><td class="key-bind">KeyZ</button></td></tr>
+              <tr><td>Rotate CW</td><td class="key-bind">KeyX</button></td></tr>
+              <tr><td>Rotate 180</td><td class="key-bind">KeyC</button></td></tr>
+              <tr><td>Hold</td><td class="key-bind">ShiftLeft</button></td></tr>
+              <tr><td>Retry</td><td class="key-bind">KeyR</button></td></tr>
+              <tr><td>Left</td><td class="key-bind">ArrowLeft</button></td></tr>
+              <tr><td>Right</td><td class="key-bind">ArrowRight</button></td></tr>
+              <tr><td>Soft Drop</td><td class="key-bind">ArrowDown</button></td></tr>
+              <tr><td>Hard Drop</td><td class="key-bind">Space</button></td></tr>
+              <tr><td>Start Lobby</td><td class="key-bind">KeyG</button></td></tr>
+              <tr><td>Mirror Opener</td><td class="key-bind">KeyM</button></td></tr>
+              <tr><td>Toggle Opener</td><td class="key-bind">KeyV</button></td></tr>
+              <tr><td>Open Chat</td><td class="key-bind">Enter</button></td></tr>
+              <tr><td>Cycle Variation</td><td class="key-bind">KeyN</button></td></tr>
+              <tr><td>PC Finder</td><td class="key-bind">KeyE</button></td></tr>
+              <tr><td>Toggle Focus Mode</td><td class="key-bind">KeyQ</button></td></tr>
+              <tr><td>Undo Piece</td><td class="key-bind">ControlLeft</button></td></tr>
+              <tr><td>PC Finder (2 higher)</td><td class="key-bind">KeyT</button></td></tr>
+            </table>
+          </div>
+          <div class="expand-content">
+            <span class="group-header">Skinning</span>
+            Preset <select id="SKINS" name="skins">
+              <option value="default">Default</option>
+              <option value="jstris">Jstris</option>
+              <option value="four">FOUR</option>
+              <option value="duck">Duck</option>
+              <!--<option value="compute">Compute</option>-->
+              <option value="brackets">Brackets</option>
+              <option value="legacy">Legacy</option>
+              <option value="custom">Custom</option>
+            </select><br/>
+            <span id="custom-skin-error"></span>
+            <a href="https://docs.google.com/spreadsheets/d/1xO8DTORacMmSJAQicpJscob7WUkOVuaNH0wzkR_X194/htmlview#" target="_blank" rel="noopener">Custom Skin Link<span class="icon"><img src="/res/icons/launch-icon.svg" alt="Open in new tab" width="17" height="17"/></span></a> <input id="custom-skin"><br/>
+            <a href="https://docs.google.com/spreadsheets/d/1xO8DTORacMmSJAQicpJscob7WUkOVuaNH0wzkR_X194/htmlview#" target="_blank" rel="noopener">Custom Ghost Link<span class="icon"><img src="/res/icons/launch-icon.svg" alt="Open in new tab" width="17" height="17"/></span></a> <input id="custom-ghost"><br/>
+            Connected Skin <input id="skin-connected" class="setting" type="checkbox" data-key="skinConnected"/><br/>
+            <a href="https://you.have.fail/at/tetrioplus/" target="_blank" rel="noopener">TETR.IO skins<span class="icon"><img src="/res/icons/launch-icon.svg" alt="Open in new tab" width="17" height="17"/></span></a><br/>
+            Custom Opener Preview Colors<br/>
+            <input class="opener-preview-colors" type="color" value="#D70F37" data-color="red">
+            <input class="opener-preview-colors" type="color" value="#E35B02" data-color="orange">
+            <input class="opener-preview-colors" type="color" value="#E39F02" data-color="yellow">
+            <input class="opener-preview-colors" type="color" value="#59B101" data-color="green">
+            <input class="opener-preview-colors" type="color" value="#0F9BD7" data-color="teal">
+            <input class="opener-preview-colors" type="color" value="#2141C6" data-color="blue">
+            <input class="opener-preview-colors" type="color" value="#AF298A" data-color="purple">
+          </div>
+          <div class="expand-content">
+            <span class="group-header">Visuals</span>
+            Theme <select class="setting" id="theme" data-key="theme" name="themes">
+              <option value="dark">Dark</option>
+              <option value="night">Night</option>
+              <option value="light">Light</option>
+            </select><br/>
+            Center Play Field <input type="checkbox" class="setting" data-key="centerBoard"/><br/>
+            Show Rotation Center <input type="checkbox" class="setting" data-key="showRotationCenter"><br/>
+            Piece Locking Bar <input type="checkbox" class="setting" data-key="lockingBar" checked><br/>
+            Attack Log <input id="attack-log" class="setting" type="checkbox" data-key="attackLog" checked/><br/>
+            Segmented Attack Bar <input type="checkbox" class="setting" data-key="segmentedAttackBar" checked/><br/>
+            Lines Counter Behind Board <input type="checkbox" class="setting" data-key="behindBoard" checked/><br/>
+            Show Timer <input type="checkbox" class="setting" data-key="showTimer"/><br/>
+            Opener Preview Opacity <input type="number" class="setting" data-key="previewAlpha" min="0" max="100" value="25"/> %<br/>
+            PC Finder On-screen <input type="checkbox" class="setting" data-key="pcOnscreen" checked/><br/>
+            Bag Seperator <input type="checkbox" class="setting" data-key="bagSeperator"/><br/>
+          </div>
+          <div class="expand-content">
+            <span class="group-header">Special Effects</span>
+            Shadow <input id="SHADOW" class="effects" type="checkbox" data-key="shadow"/><br/>
+            Reverse Shadow <input id="RSHADOW" class="effects" type="checkbox" data-key="reverseShadow"/><br/>
+            Piece Shadow <input id="PSHADOW" class="effects" type="checkbox" data-key="pieceShadow"/><br/>
+            Line Clear <input id="LINE-CLEAR" class="effects" type="checkbox" data-key="lineClear" checked/><button class="expand-effect">></button><br/>
+            <div class="effect-set">
+              Time <input id="TIME-LINE" class="effect-settings" type="number"/> ms<br/>
+              Opacity Start <input id="OSTART-LINE" class="effect-settings" type="number"/><br/>
+              Opacity End <input id="OSTOP-LINE" class="effect-settings" type="number"/><br/>
+            </div>
+            Hard Drop Trail <input id="HARD-DROP-TRAIL" class="effects" type="checkbox" data-key="hardDrop"/><button class="expand-effect">></button><br/>
+            <div class="effect-set">
+              Time <input id="TIME-TRAIL" class="effect-settings" type="number"/> ms<br/>
+              Colored <input id="COLORED-TRAIL" class="effect-settings" type="checkbox"/><br/>
+              Opacity Start <input id="OSTART-TRAIL" class="effect-settings" type="number"/><br/>
+              Opacity End <input id="OSTOP-TRAIL" class="effect-settings" type="number"/><br/>
+            </div>
+            <!--Colored Trail <input id="COLORED-TRAIL" class="effects" type="checkbox"/><br/>-->
+          </div>
+          <div class="expand-content">
+            <span class="group-header">Sound</span>
+            Volume <input id="volume" min="0" max="100" value="0" type="range"/><br/>
+            Sound Effect <select id="SFX" name="sounds">
+              <option value="sonar">Sonar</option>
+            </select><br/>
+            <span class="milies">Sonar Ping by digifishmusic, CC BY 3.0, remixed, freesound.org</span><br/>
+          </div>
+          <div class="expand-content">
+            <span class="group-header">Advanced</span>
+            <!--<span title="Pixel perfect scaling">Scaling</span> <input id="scaling" type="checkbox"/><br/>-->
+            Show FPS <input id="show-fps" type="checkbox"/><br/>
+            FPS Limiter <select id="frame-limiter" name="frame-limiter">
+              <option value="0">Monitor</option>
+              <option value="1">Custom</option>
+              <option value="2">Unlimited</option>
+            </select><br/>
+            FPS Limit (Custom Only) <input id="frame-limit" type="number" value="60"/><br/>
+            Show Ping <input id="show-ping" class="setting" type="checkbox" data-key="showPing"/><br/>
+            Show Tips <input id="show-tips" class="setting" type="checkbox" data-key="showTips" checked/><br/>
+            Show Input Lag <input id="log-input-time" class="setting" type="checkbox" data-key="logInputTime"/><br/>
+            Precise Input <input id="precise-input" class="setting" type="checkbox" data-key="preciseInput" checked/><br/>
+            Performance Mode <input id="performance-mode" class="setting" type="checkbox" data-key="performanceMode"/><br/>
+            <!-- Enable WebGL <input id="webgl" class="setting" type="checkbox" data-key="webgl"/><br/> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="account-wrapper" class="hidden">
+    <div id="account">
+      <button class="close" id="close-login" onclick="document.getElementById('account-wrapper').classList.add('hidden'); account = false;">X</button>
+      <span class="group-header">Account</span><br/>
+      <p id="account-status"></p>
+      <div><label for="username">Username</label> <input id="username" type="text" name="username" autocomplete="username" placeholder="username"/></div>
+      <div><label for="password">Password</label> <input id="password" type="password" name="password" autocomplete="password" placeholder="password"/></div>
+      <button id="login">Login</button><button id="register">Register</button>
+    </div>
+  </div>
+  <div id="leaderboards-wrapper" class="popup-wrapper hidden">
+    <div id="leaderboards">
+      <button id="close-leaderboard" tabindex="0" onclick="document.getElementById('leaderboards-wrapper').classList.add('hidden');">X</button>
+      <div class="title" >Leaderboards</div>
+      <div id="leaderboard-modes">
+        <button value="2">40 Lines</button>
+        <button value="7">Hyper</button>
+        <button value="3">Digger</button>
+        <button value="6">Four Wide</button>
+        <button value="1">PC Mode</button>
+        <button value="4">Survival</button>
+        <button value="5">T.A.Death</button>
+        <button value="8">T-Spin Rush</button>
+        <button value="9">T-Spin Puzzle</button>
+        <button value="10">All-Spin Puzzle</button>
+        <span>Duplicates <input id="duplicates" type="checkbox"></span>
+      </div>
+      <span class="group-header" id="leaderboard-title">40 Lines Leaderboard</span>
+      <div id="leaderboard">
+        <table class="score-table" id="leaderboard-table">
+          <tbody id="leaderboard-content">
+            <tr id="top-row">
+              <th>Position</th>
+              <th>Player</th>
+              <th>Time</th>
+              <th>Pieces</th>
+              <th>PPS</th>
+              <th>Date</th>
+              <th>Replay</th>
+            </tr>
+          </tbody>
+        </table>
+        <div id="leaderboard-loading" class="loading"></div>
+      </div>
+    </div>
+  </div>
+  <div id="opener-search-wrapper" class="popup-wrapper hidden">
+    <div id="opener-search">
+      <div class="search"><span class="search-icon"><img src="/res/icons/search-icon.svg" alt="Open in new tab" width="17" height="17"/></span><input type="text" class="searchbar" placeholder="Type to search"/></div>
+      <div class="scroll">
+        <div id="categories">
+          <div data-category="T-spin opener">T-Spin Opener</div>
+          <div data-category="PC opener">PC Opener</div>
+          <div data-category="Fourwide">Fourwide</div>
+          <div data-category="Guaranteed First Bag">Guaranteed First Bag</div>
+          <div data-category="Competitive">Competitive</div>
+          <div data-category="First Bag TSD">First Bag TSD</div>
+          <div data-category="Air TSD">Air TSD</div>
+          <div data-category="DT">DT</div>
+          <div data-category="BT">BT</div>
+          <div data-category="TT">TT</div>
+          <div data-category="C-Spin">C-Spin</div>
+          <div data-category="STSD">STSD</div>
+          <div data-category="Trinity">Trinity</div>
+          <div data-category="STD">STD</div>
+          <div data-category="MTSD">MTSD</div>
+          <div data-category="DPC">DPC</div>
+          <div data-category="Hyper">Hyper</div>
+          <div data-category="Fin">Fin</div>
+          <div data-category="Neo">Neo</div>
+          <div data-category="Iso">Iso</div>
+          <div data-category="Meme">Meme</div>
+          <div data-category="Breaks B2B">Breaks B2B</div>
+          <div data-category="Beginner">Beginner</div>
+          <div data-category="Intermediate">Intermediate</div>
+          <div data-category="Advanced">Advanced</div>
+        </div>
+        <div class="results"></div>
+      </div>
+    </div>
+  </div>
+  <div id="help-wrapper" class="popup-wrapper hidden">
+    <div id="help">
+      <div class="title" >Help <button class="close-window" tabindex="0" onclick="document.getElementById('help-wrapper').classList.add('hidden')">X</button></div>
+      <article>
+        <div class="sections">
+          <section>
+            <h2 class="group-header">How to change Controls</h2><br/><br/>
+            <p>Step 1: Click on the settings cog.</p>
+            <div>
+              <span class="cog" title="Game Settings"><img src="/res/icons/settings-icon.svg" alt="Settings Cog" width="60" height="60"/><span>Settings</span></span>
+            </div>
+            <p>Step 2: Click the button next to the action and press the key you want to bind to that action.</p>
+            <img src="https://i.imgur.com/ZE07ySM.png" alt="Cursor opening controls section of settings menu" loading="lazy"><br/>
+          </section>
+          <section>
+            <h2 class="group-header">How to Sign Up</h2><br/><br/>
+            <p>Step 1: Click on Login Button in the Navbar</p>
+            <img src="https://i.imgur.com/krtt47w.png" alt="Cursor pressing login button" loading="lazy"><br/>
+            <p>Step 2: Enter your Information and hit the register button</p>
+            <img src="https://i.imgur.com/fnewtig.png" alt="Account login menu" loading="lazy"><br/>
+            <p>Step 3: Click the login button after confirming you have registered sucessfully</p>
+          </section>
+        </div>
+      </article>
+    </div>
+  </div>
+  <div id="player-card" class="hidden">
+    <div id="player-header">
+      <span id="player-name"></span>
+      <div id="player-stats"><span>0/0</span><span>0</span><span>0/0</span></div>
+    </div>
+    <div id="player-positions"></div>
+    <div id="player-loading"></div>
+  </div>
+  <div id="redirect" class="alert">
+    <h1>You have been redirected</h1>
+    <div>Blox has changed domain from <a>blox-server.herokuapp.com</a> to <a>blox.askplays.com</a>.<br/>Your settings have been transferred over successfully.</div>
+    <button onclick="this.parentElement.remove()">Okay</button>
+  </div>
+  <div id="wrong-url" class="alert">
+    <h1>Please use new URL if possible</h1>
+    <div>Blox has changed domain from <a>blox-server.herokuapp.com</a> to <a>blox.askplays.com</a>.<br/>Your settings have been transferred over successfully.</div>
+    <a id="redirect-url"><button>Go to new URL</button></a>
+    <button onclick="this.parentElement.remove()">Stay here</button>
+    <button onclick="localStorage.setItem('no-redirect', true); this.parentElement.remove()">Don't ask again</button>
+  </div>
+  <div class="hidden">
+    <audio id="sonar0"><source src="res/audio/sonar0.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar1"><source src="res/audio/sonar1.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar2"><source src="res/audio/sonar2.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar3"><source src="res/audio/sonar3.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar4"><source src="res/audio/sonar4.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar5"><source src="res/audio/sonar5.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar6"><source src="res/audio/sonar6.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar7"><source src="res/audio/sonar7.mp3" type="audio/mpeg"></audio>
+    <audio id="sonar8"><source src="res/audio/sonar8.mp3" type="audio/mpeg"></audio>
+  </div>
+  <div class="hidden">
+    <svg>
+      <filter id="blue-wash">
+      <feColorMatrix type="matrix" values="0 0 0 0 0   0 0 0 0 0  1 1 1 0 0  0 0 0 1 0"/>
+      </filter>
+      <filter id="red-wash">
+      <feColorMatrix type="matrix" values="1 1 1 0 0   0 0 0 0 0  0 0 0 0 0  0 0 0 1 0"/>
+      </filter>
+    </svg>
+  </div>
+</body>
+</html>

@@ -48,3 +48,6 @@ https://www.youtube.com/watch?v=yIpk5TJ_uaI
 
 After ~37 minutes 
 On windows the memory goes from 50mb to 20~15mb
+
+
+https://github.com/thesilican/tetris-ai

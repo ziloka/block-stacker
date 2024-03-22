@@ -4,9 +4,9 @@ use macroquad::{
 };
 
 use crate::{
-    core::{board::Board, consts::vec2},
+    core::logic::{board::Board, consts::vec2},
     extensions::history::History,
-    settings::Settings,
+    ui::Settings,
 };
 
 #[derive(Default)]

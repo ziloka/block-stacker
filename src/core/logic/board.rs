@@ -5,9 +5,9 @@ use std::{
 };
 
 use super::{
-    action::Action,
     consts::{vec2, Piece, State, Tetromino, Vec2},
-    generator::Generator,
+    score::Action,
+    utils::Generator,
 };
 
 pub type POSITIONS = Vec<Vec<Option<(u8, u8, u8)>>>;

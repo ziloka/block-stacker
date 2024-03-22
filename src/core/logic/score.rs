@@ -103,4 +103,36 @@ impl Action {
             }
         }
     }
+
+    // pub fn get_garbage(&self, additional: u64) -> u64 {
+    //     match *self {
+    //         Action::Single => 0,
+    //         Action::Double => 1,
+    //         Action::Triple => 2,
+    //         Action::Tetris => 4,
+    //         Action::TSpinMiniNoLines => 0,
+    //         Action::TSpinNoLines => 0,
+    //         Action::TSpinMiniSingle => 2,
+    //         Action::TSpinSingle => 2,
+    //         Action::TSpinMiniDouble => 4,
+    //         Action::TSpinDouble => 4,
+    //         Action::TSpinTriple => 6,
+    //         Action::BackToBackDifficultLineClears => {
+    //             // Action score × 1.5 (excluding soft drop and hard drop)
+    //             action_score * 1.5
+    //         }
+    //         Action::Combo => {
+    //             // 50 × combo count × level
+    //             26.
+    //         }
+    //         Action::SoftDrop => {
+    //             // 1 per cell
+    //             1.
+    //         }
+    //         Action::HardDrop => {
+    //             // 2 per cell
+    //             2.
+    //         }
+    //     }
+    // }
 }

@@ -1,6 +1,6 @@
 // https://harddrop.com/wiki/SRS#Wall_Kick_Illustration
 
-use tetris::core::{
+use tetris::core::logic::{
     board::Board,
     consts::{vec2, Tetromino, Vec2},
 };

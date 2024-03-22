@@ -3,7 +3,7 @@
 
 use std::collections::VecDeque;
 
-use crate::core::board::Board;
+use crate::core::logic::board::Board;
 
 #[derive(Default)]
 pub struct History {
